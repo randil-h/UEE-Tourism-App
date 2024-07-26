@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import tw from 'twrnc';
+import tw from '../../tailwind';
 
 const App = () => {
   return (
-    <View style={tw`flex-1 justify-center items-center bg-blue-100`}>
-      <Text style={tw`text-black text-lg`}>Hello Bimidu!</Text>
+    <View style={tw`flex-1 justify-center items-center bg-blue-500`}>
+      <Text style={tw`text-white text-lg`}>Hello, Tailwind CSS!</Text>
     </View>
   );
 };
