@@ -1,10 +1,16 @@
 module.exports = {
   content: [
-    './App.js', 
-    './src/**/*.{js,jsx,ts,tsx}'
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};
+   "./App.{js,jsx,ts,tsx}",
+   "./app/.{js,jsx,ts,tsx}",  
+   "./components/**/*.{js,jsx,ts,tsx}",
+   "./app/(tabs)/meditate.tsx"  
+ ],
+   theme: {
+     extend: {
+       fontFamily: {
+         rmono: ['SFProDisplay', 'sans-serif']
+       }
+     },
+   },
+   plugins: [],
+}
