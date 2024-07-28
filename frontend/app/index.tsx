@@ -1,9 +1,25 @@
 import { View, Text, ImageBackground, TouchableOpacity, StyleSheet } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
+import * as Font from 'expo-font';
+// @ts-ignore
+import { AppLoading } from 'expo';
 
 import openingImage from "../assets/images/kandy-lake.jpg";
 
 const App = () => {
+    const [fontsLoaded, setFontsLoaded] = useState(false);
+
+    const loadFonts = async () => {
+        await Font.loadAsync({
+            'SFProDisplay': require('../assets/fonts/SFProDisplay.ttf'),
+        });
+        setFontsLoaded(true);
+    };
+
+    if (!fontsLoaded) {
+        return <AppLoading startAsync={loadFonts} onFinish={() => setFontsLoaded(true)} />;
+    }
+
     return (
         <View style={styles.container}>
             <ImageBackground
@@ -13,6 +29,9 @@ const App = () => {
             >
                 <Text style={styles.title}>Sri Lanka</Text>
                 <Text style={styles.subtitle}>Wonder of Asia</Text>
+                <Text style={{ fontFamily: 'SFProDisplay', fontSize: 20 }}>
+                    Hello, world!
+                </Text>
                 <TouchableOpacity style={styles.button}>
                     <Text style={styles.buttonText}>Get Started</Text>
                 </TouchableOpacity>
