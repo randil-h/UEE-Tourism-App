@@ -1,6 +1,6 @@
 import React from 'react';
 
-const HomePage: React.FC = () => {
+const EventPage: React.FC = () => {
   return (
     <div>
       <h1>Home Page</h1>
@@ -8,4 +8,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage;
+export default EventPage;
