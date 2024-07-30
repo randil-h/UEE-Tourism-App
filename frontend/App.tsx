@@ -1,9 +1,11 @@
 import * as React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+// @ts-ignore
+import { MaterialCommunityIcons } from 'react-native-vector-icons';
 import { Provider as PaperProvider } from 'react-native-paper';
-import { Ionicons } from 'react-native-vector-icons';
 import MapPage from "@/frontend/app/screens/MapPage";
 import HomePage from "@/frontend/app/screens/Homepage";
 import EventPage from "@/frontend/app/screens/EventPage";
@@ -40,14 +42,15 @@ const MainTabs = () => {
                     } else if (route.name === 'Events') {
                         iconName = 'calendar';
                     } else if (route.name === 'Map') {
-                        iconName = 'compass-outline';
+                        iconName = 'map';
                     } else if (route.name === 'Itinerary') {
-                        iconName = 'list-outline';
+                        iconName = 'clipboard-list';
+
                     }
 
-                    return <Ionicons name={iconName} color={color} size={size} />;
+                    return <MaterialCommunityIcons name={iconName} color={color} size={size} />;
                 },
-                tabBarActiveTintColor: 'lime',
+                tabBarActiveTintColor: 'yellow',
                 tabBarInactiveTintColor: 'white',
                 tabBarStyle: { backgroundColor: '#474bd6' },
             })}

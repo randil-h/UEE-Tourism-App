@@ -1,10 +1,29 @@
-import * as React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+import attractions from './attractions.json';
 
-const MapPage: React.FC = () => {
+const MapPage = () => {
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Map Page</Text>
+            <MapView
+                style={styles.map}
+                initialRegion={{
+                    latitude: 7.8731,
+                    longitude: 80.7718,
+                    latitudeDelta: 2.5,
+                    longitudeDelta: 2.5,
+                }}
+            >
+                {attractions.attractions.map((attraction, index) => (
+                    <Marker
+                        key={index}
+                        coordinate={{ latitude: attraction.latitude, longitude: attraction.longitude }}
+                        title={attraction.name}
+                        description={attraction.description}
+                    />
+                ))}
+            </MapView>
         </View>
     );
 };
@@ -12,17 +31,10 @@ const MapPage: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
     },
-    title: {
-        marginTop: 30,
-        color: 'black',
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 2,
-    }
+    map: {
+        ...StyleSheet.absoluteFillObject,
+    },
 });
 
 export default MapPage;
