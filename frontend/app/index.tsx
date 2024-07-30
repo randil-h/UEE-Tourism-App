@@ -1,11 +1,9 @@
 import * as React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-// @ts-ignore
-import { MaterialCommunityIcons } from 'react-native-vector-icons';
 import { Provider as PaperProvider } from 'react-native-paper';
+import { Ionicons } from 'react-native-vector-icons'; // Updated import
 import MapPage from "@/frontend/app/screens/MapPage";
 import HomePage from "@/frontend/app/screens/Homepage";
 import EventPage from "@/frontend/app/screens/EventPage";
@@ -44,15 +42,14 @@ const MainTabs = () => {
                     } else if (route.name === 'Map') {
                         iconName = 'map';
                     } else if (route.name === 'Itinerary') {
-                        iconName = 'clipboard-list';
-
+                        iconName = 'list-outline';
                     }
 
-                    return <MaterialCommunityIcons name={iconName} color={color} size={size} />;
+                    return <Ionicons name={iconName} color={color} size={size} />;
                 },
-                tabBarActiveTintColor: 'tomato',
-                tabBarInactiveTintColor: 'gray',
-                tabBarStyle: { backgroundColor: '#ffffff' },
+                tabBarActiveTintColor: 'yellow',
+                tabBarInactiveTintColor: 'white',
+                tabBarStyle: { backgroundColor: '#474bd6' },
             })}
         >
             <Tab.Screen name="Home" component={HomePage} />
@@ -66,10 +63,10 @@ const MainTabs = () => {
 const App = () => {
     return (
         <PaperProvider>
-                <Stack.Navigator initialRouteName="Welcome">
-                    <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
-                    <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
-                </Stack.Navigator>
+            <Stack.Navigator initialRouteName="Welcome">
+                <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+            </Stack.Navigator>
         </PaperProvider>
     );
 };
