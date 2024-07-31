@@ -1,29 +1,33 @@
 import * as React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Provider as PaperProvider } from 'react-native-paper';
-import { Ionicons } from 'react-native-vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import MapPage from "@/frontend/app/screens/MapPage";
 import HomePage from "@/frontend/app/screens/Homepage";
 import EventPage from "@/frontend/app/screens/EventPage";
 import ItineraryPage from "@/frontend/app/screens/ItineraryPage";
+
+import BackgroundImage from '../assets/images/onboarding.png';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const WelcomeScreen = ({ navigation }: { navigation: any }) => {
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Sri Lanka</Text>
-            <Text style={styles.subtitle}>Wonder of Asia</Text>
-            <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.replace('Main')}
-            >
-                <Text style={styles.buttonText}>Get Started</Text>
-            </TouchableOpacity>
-        </View>
+        <ImageBackground source={BackgroundImage} style={styles.backgroundImage}>
+            <View style={styles.container}>
+                <Text style={styles.title}>Sri Lanka</Text>
+                <Text style={styles.subtitle}>Wonder of Asia</Text>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => navigation.replace('Main')}
+                >
+                    <Text style={styles.buttonText}>Get Started</Text>
+                </TouchableOpacity>
+            </View>
+        </ImageBackground>
     );
 };
 
@@ -72,13 +76,18 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
+    backgroundImage: {
+        flex: 1,
+        resizeMode: 'cover',
+    },
     container: {
+        marginTop: 45,
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
     title: {
-        marginTop: 30,
+        marginTop: 70,
         color: 'black',
         fontSize: 24,
         fontWeight: 'bold',
