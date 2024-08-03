@@ -8,6 +8,8 @@ import MapPage from "@/frontend/app/screens/MapPage";
 import HomePage from "@/frontend/app/screens/Homepage";
 import EventPage from "@/frontend/app/screens/EventPage";
 import ItineraryPage from "@/frontend/app/screens/ItineraryPage";
+import AddBlogPage from "@/frontend/app/screens/AddBlogPage";
+import {NavigationContainer} from "@react-navigation/native";
 
 import BackgroundImage from '../assets/images/onboarding.png';
 
@@ -67,10 +69,11 @@ const MainTabs = () => {
 const App = () => {
     return (
         <PaperProvider>
-            <Stack.Navigator initialRouteName="Welcome">
-                <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
-                <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
-            </Stack.Navigator>
+                <Stack.Navigator initialRouteName="Welcome">
+                    <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
+                    <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+                    <Stack.Screen name="New Blog" component={AddBlogPage} options={{headerShown : true}} />
+                </Stack.Navigator>
         </PaperProvider>
     );
 };
