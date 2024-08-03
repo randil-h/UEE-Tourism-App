@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Provider as PaperProvider } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MapPage from "@/frontend/app/screens/MapPage";
@@ -14,7 +15,7 @@ import {NavigationContainer} from "@react-navigation/native";
 import BackgroundImage from '../assets/images/onboarding.png';
 
 const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialBottomTabNavigator();
 
 const WelcomeScreen = ({ navigation }: { navigation: any }) => {
     return (
@@ -37,6 +38,10 @@ const MainTabs = () => {
     return (
         <Tab.Navigator
             initialRouteName="Home"
+            activeColor="#000000"
+            inactiveColor="#ffffff"
+            barStyle={{ backgroundColor: '#000000' }}
+            shifting={true}
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ color, size }) => {
                     let iconName;
@@ -53,15 +58,33 @@ const MainTabs = () => {
 
                     return <Ionicons name={iconName} color={color} size={size} />;
                 },
-                tabBarActiveTintColor: 'lime',
-                tabBarInactiveTintColor: 'white',
-                tabBarStyle: { backgroundColor: '#474bd6' },
+
             })}
         >
-            <Tab.Screen name="Home" component={HomePage} />
-            <Tab.Screen name="Events" component={EventPage} />
-            <Tab.Screen name="Map" component={MapPage} />
-            <Tab.Screen name="Itinerary" component={ItineraryPage} />
+            <Tab.Screen name="Home" component={HomePage} options={{
+                        tabBarLabel: 'Home',
+                        tabBarIcon: ({ color }) => (
+        <MaterialCommunityIcons name="home" color={color} size={26} />
+      ),
+    }} />
+            <Tab.Screen name="Events" component={EventPage} options={{
+                        tabBarLabel: 'Events',
+                        tabBarIcon: ({ color }) => (
+        <MaterialCommunityIcons name="calendar" color={color} size={26} />
+      ),
+    }}/>
+            <Tab.Screen name="Map" component={MapPage} options={{
+                        tabBarLabel: 'Map',
+                        tabBarIcon: ({ color }) => (
+        <MaterialCommunityIcons name="compass-outline" color={color} size={26} />
+      ),
+    }} />
+            <Tab.Screen name="Itinerary" component={ItineraryPage} options={{
+                        tabBarLabel: 'Itinerary',
+                        tabBarIcon: ({ color }) => (
+        <MaterialCommunityIcons name="format-list-bulleted" color={color} size={26} />
+      ),
+    }} />
         </Tab.Navigator>
     );
 };
