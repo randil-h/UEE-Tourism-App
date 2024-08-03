@@ -10,6 +10,7 @@ import MapPage from "@/frontend/app/screens/MapPage";
 import HomePage from "@/frontend/app/screens/Homepage";
 import EventPage from "@/frontend/app/screens/EventPage";
 import ItineraryPage from "@/frontend/app/screens/ItineraryPage";
+import AddBlogPage from "@/frontend/app/screens/AddBlogPage";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -66,10 +67,13 @@ const MainTabs = () => {
 const App = () => {
     return (
         <PaperProvider>
-            <Stack.Navigator initialRouteName="Welcome">
-                <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
-                <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
-            </Stack.Navigator>
+            <NavigationContainer>
+                <Stack.Navigator initialRouteName="Welcome">
+                    <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
+                    <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+                    <Stack.Screen name="AddBlog" component={AddBlogPage} options={{ headerShown: false }} />
+                </Stack.Navigator>
+            </NavigationContainer>
         </PaperProvider>
     );
 };
