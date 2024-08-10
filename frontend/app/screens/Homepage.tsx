@@ -1,14 +1,23 @@
 import * as React from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, FlatList, Button} from 'react-native';
-import {useEffect, useState} from "react";
-import axios from "axios";
+import {View, Text, TouchableOpacity, StyleSheet, FlatList, Button, TextInput, ScrollView} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import BlogList from "@/frontend/app/screens/components/BlogList";
 
 const HomePage: React.FC = () => {
     const navigation = useNavigation();
 
   return (
-      <View style={styles.container}>
+
+      <ScrollView contentContainerStyle={styles.container}>
+          <View style={styles.searchContainer}>
+              <Ionicons name= "search" size = {20} color = "gray" style = {styles.searchIcon}/>
+              <TextInput
+                  style={styles.search}
+                  placeholder={'Search here....'}
+                  selectionColor= 'black'
+              />
+          </View>
           <Text style={styles.title}>Home Page</Text>
           <TouchableOpacity
               style={styles.blgBttn}
@@ -16,15 +25,34 @@ const HomePage: React.FC = () => {
           >
               <Text style={styles.blgbttnText}>Add Blog</Text>
           </TouchableOpacity>
-      </View>
+          <Text style={styles.title1}>Blogs</Text>
+          <BlogList navigation={navigation}/>
+      </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        marginTop: 30
+    },
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'black',
+        borderRadius: 30,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        width: '80%',
+    },
+    search: {
+        fontSize: 16
+    },
+    searchIcon: {
+        marginRight: 10
     },
     title: {
         marginTop: 30,
@@ -33,6 +61,15 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         marginBottom: 2,
+    },
+    title1: {
+        marginTop: 10,
+        color: 'black',
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 2,
+        paddingHorizontal: 20,
+        alignSelf: 'flex-start'
     },
     blgBttn: {
         backgroundColor: 'black',

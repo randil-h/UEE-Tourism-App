@@ -13,6 +13,7 @@ import AddBlogPage from "@/frontend/app/screens/AddBlogPage";
 import {NavigationContainer} from "@react-navigation/native";
 
 import BackgroundImage from '../assets/images/onboarding.png';
+import ViewBlog from "@/frontend/app/screens/ViewBlog";
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -94,8 +95,9 @@ const App = () => {
         <PaperProvider>
                 <Stack.Navigator initialRouteName="Welcome">
                     <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
-                    <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+                    <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: true }} />
                     <Stack.Screen name="New Blog" component={AddBlogPage} options={{headerShown : true}} />
+                    <Stack.Screen name="View Blog" component={ViewBlog} options={{headerShown: true}} />
                 </Stack.Navigator>
         </PaperProvider>
     );
