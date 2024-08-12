@@ -1,12 +1,25 @@
 import * as React from 'react';
-import {ScrollView, View, Text, TouchableOpacity, StyleSheet, Alert, TextInput, Image, Platform} from 'react-native';
+import {
+    ScrollView,
+    View,
+    Text,
+    TouchableOpacity,
+    StyleSheet,
+    Alert,
+    TextInput,
+    Image,
+    Platform,
+    ActivityIndicator
+} from 'react-native';
 import {useEffect, useState} from 'react';
 import * as ImagePicker from 'expo-image-picker';
-import { RadioButton } from 'react-native-paper'; // Correct import
+import { RadioButton } from 'react-native-paper';
+import {db, collection, addDoc} from "@/frontend/firebaseConfig";
 
 const categories = ['Religious', 'Beach', 'Hiking', 'Safari']; // Define categories
 
 const AddBlogPage: React.FC = () => {
+    const [loading, setLoading] = useState(false);
     const [title, setTitle] = useState('');
     const [category, setCategory] = useState('');
     const [content, setContent] = useState('');
@@ -25,15 +38,15 @@ const AddBlogPage: React.FC = () => {
         })();
     }, []);
 
-    const handleCreateBlog = () => {
+    const handleCreateBlog = async () => {
         //set errors to false initially
         setTitleError(false);
         setContentError(false);
         //set errors to true if form isn't filled
-        if(!title){
+        if (!title) {
             setTitleError(true);
         }
-        if(!content){
+        if (!content) {
             setContentError(true);
         }
         //show error alert if there are any incompleted fields
@@ -50,13 +63,25 @@ const AddBlogPage: React.FC = () => {
             date: new Date().toISOString(),
         };
 
-        console.log('Blog created: ', newBlog);
-        Alert.alert('Success', 'Blog created successfully!');
+        setLoading(true);
 
-        setTitle('');
-        setCategory('');
-        setContent('');
-        setImages([]);
+        try {
+            await addDoc(collection(db, 'blogs'), newBlog);
+            console.log('Blog added to firebase');
+
+            //clearing the form
+            setTitle('');
+            setCategory('');
+            setContent('');
+            setImages([]);
+
+            Alert.alert('Success', 'Blog added successfully!');
+        }catch(error){
+            console.error('Error adding blog', error);
+            Alert.alert('Error', 'There was an error adding the blog.');
+        }finally {
+            setLoading(false);
+        }
     };
 
     const selectImages = async () => {
@@ -133,12 +158,16 @@ const AddBlogPage: React.FC = () => {
                 ))}
             </View>
 
-            <TouchableOpacity
-                style={styles.addBlgBttn}
-                onPress={handleCreateBlog}
-            >
-                <Text style={styles.addBlgBttnText}>Add Blog</Text>
-            </TouchableOpacity>
+            {loading? (
+                <ActivityIndicator size="large" color="black"/>
+            ): (
+                <TouchableOpacity
+                    style={styles.addBlgBttn}
+                    onPress={handleCreateBlog}
+                >
+                    <Text style={styles.addBlgBttnText}>Add Blog</Text>
+                </TouchableOpacity>
+            )}
         </ScrollView>
     );
 };
@@ -146,14 +175,14 @@ const AddBlogPage: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         padding: 20,
     },
     title: {
         color: 'black',
         fontSize: 24,
-        fontWeight: "condensedBold",
+        fontWeight: "bold",
         textAlign: 'center',
         marginBottom: 20,
     },
