@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
+      "resizeMode": "contain", 
       "backgroundColor": "#ffffff"
     },
     "ios": {
@@ -17,7 +17,8 @@
       "infoPlist": {
         "NSCameraUsageDescription": "This app need access to your camera to take photos.",
         "NSPhotoLibraryDescription": "This app needs access to your photo library to select photos."
-      }
+      },
+      "bundleIdentifier": "com.bimidugunathilake.frontend"
     },
     "android": {
       "permissions": [
