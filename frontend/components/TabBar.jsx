@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         marginHorizontal: 20,
         paddingVertical: 15,
-        borderRadius: 25,
+        borderRadius: 45,
         borderCurve: 'continuous',
         shadowColor: 'black',
         shadowOffset: {width: 0, height: 10},
