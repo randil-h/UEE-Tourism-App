@@ -26,7 +26,7 @@ const getRandomGradient = () => {
         ['#FF9966', '#FF5E62'], // Orange to red (still has a hint of red)
         ['#76B852', '#8DC26F'], // Lime green to softer green
         ['#F4C20D', '#F39C12'], // Bright yellow to orange
-        ['#E1F5C4', '#9CCC65'], // Light lime green to deeper green
+        ['#b0dc70', '#77aa3d'], // Light lime green to deeper green
         ['#FFAB40', '#FF8C00'], // Orange to darker orange
         ['#fae77a', '#e4c132'], // Very light yellow to bright yellow
         ['#F48FB1', '#F06292'], // Light fuchsia to medium fuchsia
