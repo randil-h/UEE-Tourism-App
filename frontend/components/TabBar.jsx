@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import {View, Text, TouchableOpacity, StyleSheet, StatusBar} from 'react-native'
 import React from 'react'
 import ColorList from "../components/ColorList";
 import {AntDesign, Feather, MaterialIcons} from "@expo/vector-icons";
@@ -17,6 +17,7 @@ const TabBar = ({ state, descriptors, navigation }) => {
     const greyColor = '#737373';
     return (
         <View style={styles.tabbar}>
+            <StatusBar barStyle="dark-content" />
             {state.routes.map((route, index) => {
                 const { options } = descriptors[route.key];
                 const label =
