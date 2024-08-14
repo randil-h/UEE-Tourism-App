@@ -13,27 +13,9 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
-      "infoPlist": {
-        "NSCameraUsageDescription": "This app needs access to your camera to take photos.",
-        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select photos.",
-        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show your current location on the map.",
-        "NSLocationAlwaysUsageDescription": "This app needs access to your location to show your current location on the map.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to your location to show your current location on the map.",
-        "UIBackgroundModes": [
-          "location",
-          "fetch"
-        ]
-      },
-      "bundleIdentifier": "com.bimidugunathilake.frontend"
+      "supportsTablet": true
     },
     "android": {
-      "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "ACCESS_FINE_LOCATION"
-      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -49,14 +31,6 @@
     ],
     "experiments": {
       "typedRoutes": true
-    },
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "035bb74e-cd6e-4595-9723-1ee0823fb7c2"
-      }
     }
   }
 }
