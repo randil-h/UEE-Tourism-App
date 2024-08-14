@@ -11,25 +11,29 @@ const _layout = () => {
             <Tabs.Screen
                 name="index"
                 options={{
-                    title: "Home"
+                    title: "Home",
+                    headerShown: false
                 }}
             />
             <Tabs.Screen
                 name="events"
                 options={{
-                    title: "Events"
+                    title: "Events",
+                    headerShown: false
                 }}
             />
             <Tabs.Screen
                 name="route"
                 options={{
-                    title: "Route"
+                    title: "Route",
+                    headerShown: false
                 }}
             />
             <Tabs.Screen
                 name="map"
                 options={{
-                    title: "Map"
+                    title: "Map",
+                    headerShown: false
                 }}
             />
             <Tabs.Screen
