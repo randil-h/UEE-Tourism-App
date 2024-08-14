@@ -2,12 +2,13 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import ColorList from "../components/ColorList";
 
-const Home = () => {
+const Events = () => {
     return (
         <View>
-            <ColorList color={"#57a3d8"} />
+            <ColorList color={"#68d857"} />
+
         </View>
     )
 }
 
-export default Home
+export default Events
