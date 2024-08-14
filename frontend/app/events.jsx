@@ -7,8 +7,6 @@ const Events = () => {
     return (
         <ScrollView className="mt-16">
             <View className="relative">
-                {/* StatusBar */}
-                <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
 
                 {/* Background Image or BlurView here */}
 

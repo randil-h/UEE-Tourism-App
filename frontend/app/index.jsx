@@ -1,10 +1,10 @@
-import { View, Text, StatusBar, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StatusBar, ScrollView, TextInput, TouchableOpacity, Platform } from 'react-native';
 import React, { useState } from 'react';
-import { FontAwesome, MaterialIcons } from '@expo/vector-icons'; // Importing MaterialIcons for additional icons
-import { LinearGradient } from 'expo-linear-gradient'; // Import LinearGradient
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import ColorList from "../components/ColorList";
+import { BlurView } from 'expo-blur';
 
-// Attractions array with 10 options
 const attractions = [
     { name: 'Safari', icon: 'nature' },
     { name: 'Beaches', icon: 'beach-access' },
@@ -18,87 +18,102 @@ const attractions = [
     { name: 'Shopping', icon: 'shopping-cart' },
 ];
 
-// Function to generate random slightly vibrant gradients
 const getRandomGradient = () => {
     const colors = [
-        ['#A8E063', '#56AB2F'], // Light green to deep green
-        ['#FDC830', '#F37335'], // Yellow to orange
-        ['#FF9966', '#FF5E62'], // Orange to red (still has a hint of red)
-        ['#76B852', '#8DC26F'], // Lime green to softer green
-        ['#F4C20D', '#F39C12'], // Bright yellow to orange
-        ['#b0dc70', '#77aa3d'], // Light lime green to deeper green
-        ['#FFAB40', '#FF8C00'], // Orange to darker orange
-        ['#fae77a', '#e4c132'], // Very light yellow to bright yellow
-        ['#F48FB1', '#F06292'], // Light fuchsia to medium fuchsia
-        ['#FF7043', '#FF5722'], // Vibrant orange to darker orange
+        ['#A8E063', '#56AB2F'],
+        ['#FDC830', '#F37335'],
+        ['#FF9966', '#FF5E62'],
+        ['#76B852', '#8DC26F'],
+        ['#F4C20D', '#F39C12'],
+        ['#b0dc70', '#77aa3d'],
+        ['#FFAB40', '#FF8C00'],
+        ['#fae77a', '#e4c132'],
+        ['#F48FB1', '#F06292'],
+        ['#FF7043', '#FF5722'],
     ];
-    return colors.sort(() => Math.random() - 0.5); // Shuffling the colors
+    return colors.sort(() => Math.random() - 0.5);
 };
 
 const Home = () => {
     const [searchQuery, setSearchQuery] = useState('');
-    const gradients = getRandomGradient(); // Generate and shuffle gradients once
+    const gradients = getRandomGradient();
 
     return (
-        <ScrollView className="mt-16">
-            <View className="relative">
-                {/* StatusBar */}
-                <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+        <View style={{ flex: 1 }}>
+            <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
 
-                <View className="flex flex-row justify-between px-6 py-2">
-                    <Text className="font-bold text-3xl">Home</Text>
-                    <View className="bg-blue-950 w-8 h-8 rounded-full flex justify-center items-center">
-                        <Text className="text-base text-white">BG</Text>
+            {/* BlurView for StatusBar */}
+            {Platform.OS === 'ios' && (
+                <BlurView
+                    intensity={80}
+                    tint="extraLight"
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: StatusBar.currentHeight || 50,
+                        zIndex: 1,
+                    }}
+                />
+            )}
+
+            <ScrollView contentContainerStyle={{ paddingTop: StatusBar.currentHeight || 50, marginTop: 16 }}>
+                <View style={{ position: 'relative' }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 8 }}>
+                        <Text style={{ fontWeight: 'bold', fontSize: 24 }}>Home</Text>
+                        <View style={{ backgroundColor: '#003ca5', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' }}>
+                            <Text style={{ fontSize: 14, color: '#fff' }}>BG</Text>
+                        </View>
                     </View>
-                </View>
 
-                {/* Search Bar with Icon */}
-                <View className="px-6 py-4">
-                    <View className="flex flex-row items-center bg-gray-200 p-3 rounded-full">
-                        <TextInput
-                            value={searchQuery}
-                            onChangeText={setSearchQuery}
-                            placeholder="Search..."
-                            placeholderTextColor="#75808c"
-                            className="flex-1 pl-2 placeholder:font-medium"
-                            style={{ fontSize: 16, textAlignVertical: 'center' }}
-                        />
+                    {/* Search Bar with Icon */}
+                    <View style={{ paddingHorizontal: 24, paddingVertical: 16 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#e0e0e0', padding: 12, borderRadius: 25 }}>
+                            <TextInput
+                                value={searchQuery}
+                                onChangeText={setSearchQuery}
+                                placeholder="Search..."
+                                placeholderTextColor="#75808c"
+                                style={{ flex: 1, fontSize: 16, textAlignVertical: 'center' }}
+                            />
+                            <TouchableOpacity>
+                                <FontAwesome name="search" size={18} color="#75808c" style={{ marginLeft: 10 }} />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
+                    {/* Title and See More Button */}
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingTop: 16 }}>
+                        <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Popular Attractions</Text>
                         <TouchableOpacity>
-                            <FontAwesome name="search" size={18} color="#75808c" style={{ marginLeft: 10, marginEnd: 8 }} />
+                            <Text style={{ color: '#2475ff', fontWeight: '500' }}>See More</Text>
                         </TouchableOpacity>
                     </View>
+
+                    {/* Tourist Attractions - Horizontally Scrollable View */}
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: 24, paddingVertical: 16 }}>
+                        {attractions.map((attraction, index) => {
+                            const gradient = gradients[index % gradients.length];
+                            return (
+                                <View key={index} style={{ alignItems: 'center', marginRight: 16 }}>
+                                    <LinearGradient
+                                        colors={gradient}
+                                        style={{ width: 64, height: 64, borderRadius: 32, justifyContent: 'center', alignItems: 'center' }}
+                                    >
+                                        <MaterialIcons name={attraction.icon} size={24} color="#fff" />
+                                    </LinearGradient>
+                                    <Text style={{ marginTop: 8, fontSize: 12, fontWeight: '500', textAlign: 'center' }}>{attraction.name}</Text>
+                                </View>
+                            );
+                        })}
+                    </ScrollView>
+
+                    {/* ColorList Component */}
+                    <ColorList color="#60a5fa" />
                 </View>
-
-                {/* Title and See More Button */}
-                <View className="flex flex-row justify-between items-center px-6 pt-4">
-                    <Text className="font-bold text-xl">Popular Attractions</Text>
-                    <TouchableOpacity>
-                        <Text className="text-blue-500 font-medium">See More</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Tourist Attractions - Horizontally Scrollable View */}
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-6 py-4">
-                    {attractions.map((attraction, index) => {
-                        const gradient = gradients[index % gradients.length];
-                        return (
-                            <View key={index} className="flex items-center mr-4">
-                                <LinearGradient
-                                    colors={gradient}
-                                    className="w-16 h-16 rounded-full flex items-center justify-center"
-                                >
-                                    <MaterialIcons name={attraction.icon} size={24} color="#fff" />
-                                </LinearGradient>
-                                <Text className="mt-2 text-sm font-medium text-center">{attraction.name}</Text>
-                            </View>
-                        );
-                    })}
-                </ScrollView>
-
-                {/* ColorList Component */}
-                <ColorList color="#57a3d8" />
-            </View>
-        </ScrollView>
+            </ScrollView>
+        </View>
     );
 }
 
