@@ -21,16 +21,16 @@ const attractions = [
 // Function to generate random slightly vibrant gradients
 const getRandomGradient = () => {
     const colors = [
-        ['#FF7E5F', '#FD3A69'], // Vibrant red-orange
-        ['#6A82FB', '#FC5C7D'], // Blue to pink gradient
-        ['#6DD5ED', '#2193B0'], // Light blue to deep blue
         ['#A8E063', '#56AB2F'], // Light green to deep green
         ['#FDC830', '#F37335'], // Yellow to orange
-        ['#FF9966', '#FF5E62'], // Orange to red
-        ['#00C9FF', '#92FE9D'], // Cyan to green
-        ['#8E2DE2', '#4A00E0'], // Deep purple to lighter purple
-        ['#FE8C00', '#F83600'], // Orange to deep red-orange
+        ['#FF9966', '#FF5E62'], // Orange to red (still has a hint of red)
         ['#76B852', '#8DC26F'], // Lime green to softer green
+        ['#F4C20D', '#F39C12'], // Bright yellow to orange
+        ['#E1F5C4', '#9CCC65'], // Light lime green to deeper green
+        ['#FFAB40', '#FF8C00'], // Orange to darker orange
+        ['#F5F3C1', '#F9E79F'], // Very light yellow to bright yellow
+        ['#F48FB1', '#F06292'], // Light fuchsia to medium fuchsia
+        ['#FF7043', '#FF5722'], // Vibrant orange to darker orange
     ];
     return colors.sort(() => Math.random() - 0.5); // Shuffling the colors
 };
