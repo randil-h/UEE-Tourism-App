@@ -20,7 +20,7 @@ const TabBarButton = (props) => {
         const scaleValue = interpolate(
             scale.value,
             [0, 1],
-            [1, 1.4]
+            [1, 1.2]
         );
         const top = interpolate(
             scale.value,
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        gap: 4
+        gap: 4,
     }
 })
 
