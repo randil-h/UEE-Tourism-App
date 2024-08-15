@@ -65,9 +65,6 @@ const styles = StyleSheet.create({
     container: {
         position: 'absolute',
         bottom: 20,
-        borderStyle: 'solid',
-        borderWidth: 1,
-        borderColor: '#aaaaaa',
         left: 15,
         right: 15,
         borderRadius: 45,

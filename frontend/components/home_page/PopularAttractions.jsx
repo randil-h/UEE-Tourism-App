@@ -1,4 +1,4 @@
-import {View, Text, ScrollView} from 'react-native'
+import {View, Text, ScrollView, TouchableOpacity} from 'react-native'
 import React from 'react'
 
 import { MaterialIcons} from "@expo/vector-icons";
@@ -37,23 +37,32 @@ const PopularAttractions = () => {
     const gradients = getRandomGradient();
 
     return (
+     <View>
+         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingTop: 16 }}>
+             <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Popular Attractions</Text>
+             <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}>
+                 <Text style={{ color: '#2475ff', fontWeight: '500' }}>See More</Text>
+                 <Text style={{ color: '#2475ff', marginLeft: 4 }}>{'\u2192'}</Text>
+             </TouchableOpacity>
+         </View>
+         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: 24, paddingVertical: 16 }}>
+             {popular_attraction_categories.map((attraction, index) => {
+                 const gradient = gradients[index % gradients.length];
+                 return (
+                     <View key={index} style={{ alignItems: 'center', marginRight: 16 }}>
+                         <LinearGradient
+                             colors={gradient}
+                             style={{ width: 64, height: 64, borderRadius: 32, justifyContent: 'center', alignItems: 'center' }}
+                         >
+                             <MaterialIcons name={attraction.icon} size={24} color="#fff" />
+                         </LinearGradient>
+                         <Text style={{ marginTop: 8, fontSize: 12, fontWeight: '500', textAlign: 'center' }}>{attraction.name}</Text>
+                     </View>
+                 );
+             })}
+         </ScrollView>
+     </View>
 
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: 24, paddingVertical: 16 }}>
-        {popular_attraction_categories.map((attraction, index) => {
-            const gradient = gradients[index % gradients.length];
-            return (
-                <View key={index} style={{ alignItems: 'center', marginRight: 16 }}>
-                    <LinearGradient
-                        colors={gradient}
-                        style={{ width: 64, height: 64, borderRadius: 32, justifyContent: 'center', alignItems: 'center' }}
-                    >
-                        <MaterialIcons name={attraction.icon} size={24} color="#fff" />
-                    </LinearGradient>
-                    <Text style={{ marginTop: 8, fontSize: 12, fontWeight: '500', textAlign: 'center' }}>{attraction.name}</Text>
-                </View>
-            );
-        })}
-    </ScrollView>
     )
 }
 

@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import ColorList from "../components/test_components/ColorList";
 import { BlurView } from 'expo-blur';
 import PopularAttractions from "../components/home_page/PopularAttractions";
+import Blogs from "../components/home_page/Blogs";
 
 const Home = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -54,18 +55,11 @@ const Home = () => {
                         </View>
                     </View>
 
-                    {/* Title and See More Button */}
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingTop: 16 }}>
-                        <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Popular Attractions</Text>
-                        <TouchableOpacity>
-                            <Text style={{ color: '#2475ff', fontWeight: '500' }}>See More</Text>
-                        </TouchableOpacity>
-                    </View>
 
-<PopularAttractions/>
 
-                    {/* ColorList Component */}
-                    <ColorList color="#60a5fa" />
+                    <PopularAttractions/>
+                    <Blogs/>
+
                 </View>
             </ScrollView>
         </View>
