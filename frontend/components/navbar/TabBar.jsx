@@ -5,7 +5,7 @@ import { BlurView } from 'expo-blur'; // Import BlurView
 import TabBarButton from './TabBarButton';
 
 const TabBar = ({ state, descriptors, navigation }) => {
-    const primaryColor = '#6b9a17';
+    const primaryColor = '#ff6a00';
     const greyColor = '#737373';
 
     return (
@@ -65,6 +65,9 @@ const styles = StyleSheet.create({
     container: {
         position: 'absolute',
         bottom: 20,
+        borderStyle: 'solid',
+        borderWidth: 1,
+        borderColor: '#aaaaaa',
         left: 15,
         right: 15,
         borderRadius: 45,

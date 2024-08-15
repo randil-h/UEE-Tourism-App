@@ -1,5 +1,5 @@
 
-import ColorList from "../components/ColorList";
+import ColorList from "../components/test_components/ColorList";
 
 
 import React, { useEffect, useState } from 'react';
@@ -7,7 +7,7 @@ import { StyleSheet, View, Alert, Text } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import Slider from '@react-native-community/slider';
-import attractions from './attractions.json';
+import attractions from '../assets/data_scripts/attractions.json';
 
 const Map = () => {
 
