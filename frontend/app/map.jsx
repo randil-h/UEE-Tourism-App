@@ -1,16 +1,13 @@
-
-import ColorList from "../components/test_components/ColorList";
-
-
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Alert, Text } from 'react-native';
+import { StyleSheet, View, Alert, Text, Image } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import Slider from '@react-native-community/slider';
+import { BlurView } from 'expo-blur';
 import attractions from '../assets/data_scripts/attractions.json';
+import ColorList from "../components/test_components/ColorList";
 
 const Map = () => {
-
     const [location, setLocation] = useState(null);
     const [radius, setRadius] = useState(5); // default to 5 km
     const [filteredAttractions, setFilteredAttractions] = useState([]);
@@ -39,10 +36,8 @@ const Map = () => {
                 Alert.alert('Location permission denied');
                 return;
             }
-
             getCurrentLocation();
         };
-
         requestLocationPermission();
     }, []);
 
@@ -79,7 +74,7 @@ const Map = () => {
     };
 
     return (
-        <View>
+        <View style={styles.container}>
             <ColorList color={"#d8b357"} />
             <MapView
                 style={styles.map}
@@ -89,8 +84,8 @@ const Map = () => {
                     latitudeDelta: 2.5,
                     longitudeDelta: 2.5,
                 }}
-                showsUserLocation={true}  // Shows the blue dot for the user's location
-                followsUserLocation={true}  // Keeps the map centered on the user's location
+                showsUserLocation={true}
+                followsUserLocation={true}
             >
                 {filteredAttractions.map((attraction, index) => (
                     <Marker
@@ -98,11 +93,12 @@ const Map = () => {
                         coordinate={{ latitude: attraction.latitude, longitude: attraction.longitude }}
                         title={attraction.name}
                         description={attraction.description}
-                    />
+                    >
+                        <Image source={require('../assets/icons/MapPin2.png')} style={{height: 35, width:35 }} />
+                    </Marker>
                 ))}
             </MapView>
-            <View style={styles.sliderContainer}>
-                <Text>Radius: {radius} km</Text>
+            <BlurView intensity={60} style={styles.sliderContainer}>
                 <Slider
                     style={styles.slider}
                     minimumValue={10}
@@ -110,14 +106,15 @@ const Map = () => {
                     step={1}
                     value={radius}
                     onValueChange={(value) => setRadius(value)}
-                    minimumTrackTintColor="#1EB1FC"
-                    maximumTrackTintColor="#d3d3d3"
-                    thumbTintColor="#1EB1FC"
+                    minimumTrackTintColor="#3f51b5"
+                    maximumTrackTintColor="rgba(255, 255, 255, 0.8)"
+                    thumbTintColor="#3f51b5"
                 />
-            </View>
+                <Text style={styles.sliderValue}>{radius} km</Text>
+            </BlurView>
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -131,19 +128,30 @@ const styles = StyleSheet.create({
         bottom: 120,
         left: 20,
         right: 20,
-        backgroundColor: 'white',
-        padding: 10,
-        borderRadius: 10,
-        elevation: 3,
+        padding: 16,
+        borderRadius: 16,
+        overflow: 'hidden',
+        borderColor: 'rgba(255, 255, 255, 0.5)',
+        borderWidth: 1,
     },
     slider: {
         width: '100%',
         height: 40,
     },
+    sliderText: {
+        color: 'black',
+        fontSize: 16,
+        marginBottom: 8
+    },
+    sliderValue: {
+        textAlign: 'center',
+        marginTop: 8,
+        fontSize: 16,
+        color: 'white',
+        textShadowColor: 'rgba(0, 0, 0, 0.75)',
+        textShadowOffset: {width: -1, height: 1},
+        textShadowRadius: 10
+    },
 });
 
-
-export default Map
-
-
-
+export default Map;
