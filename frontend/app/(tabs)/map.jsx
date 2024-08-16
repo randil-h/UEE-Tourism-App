@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     },
     sliderContainer: {
         position: 'absolute',
-        bottom: 120,
+        bottom: 30,
         left: 20,
         right: 20,
         padding: 16,
