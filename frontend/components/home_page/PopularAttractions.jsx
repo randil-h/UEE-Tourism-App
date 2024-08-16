@@ -45,7 +45,7 @@ const PopularAttractions = () => {
                  <Text style={{ color: '#2475ff', marginLeft: 4 }}>{'\u2192'}</Text>
              </TouchableOpacity>
          </View>
-         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: 24, paddingVertical: 16 }}>
+         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: 24, paddingVertical: 16, paddingEnd: 48}}>
              {popular_attraction_categories.map((attraction, index) => {
                  const gradient = gradients[index % gradients.length];
                  return (

@@ -10,10 +10,10 @@ const Blogs = () => {
     ];
 
     return (
-        <View>
+        <View >
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingTop: 16 }}>
                 <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Recent Blogs</Text>
-                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <TouchableOpacity onPress={() => navigate('/blogs/allBlogs')} style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Text style={{ color: '#2475ff', fontWeight: '500' }}>See More</Text>
                     <Text style={{ color: '#2475ff', marginLeft: 4 }}>{'\u2192'}</Text>
                 </TouchableOpacity>
