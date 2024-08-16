@@ -1,6 +1,6 @@
 import {View, Text, StatusBar, TextInput, TouchableOpacity, ScrollView} from 'react-native'
 import React from 'react'
-import ColorList from "../components/test_components/ColorList";
+import ColorList from "../../components/test_components/ColorList";
 import {FontAwesome} from "@expo/vector-icons";
 
 const Route = () => {

@@ -4,8 +4,8 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import Slider from '@react-native-community/slider';
 import { BlurView } from 'expo-blur';
-import attractions from '../assets/data_scripts/attractions.json';
-import ColorList from "../components/test_components/ColorList";
+import attractions from '../../assets/data_scripts/attractions.json';
+import ColorList from "../../components/test_components/ColorList";
 
 const Map = () => {
     const [location, setLocation] = useState(null);
@@ -94,7 +94,7 @@ const Map = () => {
                         title={attraction.name}
                         description={attraction.description}
                     >
-                        <Image source={require('../assets/icons/MapPin2.png')} style={{height: 35, width:35 }} />
+                        <Image source={require('../../assets/icons/MapPin2.png')} style={{height: 35, width:35 }} />
                     </Marker>
                 ))}
             </MapView>

@@ -2,10 +2,10 @@ import { View, Text, StatusBar, ScrollView, TextInput, TouchableOpacity, Platfor
 import React, { useState } from 'react';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import ColorList from "../components/test_components/ColorList";
+import ColorList from "../../components/test_components/ColorList";
 import { BlurView } from 'expo-blur';
-import PopularAttractions from "../components/home_page/PopularAttractions";
-import Blogs from "../components/home_page/Blogs";
+import PopularAttractions from "../../components/home_page/PopularAttractions";
+import Blogs from "../../components/home_page/Blogs";
 
 const Home = () => {
     const [searchQuery, setSearchQuery] = useState('');
