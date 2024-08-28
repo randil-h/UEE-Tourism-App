@@ -4,20 +4,40 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 const Route = () => {
     const [numDays, setNumDays] = useState('');
     const [startDate, setStartDate] = useState('');
-    const [activityPreference, setActivityPreference] = useState('sightseeing');
-    const [budget, setBudget] = useState('low');
+    const [activityPreferences, setActivityPreferences] = useState([]);
+    const [budget, setBudget] = useState([]);
 
     const handleGetItinerary = () => {
         console.log('Number of Days:', numDays);
         console.log('Starting Date:', startDate);
         console.log('Budget:', budget);
-        console.log('Activity Preference:', activityPreference);
+        console.log('Activity Preferences:', activityPreferences);
     };
 
-    const RadioButton = ({ label, value, selectedValue, onSelect }) => (
-        <TouchableOpacity style={styles.radioItem} onPress={() => onSelect(value)}>
-            <View style={[styles.radioButton, value === selectedValue && styles.radioButtonSelected]} />
-            <Text style={styles.radioText}>{label}</Text>
+    const toggleSelection = (value, type) => {
+        if (type === 'activity') {
+            setActivityPreferences(prevState =>
+                prevState.includes(value)
+                    ? prevState.filter(item => item !== value)
+                    : [...prevState, value]
+            );
+        } else if (type === 'budget') {
+            setBudget(prevState =>
+                prevState.includes(value)
+                    ? prevState.filter(item => item !== value)
+                    : [...prevState, value]
+            );
+        }
+    };
+
+    const Box = ({ label, value, selectedValues, type }) => (
+        <TouchableOpacity
+            style={[styles.box, selectedValues.includes(value) && styles.boxSelected]}
+            onPress={() => toggleSelection(value, type)}
+        >
+            <Text style={[styles.boxText, selectedValues.includes(value) && styles.boxTextSelected]}>
+                {label}
+            </Text>
         </TouchableOpacity>
     );
 
@@ -33,17 +53,17 @@ const Route = () => {
                 keyboardType="numeric"
             />
             <Text style={styles.subtitle}>Activity Preferences</Text>
-            <View style={styles.radioGroupContainer}>
-                <RadioButton label="Sightseeing" value="sightseeing" selectedValue={activityPreference} onSelect={setActivityPreference} />
-                <RadioButton label="Cultural" value="cultural" selectedValue={activityPreference} onSelect={setActivityPreference} />
-                <RadioButton label="Adventurous" value="adventurous" selectedValue={activityPreference} onSelect={setActivityPreference} />
-                <RadioButton label="Wildlife" value="wildlife" selectedValue={activityPreference} onSelect={setActivityPreference} />
+            <View style={styles.boxGroupContainer}>
+                <Box label="Sightseeing" value="sightseeing" selectedValues={activityPreferences} type="activity" />
+                <Box label="Cultural" value="cultural" selectedValues={activityPreferences} type="activity" />
+                <Box label="Adventurous" value="adventurous" selectedValues={activityPreferences} type="activity" />
+                <Box label="Wildlife" value="wildlife" selectedValues={activityPreferences} type="activity" />
             </View>
             <Text style={styles.subtitle}>Budget</Text>
-            <View style={styles.radioGroupContainer}>
-                <RadioButton label="Low" value="low" selectedValue={budget} onSelect={setBudget} />
-                <RadioButton label="Mid" value="mid" selectedValue={budget} onSelect={setBudget} />
-                <RadioButton label="High" value="high" selectedValue={budget} onSelect={setBudget} />
+            <View style={styles.boxGroupContainer}>
+                <Box label="Low" value="low" selectedValues={budget} type="budget" />
+                <Box label="Mid" value="mid" selectedValues={budget} type="budget" />
+                <Box label="High" value="high" selectedValues={budget} type="budget" />
             </View>
             <TouchableOpacity style={styles.button} onPress={handleGetItinerary}>
                 <Text style={styles.buttonText}>Get My Itinerary</Text>
@@ -83,30 +103,32 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         marginVertical: 10,
     },
-    radioGroupContainer: {
-        alignItems: 'flex-start',
-        width: '100%',
-    },
-    radioItem: {
+    boxGroupContainer: {
         flexDirection: 'row',
-        alignItems: 'center',
-        marginVertical: 5,
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
     },
-    radioButton: {
-        height: 20,
-        width: 20,
-        borderRadius: 10,
+    box: {
+        width: '48%',
+        padding: 15,
+        marginVertical: 5,
+        borderColor: 'gray',
         borderWidth: 2,
-        borderColor: 'black',
+        borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: 'white',
     },
-    radioButtonSelected: {
+    boxSelected: {
         backgroundColor: 'black',
+        borderColor: 'black',
     },
-    radioText: {
-        marginLeft: 8,
+    boxText: {
         fontSize: 16,
+        color: 'black',
+    },
+    boxTextSelected: {
+        color: 'white',
     },
     subtitleSmall: {
         marginBottom: 10,
