@@ -8,12 +8,12 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/images/splash.jpg",
+      "resizeMode": "cover"
     },
     "ios": {
       "supportsTablet": true,
+      "icon": "",
       "infoPlist": {
         "NSCameraUsageDescription": "This app needs access to your camera to take photos.",
         "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select photos.",
@@ -28,16 +28,11 @@
       "bundleIdentifier": "com.bimidugunathilake.frontend"
     },
     "android": {
-      "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "ACCESS_FINE_LOCATION"
-      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.bimidugunathilake.frontend"
     },
     "web": {
       "bundler": "metro",
@@ -49,14 +44,6 @@
     ],
     "experiments": {
       "typedRoutes": true
-    },
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "035bb74e-cd6e-4595-9723-1ee0823fb7c2"
-      }
     }
   }
 }

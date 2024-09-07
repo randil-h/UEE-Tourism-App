@@ -31,12 +31,6 @@
           <string>com.bimidugunathilake.frontend</string>
         </array>
       </dict>
-      <dict>
-        <key>CFBundleURLSchemes</key>
-        <array>
-          <string>exp+frontend</string>
-        </array>
-      </dict>
     </array>
     <key>CFBundleVersion</key>
     <string>1</string>
@@ -57,8 +51,6 @@
     <string>This app needs access to your location to show your current location on the map.</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>This app needs access to your location to show your current location on the map.</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your microphone</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>This app needs access to your photo library to select photos.</string>
     <key>NSUserActivityTypes</key>
