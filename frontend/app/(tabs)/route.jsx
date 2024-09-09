@@ -1,153 +1,263 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 
-const Route = () => {
-    const [numDays, setNumDays] = useState('');
-    const [startDate, setStartDate] = useState('');
-    const [activityPreferences, setActivityPreferences] = useState([]);
-    const [budget, setBudget] = useState([]);
 
-    const handleGetItinerary = () => {
-        console.log('Number of Days:', numDays);
-        console.log('Starting Date:', startDate);
-        console.log('Budget:', budget);
-        console.log('Activity Preferences:', activityPreferences);
-    };
+const Itinerary = () => {
+    const [days, setDays] = useState('');
+    const [budget, setBudget] = useState('Mid');
+    const [activities, setActivities] = useState(['Sightseeing', 'Cultural']);
+    const [startLocation, setStartLocation] = useState('Colombo');
+    const [endLocation, setEndLocation] = useState('Kandy');
+    const [touristType, setTouristType] = useState('Local');
 
-    const toggleSelection = (value, type) => {
-        if (type === 'activity') {
-            setActivityPreferences(prevState =>
-                prevState.includes(value)
-                    ? prevState.filter(item => item !== value)
-                    : [...prevState, value]
-            );
-        } else if (type === 'budget') {
-            setBudget(prevState =>
-                prevState.includes(value)
-                    ? prevState.filter(item => item !== value)
-                    : [...prevState, value]
-            );
+    const sriLankaCities = [
+        'Colombo', 'Kandy', 'Galle', 'Anuradhapura', 'Sigiriya', 'Nuwara Eliya',
+        'Trincomalee', 'Jaffna', 'Ella', 'Mirissa', 'Dambulla', 'Polonnaruwa'
+    ];
+
+    const toggleActivity = (activity) => {
+        if (activities.includes(activity)) {
+            setActivities(activities.filter(a => a !== activity));
+        } else {
+            setActivities([...activities, activity]);
         }
     };
 
-    const Box = ({ label, value, selectedValues, type }) => (
-        <TouchableOpacity
-            style={[styles.box, selectedValues.includes(value) && styles.boxSelected]}
-            onPress={() => toggleSelection(value, type)}
-        >
-            <Text style={[styles.boxText, selectedValues.includes(value) && styles.boxTextSelected]}>
-                {label}
-            </Text>
-        </TouchableOpacity>
-    );
-
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Unveil Sri Lanka</Text>
-            <Text style={styles.subtitleSmall}>Tailored Itinerary just for you</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Number of Days"
-                value={numDays}
-                onChangeText={setNumDays}
-                keyboardType="numeric"
-            />
-            <Text style={styles.subtitle}>Activity Preferences</Text>
-            <View style={styles.boxGroupContainer}>
-                <Box label="Sightseeing" value="sightseeing" selectedValues={activityPreferences} type="activity" />
-                <Box label="Cultural" value="cultural" selectedValues={activityPreferences} type="activity" />
-                <Box label="Adventurous" value="adventurous" selectedValues={activityPreferences} type="activity" />
-                <Box label="Wildlife" value="wildlife" selectedValues={activityPreferences} type="activity" />
-            </View>
-            <Text style={styles.subtitle}>Budget</Text>
-            <View style={styles.boxGroupContainer}>
-                <Box label="Low" value="low" selectedValues={budget} type="budget" />
-                <Box label="Mid" value="mid" selectedValues={budget} type="budget" />
-                <Box label="High" value="high" selectedValues={budget} type="budget" />
-            </View>
-            <TouchableOpacity style={styles.button} onPress={handleGetItinerary}>
-                <Text style={styles.buttonText}>Get My Itinerary</Text>
-            </TouchableOpacity>
+            <ScrollView>
+                <Image
+                    source={{ uri: 'https://media1.thrillophilia.com/filestore/aobaf1yw2mrowt8a50rvhq5jhavm_1582217692_galle_lighthouse.jpg?w=400&dpr=2' }}
+                    style={styles.backgroundImage}
+                />
+                <View style={styles.overlay}>
+                    <View style={styles.overlay}>
+                        <Text style={styles.title1}>Build Your</Text>
+                        <Text style={styles.title2}>Ideal Trip</Text>
+                        <Text style={styles.subtitle}>Tailored Itinerary Just For You</Text>
+                    </View>
+
+                </View>
+
+                <View style={styles.form}>
+                    <Text style={styles.label}>No of days</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={days}
+                        onChangeText={setDays}
+                        keyboardType="numeric"
+                    />
+
+                    <Text style={styles.label}>Budget</Text>
+                    <View style={styles.budgetContainer}>
+                        {['High', 'Mid', 'Low'].map(b => (
+                            <TouchableOpacity
+                                key={b}
+                                style={[styles.budgetButton, budget === b && styles.selectedBudget]}
+                                onPress={() => setBudget(b)}
+                            >
+                                <Text style={[styles.budgetText, budget === b && styles.selectedText]}>{b}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+
+                    <Text style={styles.label}>Activity Preferences</Text>
+                    <View style={styles.activityContainer}>
+                        {['Sightseeing', 'Adventurous', 'Cultural', 'Relaxation'].map(a => (
+                            <TouchableOpacity
+                                key={a}
+                                style={[styles.activityButton, activities.includes(a) && styles.selectedActivity]}
+                                onPress={() => toggleActivity(a)}
+                            >
+                                <Text style={[styles.activityText, activities.includes(a) && styles.selectedText]}>{a}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+
+                    <Text style={styles.label}>Starting Location</Text>
+                    <View style={styles.pickerContainer}>
+                        <Picker
+                            selectedValue={startLocation}
+                            style={styles.picker}
+                            onValueChange={(itemValue) => setStartLocation(itemValue)}
+                        >
+                            {sriLankaCities.map(city => (
+                                <Picker.Item key={city} label={city} value={city} />
+                            ))}
+                        </Picker>
+                    </View>
+
+                    <Text style={styles.label}>Ending Location</Text>
+                    <View style={styles.pickerContainer}>
+                        <Picker
+                            selectedValue={endLocation}
+                            style={styles.picker}
+                            onValueChange={(itemValue) => setEndLocation(itemValue)}
+                        >
+                            {sriLankaCities.map(city => (
+                                <Picker.Item key={city} label={city} value={city} />
+                            ))}
+                        </Picker>
+                    </View>
+
+                    <Text style={styles.label}>Tourist Type</Text>
+                    <View style={styles.touristTypeContainer}>
+                        {['Local', 'Foreign'].map(t => (
+                            <TouchableOpacity
+                                key={t}
+                                style={[styles.touristTypeButton, touristType === t && styles.selectedTouristType]}
+                                onPress={() => setTouristType(t)}
+                            >
+                                <Text style={[styles.touristTypeText, touristType === t && styles.selectedText]}>{t}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+
+                    <TouchableOpacity style={styles.generateButton}>
+                        <Text style={styles.generateButtonText}>Generate My Itinerary</Text>
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        padding: 16,
-        width: '100%',
-        maxWidth: 400,
-        alignSelf: 'center',
+        flex: 1,
+        backgroundColor: '#fff',
     },
-    title: {
-        marginBottom: 20,
-        marginTop: 25,
-        color: 'black',
+    backgroundImage: {
+        width: '100%',
+        height: 200,
+        position: 'absolute',
+    },
+    overlay: {
+        padding: 20,
+    },
+    title1: {
         fontSize: 24,
         fontWeight: 'bold',
-        textAlign: 'center',
+        color: '#000',
+    },
+    title2: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#fff',
     },
     subtitle: {
-        marginTop: 20,
-        marginBottom: 10,
-        color: 'black',
-        fontSize: 18,
+        fontSize: 16,
+        color: '#fff',
         fontWeight: 'bold',
+        textAlign: 'right', // Aligns the text to the right
+        marginTop: 60, // Adjust this value to move the subtitle down
+
+    },
+    form: {
+        paddingTop: 2,
+        paddingLeft:20,
+        paddingRight:20,
+        paddingBottom:5,
+         // Adjust this value if needed to ensure form starts after the image
+    },
+    label: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginTop: 10,
+        marginBottom: 5,
     },
     input: {
-        width: '100%',
-        height: 40,
-        borderColor: 'gray',
         borderWidth: 1,
+        borderColor: '#ccc',
         borderRadius: 5,
-        paddingHorizontal: 10,
-        marginVertical: 10,
+        padding: 10,
+        marginBottom: 10,
     },
-    boxGroupContainer: {
+    budgetContainer: {
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        marginBottom: 10,
+    },
+    budgetButton: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: 10,
+        flex: 1,
+        marginRight: 5,
+    },
+    selectedBudget: {
+        backgroundColor: '#000',
+    },
+    budgetText: {
+        textAlign: 'center',
+        color: '#000',
+    },
+    selectedText: {
+        color: '#fff',
+    },
+    activityContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'space-between',
-    },
-    box: {
-        width: '48%',
-        padding: 15,
-        marginVertical: 5,
-        borderColor: 'gray',
-        borderWidth: 2,
-        borderRadius: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'white',
-    },
-    boxSelected: {
-        backgroundColor: 'black',
-        borderColor: 'black',
-    },
-    boxText: {
-        fontSize: 16,
-        color: 'black',
-    },
-    boxTextSelected: {
-        color: 'white',
-    },
-    subtitleSmall: {
+        justifyContent: 'space-between', // Ensures even spacing
         marginBottom: 10,
-        color: 'black',
-        fontSize: 16,
-        textAlign: 'center',
     },
-    button: {
+    activityButton: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: 10,
+        width: '49%', // Makes sure two items fit per row with some spacing
+        marginBottom: 10,
+    },
+    selectedActivity: {
+        backgroundColor: '#000',
+    },
+    activityText: {
+        color: '#000',
+    },
+    touristTypeContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 10,
+    },
+    touristTypeButton: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: 10,
+        flex: 1,
+        marginRight: 5,
+    },
+    selectedTouristType: {
+        backgroundColor: '#000',
+    },
+    touristTypeText: {
+        textAlign: 'center',
+        color: '#000',
+    },
+    generateButton: {
+        backgroundColor: '#000',
+        padding: 10,
+        borderRadius: 10,
+        alignItems: 'center',
         marginTop: 20,
-        backgroundColor: 'black',
-        padding: 12,
-        borderRadius: 50,
+        width: '60%',
         alignSelf: 'center',
     },
-    buttonText: {
-        color: 'white',
-        fontSize: 18,
-        fontWeight: '600',
+
+    generateButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
     },
+    pickerContainer: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        marginBottom: 10,
+    }
+
 });
 
-export default Route;
+export default Itinerary;
