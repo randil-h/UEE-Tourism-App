@@ -14,6 +14,7 @@ const Profile = () => {
                 </View>
 
 
+
                 <ColorList color="#57a3d8" />
             </View>
         </ScrollView>
