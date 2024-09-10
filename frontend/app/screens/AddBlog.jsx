@@ -205,7 +205,6 @@ const AddBlogPage = () => {
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
-        paddingTop: 25
     },
     innerContainer: {
         flexGrow: 1,
@@ -215,14 +214,14 @@ const styles = StyleSheet.create({
     },
     bimage: {
         width: '100%',
-        height: 250,  // Adjust the height as needed
+        height: 275,  // Adjust the height as needed
         resizeMode: 'cover',  // Adjust the image to cover the entire area
         marginBottom: 20,
         borderRadius: 10,
     },
     headContainer: {
         padding: 20,
-        marginTop: 10,
+        marginTop: 25,
     },
     imageHead: {
         fontWeight: "bold",
@@ -230,8 +229,8 @@ const styles = StyleSheet.create({
     },
     footerContainer: {
       position: 'absolute',
-      bottom: 18,
-      right: 18
+      bottom: 12,
+      right: 15
     },
     imageFootText: {
         fontWeight: "bold",

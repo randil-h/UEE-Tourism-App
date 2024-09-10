@@ -19,7 +19,7 @@ const Blogs = () => {
                 <TouchableOpacity onPress={() => router.push('screens/AddBlog')}>
                     <Text style={{fontWeight: 'bold',color: '#2475ff', padding: 4, borderRadius: 5}}>Add Blog</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigate('/blogs/allBlogs')} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <TouchableOpacity onPress={() => router.push('screens/AllBlogs')} style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Text style={{ color: '#2475ff', fontWeight: '500' }}>See More</Text>
                     <Text style={{ color: '#2475ff', marginLeft: 4 }}>{'\u2192'}</Text>
                 </TouchableOpacity>
