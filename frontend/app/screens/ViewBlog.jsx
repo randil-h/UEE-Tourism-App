@@ -3,12 +3,15 @@ import { ScrollView, Text, View, Image, StyleSheet, Dimensions, TouchableOpacity
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams } from "expo-router";
 import { fetchImageURL } from "../utils/fetchImageURL";
+import {db} from "../../firebaseConfig";
+import {doc, getDoc, updateDoc} from "@firebase/firestore";
 
 const ViewBlog = ({ route }) => {
     const { blog } = useLocalSearchParams();
     const parsedBlog = JSON.parse(decodeURIComponent(blog));
     const [liked, setLiked] = useState(false);
     const [imageURLs, setImageURLs] = useState([]);
+    const [likesCount, setLikesCount] = useState(null);
 
     useEffect(() => {
         const loadImages = async () => {
@@ -20,12 +23,34 @@ const ViewBlog = ({ route }) => {
             );
             setImageURLs(urls);
         };
-        loadImages();
-    }, [parsedBlog.images]);
+        const fetchLikes = async () => {
+            const docRef = doc(db, "blogs", parsedBlog.id);
+            const docSnap = await getDoc(docRef);
+            if(docSnap.exists()) {
+                const data = docSnap.data();
+                setLikesCount(data.likes || 0);
+                setLiked(data.liked || false);
+            }
+        };
 
-    const toggleLike = () => {
-        setLiked(!liked);
-    }
+        loadImages();
+        fetchLikes();
+    }, [parsedBlog.images, parsedBlog.id]);
+
+    const toggleLike = async () => {
+        const newLikeStatus = !liked;
+        const newLikesCount = newLikeStatus ? likesCount + 1 : likesCount - 1;
+
+        setLiked(newLikeStatus);
+        setLikesCount(newLikesCount);
+
+        try {
+            const docRef = doc(db, "blogs", parsedBlog.id);
+            await updateDoc(docRef, {likes: newLikesCount, liked: newLikeStatus});
+        } catch (error) {
+            console.error("Error updating likes", error);
+        }
+    };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -37,6 +62,7 @@ const ViewBlog = ({ route }) => {
                 <TouchableOpacity onPress={toggleLike} style={styles.likeButton}>
                     <Ionicons name={liked ? "heart" : "heart-outline"} size={20} color={liked ? "red" : "gray"} />
                 </TouchableOpacity>
+                <Text>{likesCount}</Text>
             </View>
             <View style={styles.imageContainer}>
                 {imageURLs.map((url, index) => (

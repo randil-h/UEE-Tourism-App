@@ -43,7 +43,10 @@ const BlogList = () => {
                             <ImageBackground key={index} source={{ uri: image }} style={styles.image} >
                                 <Text style={styles.title}>{blog.title}</Text>
                                 <View style={styles.dateContainer}>
-                                    <Ionicons name="heart-outline" size={24} color="red" style={styles.likeIcon} />
+                                    <Ionicons name={blog.liked ? "heart" : "heart-outline"}
+                                              size={24}
+                                              color={blog.liked ? "red" : "red"}
+                                              style={styles.likeIcon} />
                                 </View>
                             </ImageBackground>
                         ))}
