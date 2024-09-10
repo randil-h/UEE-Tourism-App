@@ -1,7 +1,7 @@
 import React from "react";
 import {ScrollView, StyleSheet, Text, View, Image, TouchableOpacity, ImageBackground} from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import {collection, onSnapshot, query, orderBy} from "@firebase/firestore";
+import {collection, onSnapshot, query, orderBy, limit} from "@firebase/firestore";
 import {db} from "../../../firebaseConfig";
 import {useRouter} from "expo-router";
 
@@ -10,7 +10,9 @@ const BlogList = () => {
     const router = useRouter();
 
     React.useEffect(() => {
-        const q = query(collection(db, 'blogs'), orderBy('date', 'desc'));
+        const q = query(collection(db, 'blogs'),
+            orderBy('date', 'desc'),
+            limit(5));
 
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
             const blogsArray = querySnapshot.docs.map(doc => {

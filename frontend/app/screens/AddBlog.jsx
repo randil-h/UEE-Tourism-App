@@ -9,17 +9,18 @@ import {
     TextInput,
     Image,
     Platform,
-    ActivityIndicator
+    ActivityIndicator, ImageBackground
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { RadioButton } from 'react-native-paper';
 import {addDoc, collection} from "@firebase/firestore";
 import {db} from "../../firebaseConfig";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import travel from "../../assets/images//demo_images/travel.jpg";
 
 
 
-const categories = ['Religious', 'Beach', 'Hiking', 'Safari']; // Define categories
+const categories = ['Religious', 'Beach', 'Adventure', 'Wildlife', 'Food & Culinary', 'Cultural' ]; // Define categories
 
 const AddBlogPage = () => {
     const [loading, setLoading] = useState(false);
@@ -121,71 +122,82 @@ const AddBlogPage = () => {
     };
 
     return (
+
         <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Add New Blogs!</Text>
+            <ImageBackground source={travel} style={styles.bimage}>
+                <View style={styles.headContainer}>
+                    <Text style={styles.imageHead}>Share your</Text>
+                    <Text style={styles.imageHead}>Experiences</Text>
+                    <Text style={[styles.imageHead, { color: 'white' }]}>with the World</Text>
+                </View>
+                <View style={styles.footerContainer}>
+                    <Text style={[styles.imageFootText, { color: 'white' }]}>Add Blogs</Text>
+                </View>
+            </ImageBackground>
+            <View style={styles.innerContainer}>
+                <Text style={styles.label}>Title</Text>
+                <TextInput
+                    style={[styles.input, titleError && styles.errorInput]}
+                    value={title}
+                    onChangeText={setTitle}
+                    placeholder="Enter blog title"
+                    selectionColor='black'
+                />
 
-            <Text style={styles.label}>Title</Text>
-            <TextInput
-                style={[styles.input, titleError && styles.errorInput]}
-                value={title}
-                onChangeText={setTitle}
-                placeholder="Enter blog title"
-                selectionColor='black'
-            />
+                <Text style={styles.label}>Category</Text>
+                <View style={styles.radioGroup}>
+                    {categories.map((cat) => (
+                        <View key={cat} style={styles.radioContainer}>
+                            <RadioButton
+                                value={cat}
+                                status={category === cat ? 'checked' : 'unchecked'}
+                                onPress={() => setCategory(cat)}
+                            />
+                            <Text>{cat}</Text>
+                        </View>
+                    ))}
+                </View>
 
-            <Text style={styles.label}>Category</Text>
-            <View style={styles.radioGroup}>
-                {categories.map((cat) => (
-                    <View key={cat} style={styles.radioContainer}>
-                        <RadioButton
-                            value={cat}
-                            status={category === cat ? 'checked' : 'unchecked'}
-                            onPress={() => setCategory(cat)}
-                        />
-                        <Text>{cat}</Text>
-                    </View>
-                ))}
-            </View>
+                <Text style={styles.label}>Content</Text>
+                <TextInput
+                    style={[styles.textArea, contentError && styles.errorInput]}
+                    value={content}
+                    onChangeText={setContent}
+                    placeholder="Enter blog content...."
+                    selectionColor='black'
+                    multiline
+                />
 
-            <Text style={styles.label}>Content</Text>
-            <TextInput
-                style={[styles.textArea, contentError && styles.errorInput]}
-                value={content}
-                onChangeText={setContent}
-                placeholder="Enter blog content...."
-                selectionColor='black'
-                multiline
-            />
-
-            <Text style={styles.label}>Images</Text>
-            <TouchableOpacity
-                style={styles.imagePickerButton}
-                onPress={selectImages}
-            >
-                <Text style={styles.imagePickerButtonText}>Select Images</Text>
-            </TouchableOpacity>
-
-            <View style={styles.imageContainer}>
-                {images.map((image, index) => (
-                    <View key={index} style={styles.imageWrapper}>
-                        <Image source={{ uri: image }} style={styles.image} />
-                        <TouchableOpacity style={styles.removeButton} onPress={() => removeImage(image)}>
-                            <Text style={styles.removeButtonText}>X</Text>
-                        </TouchableOpacity>
-                    </View>
-                ))}
-            </View>
-
-            {loading ? (
-                <ActivityIndicator size="large" color="black" />
-            ) : (
+                <Text style={styles.label}>Images</Text>
                 <TouchableOpacity
-                    style={styles.addBlgBttn}
-                    onPress={handleCreateBlog}
+                    style={styles.imagePickerButton}
+                    onPress={selectImages}
                 >
-                    <Text style={styles.addBlgBttnText}>Add Blog</Text>
+                    <Text style={styles.imagePickerButtonText}>Select Images</Text>
                 </TouchableOpacity>
-            )}
+
+                <View style={styles.imageContainer}>
+                    {images.map((image, index) => (
+                        <View key={index} style={styles.imageWrapper}>
+                            <Image source={{ uri: image }} style={styles.image} />
+                            <TouchableOpacity style={styles.removeButton} onPress={() => removeImage(image)}>
+                                <Text style={styles.removeButtonText}>X</Text>
+                            </TouchableOpacity>
+                        </View>
+                    ))}
+                </View>
+
+                {loading ? (
+                    <ActivityIndicator size="large" color="black" />
+                ) : (
+                    <TouchableOpacity
+                        style={styles.addBlgBttn}
+                        onPress={handleCreateBlog}
+                    >
+                        <Text style={styles.addBlgBttnText}>Add Blog</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
         </ScrollView>
     );
 };
@@ -193,9 +205,37 @@ const AddBlogPage = () => {
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
+        paddingTop: 25
+    },
+    innerContainer: {
+        flexGrow: 1,
         justifyContent: 'flex-start',
         alignItems: 'center',
+        paddingHorizontal: 20,
+    },
+    bimage: {
+        width: '100%',
+        height: 250,  // Adjust the height as needed
+        resizeMode: 'cover',  // Adjust the image to cover the entire area
+        marginBottom: 20,
+        borderRadius: 10,
+    },
+    headContainer: {
         padding: 20,
+        marginTop: 10,
+    },
+    imageHead: {
+        fontWeight: "bold",
+        fontSize: 25
+    },
+    footerContainer: {
+      position: 'absolute',
+      bottom: 18,
+      right: 18
+    },
+    imageFootText: {
+        fontWeight: "bold",
+        fontSize: 18,
     },
     title: {
         color: 'black',
@@ -216,7 +256,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         padding: 10,
         marginBottom: 15,
-        borderRadius: 5,
+        borderRadius: 10,
     },
     textArea: {
         width: '100%',
@@ -224,20 +264,21 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         padding: 10,
         marginBottom: 15,
-        borderRadius: 5,
+        borderRadius: 10,
         height: 100,
         textAlignVertical: 'top'
     },
     radioGroup: {
         width: '100%',
+        marginBottom: 10
     },
     radioContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: 2,
     },
     imagePickerButton: {
-        backgroundColor: '#2475ff',
+        backgroundColor: 'black',
         padding: 12,
         borderRadius: 20,
         marginBottom: 10,
@@ -279,9 +320,10 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     addBlgBttn: {
-        backgroundColor: '#2475ff',
+        backgroundColor: 'black',
         borderRadius: 20,
         padding: 12,
+        marginBottom: 10
     },
     addBlgBttnText: {
         color: 'white',
