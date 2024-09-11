@@ -17,6 +17,7 @@ import {addDoc, collection} from "@firebase/firestore";
 import {db} from "../../firebaseConfig";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import travel from "../../assets/images//demo_images/travel.jpg";
+import {router} from "expo-router";
 
 
 
@@ -94,6 +95,7 @@ const AddBlogPage = () => {
             setImages([]);
 
             Alert.alert('Success', 'Blog added successfully!');
+            router.push('/screens/AllBlogs')
         } catch (error) {
             console.error('Error adding blog', error);
             Alert.alert('Error', 'There was an error adding the blog.');
