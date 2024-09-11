@@ -85,7 +85,7 @@ const AllBlogs = () => {
                         style={styles.blogCard}
                         onPress={() => router.push(`screens/ViewBlog?blog=${encodeURIComponent(JSON.stringify(blog))}`)}
                     >
-                        <View style={styles.imageContainer}>
+                       {/* <View style={styles.imageContainer}>
                             {blog.images.map((image, index) => (
                                 <ImageBackground key={index} source={{ uri: image }} style={styles.image} >
                                     <Text style={styles.title}>{blog.title}</Text>
@@ -97,6 +97,25 @@ const AllBlogs = () => {
                                     </View>
                                 </ImageBackground>
                             ))}
+                        </View>*/}
+                        <Text style={styles.title}>{blog.title}</Text>
+                        <View style={styles.imageContainer}>
+                            {blog.images.map((image: string, index: number) => (
+                                <ImageBackground key={index} source={{ uri: image }} style={styles.image} />
+                            ))}
+                        </View>
+                        <Text style={styles.content} numberOfLines={1} ellipsizeMode='tail'>{blog.content}</Text>
+                        <View style={styles.dateContainer}>
+                            <View style={{flexDirection: 'row'}}>
+                                <Ionicons name= "time-outline" size = {18} color = "rgba(73, 73, 73, 0.8)" style = {styles.timeIcon}/>
+                                <Text style={styles.date}>{blog.date}</Text>
+                            </View>
+                            <Text style={styles.category}>{blog.category}</Text>
+                            <Ionicons name={blog.liked ? "heart" : "heart-outline"}
+                                      size={20}
+                                      color={blog.liked ? "red" : "red"}
+                                      style={styles.likeIcon} />
+                            <Ionicons name= "chatbubbles-outline" size = {18} color = "rgba(73, 73, 73, 0.8)" style = {styles.timeIcon}/>
                         </View>
                     </TouchableOpacity>
                 ))}
@@ -117,7 +136,7 @@ const styles = StyleSheet.create({
         fontSize: 15
     },
     container: {
-        padding: 10,
+        paddingBottom: 100,
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
     },
@@ -146,31 +165,37 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         marginRight: 14,
         width: '100%',
-        height: 400,
         borderRadius: 25,
-        backgroundColor: 'rgba(231, 245, 255, 0.8)',
-        overflow: 'hidden'
+        backgroundColor: 'rgba(178, 188, 202, 0.8)',
+        overflow: 'hidden',
+        paddingVertical: 5,
+
     },
     title: {
         fontSize: 18,
         fontWeight: 'bold',
-        marginBottom: 5,
         alignContent: 'center',
-        color: 'white',
-        textAlign: 'center'
+        color: 'black',
+        textAlign: 'left',
+        paddingLeft: 15,
+        paddingVertical: 12
     },
     category: {
         fontSize: 14,
         marginBottom: 8,
-        color: 'gray'
+        color: 'rgba(73, 73, 73, 0.8)',
     },
     content: {
         fontSize: 16,
-        marginBottom: 8
+        marginBottom: 8,
+        marginTop: 10,
+        paddingHorizontal: 15,
+        color: 'rgba(73, 73, 73, 0.8)',
     },
     dateContainer: {
         flexDirection: 'row',
-        justifyContent: 'flex-start'
+        justifyContent: 'space-between',
+        paddingHorizontal: 15,
     },
     timeIcon: {
         marginRight: 5
@@ -181,19 +206,24 @@ const styles = StyleSheet.create({
     date: {
         fontSize: 14,
         marginBottom: 10,
-        color: 'gray',
+        color: 'rgba(73, 73, 73, 0.8)',
         marginRight: 10
     },
     imageContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         width: '100%',
-        height: '100%'
+        height: 200,
+        paddingHorizontal: 15,
+        justifyContent: 'center',
+        borderRadius: 25,
+        overflow: 'hidden'
     },
     image: {
         width: '100%',
         height: '100%',
         borderRadius: 25,
+        overflow: 'hidden',
         justifyContent: 'center',
         alignContent: 'center',
         alignItems: 'center',

@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     content: {
-        fontSize: 18,
+        fontSize: 16,
         marginBottom: 10,
         fontWeight: "semibold",
         color: 'rgba(87, 87, 87, 1)'
