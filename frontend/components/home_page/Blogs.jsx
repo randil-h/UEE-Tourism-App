@@ -30,7 +30,7 @@ const Blogs = () => {
                         <ImageBackground
                             key={index}
                             source={image}
-                            style={{ width: 300, height: 400, marginRight: 16, justifyContent: 'center', alignItems: 'center', borderRadius: 25, overflow: 'hidden' }}
+                            style={{ width: 320, height: 160, marginRight: 16, justifyContent: 'center', alignItems: 'center', borderRadius: 25, overflow: 'hidden' }}
                         >
                             {/* You can add content inside the card here */}
                             <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 18 }}>Blog Title</Text>
