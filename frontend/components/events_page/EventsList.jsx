@@ -1,5 +1,6 @@
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import React from 'react';
+import colors from '../../assets/colors/colorScheme';
 
 const events = [
     {
@@ -62,19 +63,20 @@ const styles = StyleSheet.create({
         marginTop: 0,
         borderBottomWidth: 1.5,
         borderStyle: 'solid',
-        borderColor: '#718e57',
-        backgroundColor: '#d5f1ba',
+        borderColor: colors.powderCoat,
+        backgroundColor: colors.racingGreen,
     },
     eventCard: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: 0,
+        marginHorizontal: 20,
         paddingHorizontal: 20,
         paddingVertical: 15,
         borderTopWidth: 1.5,
         borderStyle: 'solid',
-        borderColor: '#718e57',
+        borderColor: colors.powderCoat,
     },
     textContainer: {
         flex: 1,
@@ -82,16 +84,16 @@ const styles = StyleSheet.create({
     eventTitle: {
         fontSize: 30,
         fontWeight: 'bold',
-        color: '#365712', // Static color (Tomato color)
+        color: colors.powderCoat,
         marginBottom: 1,
     },
     eventDate: {
         fontSize: 12,
-        color: '#5e8139',
+        color: colors.powderCoat,
     },
     eventDescription: {
         fontSize: 12,
-        color: '#5e8139',
+        color: colors.powderCoat,
         marginTop: 2,
     },
 });

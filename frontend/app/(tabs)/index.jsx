@@ -33,10 +33,8 @@ const Home = () => {
             <ScrollView contentContainerStyle={{ paddingTop: StatusBar.currentHeight || 50, marginTop: 16 }}>
                 <View style={{ position: 'relative' }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 8 }}>
-                        <Text style={{ fontWeight: 'bold', fontSize: 24 }}>Home</Text>
-                        <View style={{ backgroundColor: '#003ca5', width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text style={{ fontSize: 14, color: '#fff' }}>BG</Text>
-                        </View>
+                        <Text className="font-bold text-5xl">Home</Text>
+
                     </View>
 
                     {/* Search Bar with Icon */}

@@ -1,12 +1,9 @@
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import React from 'react';
-import { useNavigation } from '@react-navigation/native'; // For navigation
-import EventsGrid from '../../components/events_page/EventsGrid';
-import ColorList from '../../components/test_components/ColorList';
 import MapView from 'react-native-maps';
-import {useRouter} from "expo-router";
+import { useRouter } from "expo-router";
 import EventsList from "../../components/events_page/EventsList";
-import {Divider} from "react-native-paper"; // Import MapView
+import { Divider } from "react-native-paper";
 
 const Events = () => {
     const router = useRouter();
@@ -17,16 +14,14 @@ const Events = () => {
                 <View className="flex flex-col justify-between px-6 py-2 mt-4">
                     <Text className="font-bold text-5xl">Local Events,</Text>
                     <Text className="font-bold text-2xl mb-4 text-slate-500">With Instant Access!</Text>
-                    <Divider/>
+                    <Divider />
                 </View>
 
-
-
                 {/* Map Preview */}
-                <TouchableOpacity onPress={() => router.push('screens/events/EventsMap')}>
-                    <View className="px-4 py-2 my-6 flex items-center">
+                <TouchableOpacity onPress={() => router.push('screens/events/EventsMap')} style={{ pointerEvents: 'box-none' }}>
+                    <View className="px-4 py-2 my-6 flex items-center" style={{ width: '100%' }}>
                         <MapView
-                            style={{ height: 200, width: 200, borderRadius: 65 }}
+                            style={{ height: 200, width: '100%', borderRadius: 60 }}
                             initialRegion={{
                                 latitude: 7.8731,
                                 longitude: 80.7718,
@@ -35,12 +30,16 @@ const Events = () => {
                             }}
                             showsUserLocation={true}
                             followsUserLocation={true}
+                            scrollEnabled={true} // Enable panning
+                            zoomEnabled={true}   // Enable zoom
+                            pitchEnabled={true}  // Enable map tilt
+                            rotateEnabled={true} // Enable map rotation
                         />
                     </View>
                 </TouchableOpacity>
-                {/*<EventsGrid/>*/}
-                <EventsList/>
 
+                {/* Event List */}
+                <EventsList />
             </View>
         </ScrollView>
     );
