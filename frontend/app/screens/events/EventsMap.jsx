@@ -8,11 +8,13 @@ const EventsMap = () => {
             <MapView
                 style={styles.map}
                 initialRegion={{
-                    latitude: 37.78825,
-                    longitude: -122.4324,
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
+                    latitude: 7.8731,
+                    longitude: 80.7718,
+                    latitudeDelta: 2.5,
+                    longitudeDelta: 2.5,
                 }}
+                showsUserLocation={true}
+                followsUserLocation={true}
             />
         </View>
     );

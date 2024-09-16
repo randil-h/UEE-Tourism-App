@@ -20,29 +20,31 @@ const CategoriesBar = () => {
 const styles = StyleSheet.create({
     container: {
         paddingHorizontal: 0,
+        borderStyle: 'solid',
+        borderTopWidth: 1,
+        borderColor: '#d5d5d5',
         marginTop: 16,
-        paddingVertical: 8,
-        backgroundColor: '#e3e3e3',
+        paddingTop: 0,
     },
     scrollContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        left: 16,
-        right: 16,
     },
     categoryButton: {
-        backgroundColor: '#5185ec', // Tailwind lime-200 equivalent
+
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 8,
         paddingHorizontal: 24,
-        borderRadius: 16,
-        marginRight: 8, // Add margin between buttons
+        borderStyle: 'solid',
+        borderColor: '#d5d5d5',
+        borderRightWidth: 1,
+
     },
     text: {
         fontSize: 14,
         fontWeight: '500',
-        color: '#fff',
+        color: '#2e2e2e',
     },
 });
 
