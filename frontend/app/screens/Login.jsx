@@ -33,12 +33,12 @@ const Login = ({ navigation }) => {
 
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
-                Alert.alert('Login Successful');
+                Alert.alert('Login Successful!');
                 // Navigate to the home screen
                 router.push('events');
             })
             .catch((error) => {
-                Alert.alert('Login Failed', error.message);
+                Alert.alert('Login Failed!', error.message);
             });
     };
 

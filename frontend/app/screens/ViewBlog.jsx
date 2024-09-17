@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, Text, View, Image, StyleSheet, Dimensions, TouchableOpacity } from "react-native";
+import {ScrollView, Text, View, Image, StyleSheet, Dimensions, TouchableOpacity, Alert} from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams } from "expo-router";
 import { fetchImageURL } from "../utils/fetchImageURL";
-import {db} from "../../firebaseConfig";
+import {auth, db} from "../../firebaseConfig";
 import {doc, getDoc, updateDoc} from "@firebase/firestore";
 
 const ViewBlog = ({ route }) => {
@@ -12,6 +12,7 @@ const ViewBlog = ({ route }) => {
     const [liked, setLiked] = useState(false);
     const [imageURLs, setImageURLs] = useState([]);
     const [likesCount, setLikesCount] = useState(null);
+    const currentUser = auth.currentUser;
 
     useEffect(() => {
         const loadImages = async () => {
@@ -29,7 +30,13 @@ const ViewBlog = ({ route }) => {
             if(docSnap.exists()) {
                 const data = docSnap.data();
                 setLikesCount(data.likes || 0);
-                setLiked(data.liked || false);
+                if (currentUser) {
+                    if (data.likedBy && data.likedBy.includes(currentUser.uid)) {
+                        setLiked(true);
+                    } else {
+                        setLiked(false);
+                    }
+                }
             }
         };
 
@@ -38,6 +45,10 @@ const ViewBlog = ({ route }) => {
     }, [parsedBlog.images, parsedBlog.id]);
 
     const toggleLike = async () => {
+        if( !currentUser) {
+            Alert.alert("Authentication Required!", "You must be logged in to like this blog.");
+            return;
+        }
         const newLikeStatus = !liked;
         const newLikesCount = newLikeStatus ? likesCount + 1 : likesCount - 1;
 
@@ -46,7 +57,20 @@ const ViewBlog = ({ route }) => {
 
         try {
             const docRef = doc(db, "blogs", parsedBlog.id);
-            await updateDoc(docRef, {likes: newLikesCount, liked: newLikeStatus});
+            const docSnap = await getDoc(docRef);
+            const data = docSnap.data();
+            let likedBy = data.likedBy || [];
+
+            if(newLikeStatus) {
+                likedBy.push(currentUser.uid);
+            }else {
+                likedBy = likedBy.filter(userId => userId !== currentUser.uid);
+            }
+
+            await updateDoc(docRef, {
+                likes: newLikesCount,
+                likedBy: likedBy
+            });
         } catch (error) {
             console.error("Error updating likes", error);
         }
@@ -106,7 +130,7 @@ const styles = StyleSheet.create({
     content: {
         fontSize: 16,
         marginBottom: 10,
-        fontWeight: "semibold",
+        fontWeight: "semi-bold",
         color: 'rgba(87, 87, 87, 1)'
     },
     dateContainer: {
