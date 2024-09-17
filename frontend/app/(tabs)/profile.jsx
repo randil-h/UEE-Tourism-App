@@ -1,14 +1,12 @@
-
-import {View, Text, StatusBar, TextInput, TouchableOpacity, ScrollView, Alert, StatusBar, StyleSheet } from 'react-native'
-import React, {useEffect, useState} from 'react'
+import { View, Text, StatusBar, TextInput, TouchableOpacity, ScrollView, Alert, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import ColorList from "../../components/test_components/ColorList";
-import {FontAwesome} from "@expo/vector-icons";
-import {auth} from "../../firebaseConfig";
-import {onAuthStateChanged, signOut} from 'firebase/auth';
-import {router} from "expo-router";
+import { FontAwesome } from "@expo/vector-icons";
+import { auth } from "../../firebaseConfig";
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { router } from "expo-router";
 import { Divider } from 'react-native-paper';
 import colors from '../../assets/colors/colorScheme'; // Assume colors are imported
-
 
 const Profile = () => {
     const [user, setUser] = useState(null);
@@ -22,7 +20,7 @@ const Profile = () => {
     }, []);
 
     const confirmLogout = () => {
-        Alert.alert('Confirm Logout!', 'Are you sure want to log out?',
+        Alert.alert('Confirm Logout!', 'Are you sure you want to log out?',
             [
                 {
                     text: 'Cancel',
@@ -34,7 +32,7 @@ const Profile = () => {
                     onPress: handleLogout,
                 },
             ],
-            {cancelable: true}
+            { cancelable: true }
         );
     };
 
@@ -50,15 +48,24 @@ const Profile = () => {
     };
 
     return (
-
         <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
-
-
             {/* Profile Section */}
             <View style={styles.section}>
-                <Text style={[styles.title, { color: colors.gray_bg }]}>
-                    Profile
-                </Text>
+                <View style={styles.section}>
+                    <View style={styles.userActionContainer}>
+                        <Text style={styles.title}>Profile</Text>
+                        {user ? (
+                            <TouchableOpacity onPress={confirmLogout} style={styles.logoutButton}>
+                                <Text style={styles.logoutText}>Logout</Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity onPress={() => router.push('/screens/Login')} style={styles.logoutButton}>
+                                <Text style={styles.logoutText}>Login</Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
+
+                </View>
                 <Divider />
 
                 {/* User Info */}
@@ -107,24 +114,8 @@ const Profile = () => {
                     </TouchableOpacity>
                     <Divider />
                 </View>
-
-        <ScrollView className="mt-16">
-            <View className="relative">
-                <View className="flex flex-row justify-between px-6 py-2">
-                    <Text className="font-bold text-3xl">Profile</Text>
-                    {user? (
-                        <TouchableOpacity onPress={confirmLogout} style={{justifyContent: 'center',paddingHorizontal: 10, borderRadius: 10, backgroundColor: '#2475ff'}}>
-                            <Text style={{fontWeight: 'bold', color: 'white'}}>Logout</Text>
-                        </TouchableOpacity>
-                    ) : (
-                        <TouchableOpacity onPress={() => router.push('/screens/Login')} style={{justifyContent: 'center',paddingHorizontal: 10, borderRadius: 10, backgroundColor: '#2475ff'}}>
-                            <Text style={{fontWeight: 'bold', color: 'white'}}>Login</Text>
-                        </TouchableOpacity>
-                    )}
-                </View>
-                <ColorList color="#57a3d8" />
-
             </View>
+
         </ScrollView>
     );
 };
@@ -172,6 +163,21 @@ const styles = StyleSheet.create({
     },
     settingsText: {
         fontSize: 18,
+    },
+    userActionContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    logoutButton: {
+        justifyContent: 'center',
+        paddingHorizontal: 10,
+        borderRadius: 10,
+        backgroundColor: '#2475ff',
+    },
+    logoutText: {
+        fontWeight: 'bold',
+        color: 'white',
     },
 });
 

@@ -67,7 +67,7 @@ const Home = () => {
                 <View style={{ position: 'relative' }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 8 }}>
 
-                        <Text className="font-bold text-5xl">Home</Text>
+                        <Text className="font-bold text-4xl">Home</Text>
 
 
                     </View>
