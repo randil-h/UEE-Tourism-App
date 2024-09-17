@@ -140,9 +140,9 @@ const AllBlogs = () => {
                             </View>
                             <Text style={styles.category}>{blog.category}</Text>
                             <View style={{flexDirection: 'row'}}>
-                                <Ionicons name={blog.liked ? "heart" : "heart-outline"}
+                                <Ionicons name={blog.likedBy && currentUser && blog.likedBy.includes(currentUser.uid) ? "heart" : "heart-outline"}
                                           size={20}
-                                          color={blog.liked ? "red" : "red"}
+                                          color={blog.likedBy && currentUser && blog.likedBy.includes(currentUser.uid) ? "red" : "red"}
                                           style={styles.likeIcon} />
                                 <Text style={{color: 'rgba(73, 73, 73, 0.8)'}}>{blog.likes}</Text>
                             </View>
