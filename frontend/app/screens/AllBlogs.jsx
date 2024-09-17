@@ -121,7 +121,12 @@ const AllBlogs = () => {
                                 </ImageBackground>
                             ))}
                         </View>*/}
+
                         <Text style={styles.title}>{blog.title}</Text>
+                        <View style={{flexDirection: 'row', paddingLeft: 15}}>
+                            <Ionicons name="create-outline" size={18} color="gray" style={styles.createIcon} />
+                            <Text style={styles.uName}>{blog.userName}</Text>
+                        </View>
                         <View style={styles.imageContainer}>
                             {blog.images.map((image: string, index: number) => (
                                 <ImageBackground key={index} source={{ uri: image }} style={styles.image} />
@@ -204,7 +209,18 @@ const styles = StyleSheet.create({
         color: 'black',
         textAlign: 'left',
         paddingLeft: 15,
-        paddingVertical: 12
+        paddingTop: 12,
+        paddingBottom: 3
+    },
+    uName: {
+        fontWeight: 'medium',
+        alignContent: 'center',
+        color: 'rgba(73, 73, 73, 0.8)',
+        fontSize: 13,
+        flexWrap: 'wrap',
+        paddingBottom: 7,
+        marginBottom: 2,
+        borderRadius: 10,
     },
     category: {
         fontSize: 14,
@@ -225,6 +241,9 @@ const styles = StyleSheet.create({
     },
     timeIcon: {
         marginRight: 5
+    },
+    createIcon: {
+        marginRight: 3
     },
     likeIcon: {
         marginRight: 5

@@ -55,14 +55,22 @@ const ViewBlog = ({ route }) => {
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.title}>{parsedBlog.title}</Text>
+            <View style={{flexDirection: 'row'}}>
+                <Ionicons name="create-outline" size={18} color="gray" style={styles.timeIcon} />
+                <Text style={styles.uName}>{parsedBlog.userName}</Text>
+            </View>
             <View style={styles.dateContainer}>
-                <Ionicons name="calendar-outline" size={18} color="gray" style={styles.timeIcon} />
-                <Text style={styles.date}>{parsedBlog.date}</Text>
+                <View style={{flexDirection: 'row'}}>
+                    <Ionicons name="calendar-outline" size={18} color="gray" style={styles.timeIcon} />
+                    <Text style={styles.date}>{parsedBlog.date}</Text>
+                </View>
                 <Text style={styles.category}>{parsedBlog.category}</Text>
-                <TouchableOpacity onPress={toggleLike} style={styles.likeButton}>
-                    <Ionicons name={liked ? "heart" : "heart-outline"} size={20} color={liked ? "red" : "gray"} />
-                </TouchableOpacity>
-                <Text>{likesCount}</Text>
+                <View style={{flexDirection: 'row'}}>
+                    <TouchableOpacity onPress={toggleLike} style={styles.likeButton}>
+                        <Ionicons name={liked ? "heart" : "heart-outline"} size={20} color={liked ? "red" : "gray"} />
+                    </TouchableOpacity>
+                    <Text style={{color: 'rgba(87, 87, 87, 1)', marginRight: 15}}>{likesCount}</Text>
+                </View>
             </View>
             <View style={styles.imageContainer}>
                 {imageURLs.map((url, index) => (
@@ -87,7 +95,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 10,
+        marginBottom: 2
     },
     category: {
         fontSize: 14,
@@ -103,7 +111,7 @@ const styles = StyleSheet.create({
     },
     dateContainer: {
         flexDirection: 'row',
-        justifyContent: 'flex-start',
+        justifyContent: 'space-between',
         marginBottom: 5,
     },
     timeIcon: {
@@ -116,6 +124,15 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: 'gray',
         marginRight: 15,
+    },
+    uName: {
+        color: 'rgba(87, 87, 87, 1)',
+        fontSize: 14,
+        marginBottom: 10,
+        fontWeight: 'semibold',
+        backgroundColor: 'rgba(190, 189, 190, 0.8)',
+        borderRadius: 10,
+        paddingHorizontal: 8
     },
     imageContainer: {
         width: '100%',

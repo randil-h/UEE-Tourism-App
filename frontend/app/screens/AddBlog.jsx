@@ -80,6 +80,7 @@ const AddBlogPage = () => {
             }
 
             const createdBy = auth.currentUser.uid;
+            const userName = auth.currentUser.displayName
 
             const newBlog = {
                 title,
@@ -88,6 +89,7 @@ const AddBlogPage = () => {
                 images: imageUrls,
                 date: new Date().toISOString(),
                 createdBy,
+                userName,
             };
 
             await addDoc(collection(db, 'blogs'), newBlog);
