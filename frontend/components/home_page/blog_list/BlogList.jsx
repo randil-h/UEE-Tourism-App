@@ -69,10 +69,10 @@ const styles = StyleSheet.create({
     },
     blogCard: {
         marginBottom: 20,
-        marginRight: 14,
-        width: 300,
+        marginRight: 12,
+        width: 250,
         height: 400,
-        borderRadius: 25,
+        borderRadius: 0,
         backgroundColor: 'rgba(231, 245, 255, 0.8)',
         overflow: 'hidden'
     },

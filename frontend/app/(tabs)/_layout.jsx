@@ -1,19 +1,20 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
-import {FontAwesome6, Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
+import {FontAwesome6, Foundation, Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import React from "react";
+import TabBar from "../../components/navbar/TabBar";
 
 export default function TabLayout() {
 
 
     return (
-        <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }}>
+        <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }} tabBar={props=> <TabBar {...props} />}>
             <Tabs.Screen
                 name="index"
                 options={{
                     title: 'Home',
                     headerShown: false,
-                    tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
+                    tabBarIcon: ({ color }) => <Foundation name="home" size={20} color={color}/>,
                 }}
             />
             <Tabs.Screen
