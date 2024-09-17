@@ -54,15 +54,6 @@ const Profile = () => {
                 <View style={styles.section}>
                     <View style={styles.userActionContainer}>
                         <Text style={styles.title}>Profile</Text>
-                        {user ? (
-                            <TouchableOpacity onPress={confirmLogout} style={styles.logoutButton}>
-                                <Text style={styles.logoutText}>Logout</Text>
-                            </TouchableOpacity>
-                        ) : (
-                            <TouchableOpacity onPress={() => router.push('/screens/Login')} style={styles.logoutButton}>
-                                <Text style={styles.logoutText}>Login</Text>
-                            </TouchableOpacity>
-                        )}
                     </View>
 
                 </View>
@@ -112,6 +103,19 @@ const Profile = () => {
                         <Text style={[styles.settingsText, { color: colors.darkSlateGray }]}>Language</Text>
                         <FontAwesome name="chevron-right" size={20} color={colors.darkOliveGreen} />
                     </TouchableOpacity>
+                    <Divider />
+
+                    {user ? (
+                        <TouchableOpacity onPress={confirmLogout} style={styles.settingsOption}>
+                            <Text style={[styles.settingsText, { color: colors.darkSlateGray }]}>Logout</Text>
+                            <FontAwesome name="chevron-right" size={20} color={colors.darkOliveGreen} />
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity onPress={() => router.push('/screens/Login')} style={styles.settingsOption}>
+                            <Text style={[styles.settingsText, { color: colors.darkSlateGray }]}>Login</Text>
+                            <FontAwesome name="chevron-right" size={20} color={colors.darkOliveGreen} />
+                        </TouchableOpacity>
+                    )}
                     <Divider />
                 </View>
             </View>
