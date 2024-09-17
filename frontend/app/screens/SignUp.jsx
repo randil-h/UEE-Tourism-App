@@ -42,8 +42,17 @@ const Signup = ({ navigation }) => {
         createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 const user = userCredential.user;
-                Alert.alert('Success', 'Account created successfully!');
-                router.push('/screens/Login')
+
+                updateProfile(user, {
+                    displayName: fullName,
+                })
+                    .then(() => {
+                        Alert.alert('Success', 'Account created successfully!');
+                        router.push('/screens/Login');
+                    })
+                    .catch((error) => {
+                        Alert.alert('Profile Update Failed', error.message);
+                    });
             })
             .catch((error) => {
                 Alert.alert('Oops! Signup Failed', error.message);
@@ -57,7 +66,7 @@ const Signup = ({ navigation }) => {
             style={styles.input}
             placeholder="Full Name"
             value={fullName}
-            onChange={setFullName}
+            onChangeText={setFullName}
             selectionColor= 'black'
             />
             <TextInput
