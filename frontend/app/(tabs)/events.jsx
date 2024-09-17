@@ -77,6 +77,7 @@ const Events = () => {
 
 const styles = StyleSheet.create({
     scrollView: {
+
         marginTop: 16,
         backgroundColor: colors.white, // bg-slate-900
     },
