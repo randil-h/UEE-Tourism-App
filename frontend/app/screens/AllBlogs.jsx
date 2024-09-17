@@ -1,20 +1,22 @@
-import React, {useState} from "react";
-import {ScrollView, StyleSheet, Text, View, TouchableOpacity, ImageBackground, TextInput} from "react-native";
+import React, {useEffect, useState} from "react";
+import {ScrollView, StyleSheet, Text, View, TouchableOpacity, ImageBackground, TextInput, Alert} from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import {collection, onSnapshot, query, orderBy} from "@firebase/firestore";
 import {useRouter} from "expo-router";
-import {db} from "../../firebaseConfig";
+import {auth, db} from "../../firebaseConfig";
 import {FontAwesome} from "@expo/vector-icons";
+import {onAuthStateChanged} from "firebase/auth";
 
 const AllBlogs = () => {
     const [blogs, setBlogs] = React.useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("All");
+    const [currentUser, setCurrentUser] = useState(null);
     const router = useRouter();
 
     const categories =["All",'Religious', 'Beach', 'Adventure', 'Wildlife', 'Food & Culinary', 'Cultural'];
 
-    React.useEffect(() => {
+    useEffect(() => {
         const q = query(collection(db, 'blogs'), orderBy('date', 'desc'));
 
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -34,6 +36,27 @@ const AllBlogs = () => {
 
         return () => unsubscribe();
     }, []);
+
+    useEffect(() => {
+        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+            if(user) {
+                setCurrentUser(user);
+            }else {
+                setCurrentUser(null);
+            }
+        });
+
+        return () => unsubscribeAuth();
+    }, []);
+
+    const handleAddBlog = () => {
+        if (!currentUser) {
+            Alert.alert('Not Logged In!', 'You need to be logged in to add a blog.');
+            router.push('/screens/Login');
+        }else {
+            router.push('/screens/AddBlog');
+        }
+    };
 
     const filteredBlogs = blogs.filter((blog) =>
         blog.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
@@ -55,7 +78,7 @@ const AllBlogs = () => {
                         <FontAwesome name="search" size={18} color="#75808c" style={{ marginRight: 15 }} />
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={() => router.push('screens/AddBlog')}>
+                <TouchableOpacity onPress={handleAddBlog}>
                     <FontAwesome name="plus" size={24} color="#2475ff" />
                 </TouchableOpacity>
             </View>
@@ -111,10 +134,13 @@ const AllBlogs = () => {
                                 <Text style={styles.date}>{blog.date}</Text>
                             </View>
                             <Text style={styles.category}>{blog.category}</Text>
-                            <Ionicons name={blog.liked ? "heart" : "heart-outline"}
-                                      size={20}
-                                      color={blog.liked ? "red" : "red"}
-                                      style={styles.likeIcon} />
+                            <View style={{flexDirection: 'row'}}>
+                                <Ionicons name={blog.liked ? "heart" : "heart-outline"}
+                                          size={20}
+                                          color={blog.liked ? "red" : "red"}
+                                          style={styles.likeIcon} />
+                                <Text style={{color: 'rgba(73, 73, 73, 0.8)'}}>{blog.likes}</Text>
+                            </View>
                             <Ionicons name= "chatbubbles-outline" size = {18} color = "rgba(73, 73, 73, 0.8)" style = {styles.timeIcon}/>
                         </View>
                     </TouchableOpacity>
@@ -166,7 +192,7 @@ const styles = StyleSheet.create({
         marginRight: 14,
         width: '100%',
         borderRadius: 25,
-        backgroundColor: 'rgba(178, 188, 202, 0.8)',
+        backgroundColor: 'rgba(218, 230, 255, 0.8)',
         overflow: 'hidden',
         paddingVertical: 5,
 
