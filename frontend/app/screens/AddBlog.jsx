@@ -30,6 +30,7 @@ const AddBlogPage = () => {
     const [category, setCategory] = useState('');
     const [content, setContent] = useState('');
     const [images, setImages] = useState([]);
+    const [likedBy, setLikedBy] = useState([]);
     const [titleError, setTitleError] = useState(false);
     const [contentError, setContentError] = useState(false);
 
@@ -87,6 +88,7 @@ const AddBlogPage = () => {
                 category,
                 content,
                 images: imageUrls,
+                likedBy,
                 date: new Date().toISOString(),
                 createdBy,
                 userName,

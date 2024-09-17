@@ -2,12 +2,13 @@ import React from "react";
 import {ScrollView, StyleSheet, Text, View, Image, TouchableOpacity, ImageBackground} from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import {collection, onSnapshot, query, orderBy, limit} from "@firebase/firestore";
-import {db} from "../../../firebaseConfig";
+import {auth, db} from "../../../firebaseConfig";
 import {useRouter} from "expo-router";
 
 const BlogList = () => {
     const [blogs, setBlogs] = React.useState([]);
     const router = useRouter();
+    const currentUser = auth.currentUser;
 
     React.useEffect(() => {
         const q = query(collection(db, 'blogs'),
@@ -45,9 +46,9 @@ const BlogList = () => {
                             <ImageBackground key={index} source={{ uri: image }} style={styles.image} >
                                 <Text style={styles.title}>{blog.title}</Text>
                                 <View style={styles.dateContainer}>
-                                    <Ionicons name={blog.liked ? "heart" : "heart-outline"}
+                                    <Ionicons name={blog.likedBy && currentUser && blog.likedBy.includes(currentUser.uid) ? "heart" : "heart-outline"}
                                               size={24}
-                                              color={blog.liked ? "red" : "red"}
+                                              color={blog.likedBy && currentUser && blog.likedBy.includes(currentUser.uid) ? "red" : "red"}
                                               style={styles.likeIcon} />
                                 </View>
                             </ImageBackground>
