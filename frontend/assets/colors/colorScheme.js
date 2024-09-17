@@ -1,8 +1,10 @@
 // colors.js
 const colorScheme = {
-  racingGreen: "#004225",
-  powderCoat: "#fff1e4",
-  darkOliveGreen: "#556B2F"
+  gray_bg: "#e1e0dd",
+  gray_text: "#bfbcbc",
+  black: "#35342f",
+  white: "#f1f2f0",
+  accent: "#457c39"
 };
 
 export default colorScheme;

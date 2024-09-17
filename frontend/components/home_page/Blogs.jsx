@@ -24,13 +24,13 @@ const Blogs = () => {
                     <Text style={{ color: '#2475ff', marginLeft: 4 }}>{'\u2192'}</Text>
                 </TouchableOpacity>
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: 24, paddingVertical: 16 }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: 12, paddingVertical: 16 }}>
                 {images.map((image, index) => (
                     <TouchableOpacity>
                         <ImageBackground
                             key={index}
                             source={image}
-                            style={{ width: 320, height: 160, marginRight: 16, justifyContent: 'center', alignItems: 'center', borderRadius: 25, overflow: 'hidden' }}
+                            style={{ width: 320, height: 160, marginRight: 12, justifyContent: 'center', alignItems: 'center', borderRadius: 0, overflow: 'hidden' }}
                         >
                             {/* You can add content inside the card here */}
                             <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 18 }}>Blog Title</Text>
