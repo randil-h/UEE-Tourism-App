@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated, ScrollView, Image } from 'react-native';
 import React, { useState, useRef } from 'react';
 import colorScheme from '../../assets/colors/colorScheme';
 import {Feather} from "@expo/vector-icons";
@@ -12,6 +12,7 @@ const events = [
         price: '$100',
         maxTickets: 500,
         bookBefore: 'Sep 15, 2024',
+        image: 'https://travelrebels.com/wp-content/uploads/2024/05/Horton-Plains-hike-nuwara-eliya.jpg'
     },
     {
         id: 2,
@@ -21,6 +22,7 @@ const events = [
         price: '$50',
         maxTickets: 200,
         bookBefore: 'Sep 19, 2024',
+        image: 'https://example.com/art-exhibition.jpg'
     },
     {
         id: 3,
@@ -30,6 +32,7 @@ const events = [
         price: '$150',
         maxTickets: 300,
         bookBefore: 'Sep 23, 2024',
+        image: 'https://example.com/tech-conference.jpg'
     },
     {
         id: 4,
@@ -39,6 +42,7 @@ const events = [
         price: '$75',
         maxTickets: 400,
         bookBefore: 'Sep 26, 2024',
+        image: 'https://example.com/food-expo.jpg'
     },
     {
         id: 5,
@@ -48,6 +52,7 @@ const events = [
         price: '$40',
         maxTickets: 150,
         bookBefore: 'Sep 28, 2024',
+        image: 'https://example.com/film-screening.jpg'
     },
     {
         id: 6,
@@ -57,8 +62,10 @@ const events = [
         price: '$200',
         maxTickets: 50,
         bookBefore: 'Sep 30, 2024',
+        image: 'https://example.com/yoga-retreat.jpg'
     },
 ];
+
 
 const EventsList = () => {
     const [modalVisible, setModalVisible] = useState(false);
@@ -162,6 +169,11 @@ const EventsList = () => {
                                 { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
                             ]}
                         >
+                            <Image
+                                source={{ uri: selectedEvent.image }}
+                                style={styles.eventImage}
+                                resizeMode="cover"
+                            />
                             <Text style={styles.modalTitle}>{selectedEvent.title}</Text>
                             <Text style={styles.modalDate}>{selectedEvent.date}</Text>
                             <Text style={styles.modalDescription}>{selectedEvent.description}</Text>
@@ -182,13 +194,13 @@ const EventsList = () => {
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 50,
+        paddingVertical: 50,
         paddingHorizontal: 10,
         marginTop: 0,
         marginHorizontal: 20,
         marginBottom: 20,
         backgroundColor: colorScheme.gray_bg,
-        borderBottomWidth: 1.5,
+
         borderColor: colorScheme.accent,
     },
     eventCard: {
@@ -220,6 +232,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: colorScheme.black,
         marginBottom: 1,
+    },
+    eventImage: {
+        width: 80, // Adjust the width as per requirement
+        height: 80, // Adjust the height as per requirement
+        borderRadius: 10, // Optional: gives the image rounded corners
     },
     eventDate: {
         fontSize: 12,

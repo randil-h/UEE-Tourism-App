@@ -1,28 +1,39 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+import MapViewDirections from 'react-native-maps-directions';
 import { Picker } from '@react-native-picker/picker';
-import MapView, { Polyline } from 'react-native-maps';
+import colorScheme from '../../../assets/colors/colorScheme';
+
+const GOOGLE_MAPS_APIKEY = 'AIzaSyCYArjTR-_oidGua6LPFXbKguECVdHBO0Q';
 
 const sampleRoutes = {
-    "Route 1": [
-        { latitude: 6.9271, longitude: 79.8612 }, // Colombo
-        { latitude: 7.2906, longitude: 80.6337 }, // Kandy
-        { latitude: 8.3114, longitude: 80.4037 }, // Anuradhapura
-    ],
-    "Route 2": [
-        { latitude: 6.0535, longitude: 80.2210 }, // Galle
-        { latitude: 6.9365, longitude: 79.8426 }, // Kalutara
-        { latitude: 7.8731, longitude: 80.7718 }, // Central
-    ],
-    "Route 3": [
-        { latitude: 9.6615, longitude: 80.0255 }, // Jaffna
-        { latitude: 8.5683, longitude: 81.2335 }, // Trincomalee
-        { latitude: 7.8731, longitude: 80.7718 }, // Central
-    ],
+    "Route 1": {
+        start: { latitude: 6.9271, longitude: 79.8612 }, // Colombo
+        waypoints: [
+            { latitude: 7.2906, longitude: 80.6337 }, // Kandy
+        ],
+        end: { latitude: 8.3114, longitude: 80.4037 } // Anuradhapura
+    },
+    "Route 2": {
+        start: { latitude: 6.0535, longitude: 80.2210 }, // Galle
+        waypoints: [
+            { latitude: 6.9365, longitude: 79.8426 }, // Kalutara
+        ],
+        end: { latitude: 7.8731, longitude: 80.7718 } // Central
+    },
+    "Route 3": {
+        start: { latitude: 9.6615, longitude: 80.0255 }, // Jaffna
+        waypoints: [
+            { latitude: 8.5683, longitude: 81.2335 } // Trincomalee
+        ],
+        end: { latitude: 7.8731, longitude: 80.7718 } // Central
+    },
 };
 
 const EventsMap = () => {
     const [selectedRoute, setSelectedRoute] = useState("Route 1");
+    const route = sampleRoutes[selectedRoute];
 
     return (
         <View style={styles.container}>
@@ -35,14 +46,23 @@ const EventsMap = () => {
                     longitudeDelta: 2.5,
                 }}
                 showsUserLocation={true}
-                followsUserLocation={true}
+                followsUserLocation={false}
             >
-                {/* Render the selected route as a polyline */}
-                <Polyline
-                    coordinates={sampleRoutes[selectedRoute]}
-                    strokeColor="#000" // Polyline color
-                    strokeWidth={6}     // Polyline thickness
+                {/* Render route dynamically */}
+                <MapViewDirections
+                    origin={route.start}
+                    waypoints={route.waypoints}
+                    destination={route.end}
+                    apikey={GOOGLE_MAPS_APIKEY}
+                    strokeWidth={6}
+                    strokeColor={colorScheme.accent}
+                    optimizeWaypoints={true}
                 />
+                <Marker coordinate={route.start} title="Start" />
+                <Marker coordinate={route.end} title="End" />
+                {route.waypoints.map((wp, index) => (
+                    <Marker key={index} coordinate={wp} title={`Waypoint ${index + 1}`} />
+                ))}
             </MapView>
             {/* Dropdown for selecting a route */}
             <View style={styles.pickerContainer}>
