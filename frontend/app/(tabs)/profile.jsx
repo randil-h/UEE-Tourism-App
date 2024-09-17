@@ -63,9 +63,11 @@ const Profile = () => {
                 <View style={styles.userInfoContainer}>
                     <View>
                         <Text style={[styles.userName, { color: colors.darkSlateGray }]}>
-                            Bimidu Gunathilake
+                            {user ? user.displayName || "No Name" : "Bimidu Gunathilake"}
                         </Text>
-                        <Text style={styles.userEmail}>johndoe@gmail.com</Text>
+                        <Text style={styles.userEmail}>
+                            {user ? user.email : "johndoe@gmail.com"}
+                        </Text>
                     </View>
                     <TouchableOpacity>
                         <FontAwesome name="pencil" size={24} color={colors.darkOliveGreen} />
