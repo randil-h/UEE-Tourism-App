@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, View, Alert, Text, Image, Modal, TextInput, TouchableOpacity } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, {Callout, Marker} from 'react-native-maps';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
 import Slider from '@react-native-community/slider';
@@ -57,22 +57,53 @@ const Map = () => {
         requestLocationPermission();
     }, []);
 
+    const fetchTravelTime = async (origin, destination) => {
+        try {
+            const response = await fetch(
+                `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=${GOOGLE_MAPS_API_KEY}`
+            );
+            const data = await response.json();
+            if (data.routes && data.routes.length > 0) {
+                return data.routes[0].legs[0].duration.text;
+            }
+            return 'N/A';
+        } catch (error) {
+            console.error('Error fetching travel time:', error);
+            return 'N/A';
+        }
+    };
+
     const fetchPopularAttractions = async (location) => {
         try {
             const response = await fetch(
                 `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude},${location.longitude}&radius=${radius}&type=tourist_attraction&key=${GOOGLE_MAPS_API_KEY}`
             );
             const data = await response.json();
-            // Filter attractions based on popularity (high rating and number of reviews)
+
             const popular = data.results.filter(place =>
                 place.rating >= 4.0 && place.user_ratings_total > 100
             );
 
-            setPopularAttractions(popular);
+            // Fetch travel time for each attraction
+            const attractionsWithTravelTime = await Promise.all(popular.map(async (place) => {
+                const travelTime = await fetchTravelTime(location, {
+                    latitude: place.geometry.location.lat,
+                    longitude: place.geometry.location.lng
+                });
+                return { ...place, travelTime };
+            }));
+
+            setPopularAttractions(attractionsWithTravelTime);
         } catch (error) {
             console.error('Error fetching popular attractions:', error);
         }
     };
+
+// Helper function to get a photo URL from a reference
+    const getPhotoUrl = (photoReference) => {
+        return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${GOOGLE_MAPS_API_KEY}`;
+    };
+
 
     useEffect(() => {
         if (location) {
@@ -113,20 +144,45 @@ const Map = () => {
                 showsUserLocation={true}
                 followsUserLocation={true}
             >
-                {popularAttractions.map((place, index) => (
-                    <Marker
-                        key={index}
-                        coordinate={{
-                            latitude: place.geometry.location.lat,
-                            longitude: place.geometry.location.lng
-                        }}
-                        title={place.name}
-                        description={`Rating: ${place.rating} (${place.user_ratings_total} reviews)`}
-                    >
-                        <Image source={require('../../assets/icons/MapPin2.png')} style={{ height: 35, width: 35 }} />
-                    </Marker>
-                ))}
+                {popularAttractions.map((place, index) => {
+                    const placeType = place.types?.[0]?.replace('_', ' ') || 'Tourist attraction';
+                    const photos = place.photos ? place.photos.slice(0, 4).map(photo => getPhotoUrl(photo.photo_reference)) : [];
+                    const isOpenNow = place.opening_hours?.open_now;
+                    const openStatus = isOpenNow ? 'Open now' : 'Closed';
+                    const is24Hours = place.opening_hours?.periods?.some(period => period.open.day === 0 && period.open.time === "0000");
+
+                    return (
+                        <Marker
+                            key={index}
+                            coordinate={{
+                                latitude: place.geometry.location.lat,
+                                longitude: place.geometry.location.lng
+                            }}
+                            title={place.name}
+                            description={`${placeType}\nRating: ${place.rating} (${place.user_ratings_total} reviews)\n${is24Hours ? 'Open 24 hours' : openStatus}`}
+                        >
+                            <Image source={require('../../assets/icons/MapPin2.png')} style={{ height: 35, width: 35 }} />
+
+                            <Callout>
+                                <View style={styles.calloutContainer}>
+                                    <Text style={styles.calloutTitle}>{place.name}</Text>
+                                    <Text>{placeType}</Text>
+                                    <Text>Rating: {place.rating} ({place.user_ratings_total} reviews)</Text>
+                                    <Text>{is24Hours ? 'Open 24 hours' : openStatus}</Text>
+                                    <Text>Travel time: {place.travelTime}</Text>
+
+                                    <View style={styles.photoContainer}>
+                                        {photos.map((photoUrl, i) => (
+                                            <Image key={i} source={{ uri: photoUrl }} style={styles.photo} />
+                                        ))}
+                                    </View>
+                                </View>
+                            </Callout>
+                        </Marker>
+                    );
+                })}
             </MapView>
+
 
             <BlurView intensity={60} style={styles.sliderContainer}>
                 <Slider
@@ -237,6 +293,26 @@ const styles = StyleSheet.create({
     map: {
         ...StyleSheet.absoluteFillObject,
     },
+    calloutContainer: {
+        width: 200,
+        padding: 10,
+    },
+    calloutTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    photoContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginTop: 5,
+    },
+    photo: {
+        width: 50,
+        height: 50,
+        marginRight: 5,
+        marginBottom: 5,
+        borderRadius: 5,
+    },
     sliderContainer: {
         position: 'absolute',
         bottom: 30,
@@ -268,7 +344,7 @@ const styles = StyleSheet.create({
     },
     fab: {
         position: 'absolute',
-        bottom: 80,
+        bottom: 30,
         right: 20,
         backgroundColor: '#3f51b5',
     },
