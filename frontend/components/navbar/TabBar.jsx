@@ -3,14 +3,15 @@ import React from 'react';
 import { AntDesign, Feather } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur'; // Import BlurView
 import TabBarButton from './TabBarButton';
+import colorScheme from "../../assets/colors/colorScheme";
 
 const TabBar = ({ state, descriptors, navigation }) => {
-    const primaryColor = '#005eff';
-    const greyColor = '#737373';
+    const primaryColor = colorScheme.accent;
+    const greyColor = colorScheme.black;
 
     return (
         <View style={styles.container}>
-            <BlurView intensity={60} tint={"systemChromeMaterialLight"} style={styles.tabbar}>
+            <BlurView intensity={90} tint={"systemChromeMaterialLight"} style={styles.tabbar}>
                 {state.routes.map((route, index) => {
                     const { options } = descriptors[route.key];
                     const label =
@@ -64,22 +65,20 @@ const TabBar = ({ state, descriptors, navigation }) => {
 const styles = StyleSheet.create({
     container: {
         position: 'absolute',
-        bottom: 20,
-        left: 15,
-        right: 15,
-        borderRadius: 45,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        paddingBottom: 0,
+        borderRadius: 0,
         overflow: 'hidden', // Ensure the blur view respects the border radius
     },
     tabbar: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 15,
+        paddingVertical: 25,
         backgroundColor: 'transparent', // Ensure the blur effect is visible
-        borderRadius: 45,
-        borderCurve: 'continuous',
-        shadowColor: 'black',
-        shadowOffset: { width: 0, height: 10 },
+
         shadowRadius: 10,
         shadowOpacity: 0.1,
     },
