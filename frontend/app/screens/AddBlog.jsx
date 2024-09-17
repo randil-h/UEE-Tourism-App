@@ -14,10 +14,11 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { RadioButton } from 'react-native-paper';
 import {addDoc, collection} from "@firebase/firestore";
-import {db} from "../../firebaseConfig";
+import {auth, db} from "../../firebaseConfig";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import travel from "../../assets/images//demo_images/travel.jpg";
 import {router} from "expo-router";
+import {onAuthStateChanged} from "firebase/auth";
 
 
 
@@ -31,6 +32,7 @@ const AddBlogPage = () => {
     const [images, setImages] = useState([]);
     const [titleError, setTitleError] = useState(false);
     const [contentError, setContentError] = useState(false);
+
 
     useEffect(() => {
         (async () => {
@@ -77,12 +79,17 @@ const AddBlogPage = () => {
                 imageUrls.push(downloadURL);
             }
 
+            const createdBy = auth.currentUser.uid;
+            const userName = auth.currentUser.displayName
+
             const newBlog = {
                 title,
                 category,
                 content,
                 images: imageUrls,
                 date: new Date().toISOString(),
+                createdBy,
+                userName,
             };
 
             await addDoc(collection(db, 'blogs'), newBlog);

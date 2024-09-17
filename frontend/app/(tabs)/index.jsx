@@ -1,14 +1,47 @@
 import { View, Text, StatusBar, ScrollView, TextInput, TouchableOpacity, Platform } from 'react-native';
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import ColorList from "../../components/test_components/ColorList";
 import { BlurView } from 'expo-blur';
 import PopularAttractions from "../../components/home_page/PopularAttractions";
 import Blogs from "../../components/home_page/Blogs";
+import {router} from "expo-router";
+import {auth} from "../../firebaseConfig";
+import { onAuthStateChanged } from 'firebase/auth';
 
 const Home = () => {
     const [searchQuery, setSearchQuery] = useState('');
+    const [initials, setInitials] = useState('');
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user && user.displayName) {
+                setInitials(getInitials(user.displayName));
+            } else {
+                setInitials('NA');
+            }
+        });
+
+        // Cleanup the listener on unmount
+        return () => unsubscribe();
+    }, []);
+
+    const getInitials = (fullName) => {
+        const nameArray = fullName.split(' ');
+        const initials = nameArray.map(name => name[0]).join('').toUpperCase();
+        return initials;
+    };
+
+    const handleProfileOrLogin = () => {
+        const user = auth.currentUser;
+
+        if(user) {
+            router.push('profile');
+        } else {
+            router.push('/screens/Login')
+        }
+    };
 
     return (
         <View style={{ flex: 1 }}>
@@ -33,7 +66,9 @@ const Home = () => {
             <ScrollView contentContainerStyle={{ paddingTop: StatusBar.currentHeight || 50, marginTop: 16 }}>
                 <View style={{ position: 'relative' }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 8 }}>
+
                         <Text className="font-bold text-5xl">Home</Text>
+
 
                     </View>
 
