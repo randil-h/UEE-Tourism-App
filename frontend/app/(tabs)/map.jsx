@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
     },
     sliderContainer: {
         position: 'absolute',
-        bottom: 30,
+        bottom: 100,
         left: 20,
         borderRadius: 16,
         overflow: 'hidden',
