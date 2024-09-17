@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, View, Alert, Text, Image, Modal, TextInput, TouchableOpacity } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -7,17 +7,20 @@ import Slider from '@react-native-community/slider';
 import { BlurView } from 'expo-blur';
 import { FAB } from 'react-native-paper';
 import { AntDesign } from '@expo/vector-icons';
-import attractions from '../../assets/data_scripts/attractions.json';
-import ColorList from "../../components/test_components/ColorList";
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import Config from "../../apiConfig";
 
 const Map = () => {
     const [location, setLocation] = useState(null);
-    const [radius, setRadius] = useState(5);
-    const [filteredAttractions, setFilteredAttractions] = useState([]);
+    const [radius, setRadius] = useState(5000); // meters
+    const [popularAttractions, setPopularAttractions] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [image, setImage] = useState(null);
     const [newTip, setNewTip] = useState('');
     const [newNote, setNewNote] = useState('');
+    const mapRef = useRef(null);
+
+    const GOOGLE_MAPS_API_KEY = Config.GOOGLE_MAPS_API_KEY;
 
     const getCurrentLocation = async () => {
         try {
@@ -27,9 +30,15 @@ const Map = () => {
             const currentLocation = {
                 latitude: coords.latitude,
                 longitude: coords.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
             };
             setLocation(currentLocation);
             console.log('Current location:', currentLocation);
+
+            mapRef.current?.animateToRegion(currentLocation, 1000);
+
+            fetchPopularAttractions(currentLocation);
         } catch (error) {
             console.warn(error);
             Alert.alert('Error', 'Failed to get current location');
@@ -48,37 +57,28 @@ const Map = () => {
         requestLocationPermission();
     }, []);
 
+    const fetchPopularAttractions = async (location) => {
+        try {
+            const response = await fetch(
+                `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location.latitude},${location.longitude}&radius=${radius}&type=tourist_attraction&key=${GOOGLE_MAPS_API_KEY}`
+            );
+            const data = await response.json();
+            // Filter attractions based on popularity (high rating and number of reviews)
+            const popular = data.results.filter(place =>
+                place.rating >= 4.0 && place.user_ratings_total > 100
+            );
+
+            setPopularAttractions(popular);
+        } catch (error) {
+            console.error('Error fetching popular attractions:', error);
+        }
+    };
+
     useEffect(() => {
         if (location) {
-            const nearbyAttractions = attractions.attractions.filter(attraction => {
-                const distance = getDistanceFromLatLonInKm(
-                    location.latitude,
-                    location.longitude,
-                    attraction.latitude,
-                    attraction.longitude
-                );
-                return distance <= radius;
-            });
-            setFilteredAttractions(nearbyAttractions);
+            fetchPopularAttractions(location);
         }
     }, [location, radius]);
-
-    const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
-        const R = 6371;
-        const dLat = deg2rad(lat2 - lat1);
-        const dLon = deg2rad(lon2 - lon1);
-        const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        const distance = R * c;
-        return distance;
-    };
-
-    const deg2rad = (deg) => {
-        return deg * (Math.PI / 180);
-    };
 
     const openImagePicker = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -101,24 +101,27 @@ const Map = () => {
 
     return (
         <View style={styles.container}>
-            <ColorList color={"#d8b357"} />
             <MapView
+                ref={mapRef}
                 style={styles.map}
-                initialRegion={{
+                initialRegion={location || {
                     latitude: 7.8731,
                     longitude: 80.7718,
-                    latitudeDelta: 2.5,
-                    longitudeDelta: 2.5,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
                 }}
                 showsUserLocation={true}
                 followsUserLocation={true}
             >
-                {filteredAttractions.map((attraction, index) => (
+                {popularAttractions.map((place, index) => (
                     <Marker
                         key={index}
-                        coordinate={{ latitude: attraction.latitude, longitude: attraction.longitude }}
-                        title={attraction.name}
-                        description={attraction.description}
+                        coordinate={{
+                            latitude: place.geometry.location.lat,
+                            longitude: place.geometry.location.lng
+                        }}
+                        title={place.name}
+                        description={`Rating: ${place.rating} (${place.user_ratings_total} reviews)`}
                     >
                         <Image source={require('../../assets/icons/MapPin2.png')} style={{ height: 35, width: 35 }} />
                     </Marker>
@@ -128,16 +131,21 @@ const Map = () => {
             <BlurView intensity={60} style={styles.sliderContainer}>
                 <Slider
                     style={styles.slider}
-                    minimumValue={10}
-                    maximumValue={500}
-                    step={1}
+                    minimumValue={1000}
+                    maximumValue={50000}
+                    step={1000}
                     value={radius}
-                    onValueChange={(value) => setRadius(value)}
+                    onValueChange={(value) => {
+                        setRadius(value);
+                        if (location) {
+                            fetchPopularAttractions(location);
+                        }
+                    }}
                     minimumTrackTintColor="#3f51b5"
                     maximumTrackTintColor="rgba(255, 255, 255, 0.8)"
                     thumbTintColor="#3f51b5"
                 />
-                <Text style={styles.sliderValue}>{radius} km</Text>
+                <Text style={styles.sliderValue}>{radius / 1000} km</Text>
             </BlurView>
 
             <FAB
@@ -161,7 +169,35 @@ const Map = () => {
                             <AntDesign name="close" size={24} color="black" />
                         </TouchableOpacity>
 
-                        <Text style={styles.modalTitle}>Add New Location</Text>
+                        <Text style={styles.modalTitle}>Add New Attraction</Text>
+
+                        <GooglePlacesAutocomplete
+                            placeholder='Search for a tourist attraction'
+                            onPress={(data, details = null) => {
+                                console.log(data, details);
+                            }}
+                            query={{
+                                key: GOOGLE_MAPS_API_KEY,
+                                language: 'en',
+                                types: 'tourist_attraction'
+                            }}
+                            styles={{
+                                container: {
+                                    width: '100%',
+                                    marginBottom: 20,
+                                },
+                                textInputContainer: {
+                                    width: '100%',
+                                },
+                                textInput: {
+                                    height: 40,
+                                    borderColor: '#ccc',
+                                    borderWidth: 1,
+                                    borderRadius: 5,
+                                    paddingHorizontal: 10,
+                                },
+                            }}
+                        />
 
                         <TouchableOpacity style={styles.imagePicker} onPress={openImagePicker}>
                             {image ? (
@@ -185,7 +221,7 @@ const Map = () => {
                         />
 
                         <TouchableOpacity style={styles.addButton} onPress={handleAddLocation}>
-                            <Text style={styles.addButtonText}>Add Location</Text>
+                            <Text style={styles.addButtonText}>Add Attraction</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
