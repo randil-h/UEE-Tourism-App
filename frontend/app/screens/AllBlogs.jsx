@@ -170,6 +170,7 @@ const styles = StyleSheet.create({
         paddingBottom: 100,
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
+        paddingHorizontal: 5
     },
     categoryButton: {
         paddingVertical: 8,
@@ -197,9 +198,19 @@ const styles = StyleSheet.create({
         marginRight: 14,
         width: '100%',
         borderRadius: 25,
-        backgroundColor: 'rgba(218, 230, 255, 0.8)',
+        backgroundColor: 'rgba(250, 250, 250, 0.9)',
         overflow: 'hidden',
         paddingVertical: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+
+        // Elevation for Android
+        elevation: 10,
+
+        // 3D transformation
+        transform: [{ perspective: 1000 }, { rotateX: '1deg' }, { rotateY: '-1deg' }]
 
     },
     title: {
@@ -226,6 +237,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         marginBottom: 8,
         color: 'rgba(73, 73, 73, 0.8)',
+
     },
     content: {
         fontSize: 16,
@@ -240,7 +252,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
     },
     timeIcon: {
-        marginRight: 5
+        marginRight: 5,
+        fontWeight: 500
     },
     createIcon: {
         marginRight: 3
@@ -252,7 +265,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
         marginBottom: 10,
         color: 'rgba(73, 73, 73, 0.8)',
-        marginRight: 10
+        marginRight: 10,
+        fontWeight: '500'
     },
     imageContainer: {
         flexDirection: 'row',

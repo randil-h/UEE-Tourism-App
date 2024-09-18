@@ -40,7 +40,7 @@ const Profile = () => {
         signOut(auth)
             .then(() => {
                 Alert.alert('Logged Out!', 'You have been logged out.');
-                router.push('events');
+                router.push('profile');
             })
             .catch((error) => {
                 Alert.alert('Error', error.message);
@@ -91,6 +91,12 @@ const Profile = () => {
 
                     <TouchableOpacity style={styles.settingsOption}>
                         <Text style={[styles.settingsText, { color: colors.darkSlateGray }]}>Notifications</Text>
+                        <FontAwesome name="chevron-right" size={20} color={colors.darkOliveGreen} />
+                    </TouchableOpacity>
+                    <Divider />
+
+                    <TouchableOpacity onPress={() => router.push('/screens/blogs/MyBlogs')} style={styles.settingsOption}>
+                        <Text style={[styles.settingsText, { color: colors.darkSlateGray }]}>My Blogs</Text>
                         <FontAwesome name="chevron-right" size={20} color={colors.darkOliveGreen} />
                     </TouchableOpacity>
                     <Divider />
