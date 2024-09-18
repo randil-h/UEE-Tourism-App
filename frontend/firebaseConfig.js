@@ -5,13 +5,12 @@ import { getAuth } from 'firebase/auth';
 
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCidcXZWXKlRRAGT_kWCAOv8DDKKnjxR00",
-    authDomain: "testdb-c61c8.firebaseapp.com",
-    projectId: "testdb-c61c8",
-    storageBucket: "testdb-c61c8.appspot.com",
-    messagingSenderId: "533863065625",
-    appId: "1:533863065625:web:ccb5a7fe71c55f91ed2288",
-    measurementId: "G-914Z4R4YJY"
+    apiKey: "AIzaSyCI8IDKemkX24ZRs5PGhhPPQBx2BOdO0xM",
+    authDomain: "uee-app-6192e.firebaseapp.com",
+    projectId: "uee-app-6192e",
+    storageBucket: "uee-app-6192e.appspot.com",
+    messagingSenderId: "459645974884",
+    appId: "1:459645974884:web:1d34073958113af735e271"
 };
 
 // Initialize Firebase
