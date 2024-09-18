@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import {router} from "expo-router";
 
 
 const Itinerary = () => {
@@ -22,6 +23,9 @@ const Itinerary = () => {
         } else {
             setActivities([...activities, activity]);
         }
+    };
+    const handleNavigateToAddPlace = () => {
+        router.push('frontend/app/AddPlaces'); // Adjust the route according to your setup
     };
 
     return (
@@ -116,6 +120,9 @@ const Itinerary = () => {
 
                     <TouchableOpacity style={styles.generateButton}>
                         <Text style={styles.generateButtonText}>Generate My Itinerary</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.addPlaceButton} onPress={handleNavigateToAddPlace}>
+                        <Text style={styles.addPlaceButtonText}>Add Place</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
@@ -256,7 +263,19 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 5,
         marginBottom: 10,
-    }
+    },
+    addPlaceButton: {
+        backgroundColor: 'blue', // You can change the color to your preference
+        borderRadius: 20,
+        padding: 12,
+        marginTop: 10, // Space between buttons
+    },
+    addPlaceButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '500',
+        textAlign: 'center',
+    },
 
 });
 
