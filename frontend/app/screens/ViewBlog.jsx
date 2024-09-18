@@ -151,12 +151,13 @@ const styles = StyleSheet.create({
     },
     uName: {
         color: 'rgba(87, 87, 87, 1)',
-        fontSize: 14,
+        fontSize: 13,
         marginBottom: 10,
         fontWeight: 'semibold',
         backgroundColor: 'rgba(190, 189, 190, 0.8)',
         borderRadius: 10,
-        paddingHorizontal: 8
+        paddingHorizontal: 8,
+        paddingVertical: 1.5
     },
     imageContainer: {
         width: '100%',
