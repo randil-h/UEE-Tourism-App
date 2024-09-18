@@ -1,17 +1,15 @@
-import { Stack } from 'expo-router';
+import { View, Text } from 'react-native'
+import React from 'react'
+import {Stack, Tabs} from 'expo-router'
 import TabBar from "../components/navbar/TabBar";
-import AddPlaceForm from "./AddPlaces";
 
-export default function Layout() {
+const _layout = () => {
     return (
         <Stack>
-            {/* Define the tabs route */}
-            <Stack.Screen
-                name="(tabs)"
-                options={{ headerShown: false, tabBar: () => <TabBar /> }}
-            />
-            {/* Define other screens here */}
-            <Stack.Screen name="add-place-form" component={AddPlaceForm} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="screens" options={{ headerShown: false}}/>
         </Stack>
-    );
+    )
 }
+
+export default _layout
