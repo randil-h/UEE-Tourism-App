@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import {router} from "expo-router";
-
-
+import generateItinerary from '../screens/itinerary/GenerateItinerary';
 const Itinerary = () => {
     const [days, setDays] = useState('');
     const [budget, setBudget] = useState('Mid');
@@ -25,8 +24,31 @@ const Itinerary = () => {
         }
     };
     const handleNavigateToAddPlace = () => {
-        router.push('frontend/app/AddPlaces'); // Adjust the route according to your setup
+        router.push('/screens/AddPlaces'); // Adjust the route according to your setup
     };
+    const handleGenerateItinerary = () => {
+            console.log('Form submitted with:', { days, budget, activities, startLocation, endLocation, touristType });
+
+            const generatedItinerary = generateItinerary(
+            parseInt(days), // Ensure days is an integer
+            budget,
+            activities,
+            startLocation,
+            endLocation,
+            touristType
+        );
+
+        // Log the generated itinerary for debugging
+        console.log('Generated Itinerary:', generatedItinerary);
+
+        // Navigate to ItineraryDisplay with the generated itinerary
+        router.push({
+            pathname: "/screens/itinerary/ItineraryDisplay",
+            params: { itinerary: JSON.stringify(generatedItinerary), touristType }
+        });
+    };
+
+
 
     return (
         <View style={styles.container}>
@@ -118,7 +140,7 @@ const Itinerary = () => {
                         ))}
                     </View>
 
-                    <TouchableOpacity style={styles.generateButton}>
+                    <TouchableOpacity style={styles.generateButton}onPress={handleGenerateItinerary}>
                         <Text style={styles.generateButtonText}>Generate My Itinerary</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.addPlaceButton} onPress={handleNavigateToAddPlace}>
@@ -134,6 +156,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
+        paddingBottom:150,
     },
     backgroundImage: {
         width: '100%',
@@ -275,6 +298,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '500',
         textAlign: 'center',
+
     },
 
 });
