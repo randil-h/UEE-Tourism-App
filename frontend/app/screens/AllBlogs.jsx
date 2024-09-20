@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {ScrollView, StyleSheet, Text, View, TouchableOpacity, ImageBackground, TextInput, Alert} from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import {collection, onSnapshot, query, orderBy} from "@firebase/firestore";
+import {doc, collection, onSnapshot, query, orderBy, getDoc} from "@firebase/firestore";
 import {useRouter} from "expo-router";
 import {auth, db} from "../../firebaseConfig";
 import {FontAwesome} from "@expo/vector-icons";
@@ -12,6 +12,7 @@ const AllBlogs = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [currentUser, setCurrentUser] = useState(null);
+    const [userPreferences, setUserPreferences] = useState({});
     const router = useRouter();
 
     const categories =["All",'Religious', 'Beach', 'Adventure', 'Wildlife', 'Food & Culinary', 'Cultural'];
@@ -38,16 +39,30 @@ const AllBlogs = () => {
     }, []);
 
     useEffect(() => {
-        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+        const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
             if(user) {
                 setCurrentUser(user);
-            }else {
+                await fetchUserPreferences(user.uid);
+            } else {
                 setCurrentUser(null);
             }
         });
 
         return () => unsubscribeAuth();
     }, []);
+
+    const fetchUserPreferences = async (userId) => {
+        try {
+            const preferencesDoc = await getDoc(doc(db, "preferences", userId));
+            if (preferencesDoc.exists()) {
+                setUserPreferences(preferencesDoc.data().categories || {});
+            } else {
+                setUserPreferences({});
+            }
+        } catch (error) {
+            console.error("Error fetching preferences:", error);
+        }
+    };
 
     const handleAddBlog = () => {
         if (!currentUser) {
@@ -58,9 +73,30 @@ const AllBlogs = () => {
         }
     };
 
-    const filteredBlogs = blogs.filter((blog) =>
-        blog.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        (selectedCategory === "All" || blog.category === selectedCategory)
+    const sortBlogsByPreferences = (blogs) => {
+        if (!currentUser || !userPreferences || Object.keys(userPreferences).length === 0) {
+            return blogs;
+        }
+
+        return blogs.sort((a, b) => {
+            const likesA = userPreferences[a.category] || 0;
+            const likesB = userPreferences[b.category] || 0;
+
+            // Sort blogs with the most liked categories first
+            if (likesA > likesB) {
+                return -1;
+            } else if (likesA < likesB) {
+                return 1;
+            }
+            return 0; // If categories are equally liked, preserve order
+        });
+    };
+
+    const filteredBlogs = sortBlogsByPreferences(
+        blogs.filter((blog) =>
+            blog.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+            (selectedCategory === "All" || blog.category === selectedCategory)
+        )
     );
 
     return (
