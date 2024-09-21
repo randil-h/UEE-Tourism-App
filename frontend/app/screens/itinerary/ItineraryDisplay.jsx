@@ -1,8 +1,10 @@
 import React from 'react';
 import {View, Text, Image, ScrollView, StyleSheet, SafeAreaView, Button, TouchableOpacity} from 'react-native';
 import { useRoute } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 
 const ItineraryDisplay = () => {
+    const router = useRouter();
     const route = useRoute();
     const { itinerary, touristType } = route.params || {};
 
@@ -31,16 +33,17 @@ const ItineraryDisplay = () => {
         return <Text style={styles.errorText}>Invalid itinerary format. Please try again.</Text>;
     }
 
+    const handleViewRoute = () => {
+        router.push({
+            pathname: '/screens/itinerary/ItineraryMapView',
+            params: { itinerary: JSON.stringify(parsedItinerary), touristType }
+        });
+    };
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView>
                 <Text style={styles.title}>My Itinerary</Text>
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                        navigation.navigate('RouteMap', { itinerary });
-                    }}
-                >
+                <TouchableOpacity style={styles.button} onPress={handleViewRoute}>
                     <Text style={styles.buttonText}>View Route</Text>
                 </TouchableOpacity>
                 {parsedItinerary.map((day, index) => (
@@ -77,6 +80,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
+        paddingTop:30,
     },
     title: {
         fontSize: 24,
