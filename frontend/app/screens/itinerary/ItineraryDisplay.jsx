@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import {View, Text, Image, ScrollView, StyleSheet, SafeAreaView, Button, TouchableOpacity} from 'react-native';
 import { useRoute } from '@react-navigation/native';
 
 const ItineraryDisplay = () => {
@@ -35,6 +35,14 @@ const ItineraryDisplay = () => {
         <SafeAreaView style={styles.container}>
             <ScrollView>
                 <Text style={styles.title}>My Itinerary</Text>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                        navigation.navigate('RouteMap', { itinerary });
+                    }}
+                >
+                    <Text style={styles.buttonText}>View Route</Text>
+                </TouchableOpacity>
                 {parsedItinerary.map((day, index) => (
                     <View key={index} style={styles.dayContainer}>
                         <Text style={styles.dayTitle}>Day {day.day}</Text>
@@ -74,6 +82,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         margin: 20,
+        textAlign: 'center',
     },
     dayContainer: {
         marginBottom: 20,
@@ -122,6 +131,21 @@ const styles = StyleSheet.create({
         color: 'red',
         textAlign: 'center',
         marginTop: 50,
+    },
+    button: {
+        backgroundColor: 'black',
+        borderRadius: 20, // Round button
+        paddingVertical: 10,
+        paddingHorizontal: 5,
+        marginBottom: 20,
+        width: '40%',
+        marginLeft:20,
+
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 16,
+        textAlign: 'center',
     },
 });
 
