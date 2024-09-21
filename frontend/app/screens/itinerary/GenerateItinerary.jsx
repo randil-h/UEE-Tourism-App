@@ -87,7 +87,7 @@ const generateItinerary = (days, budget, activities = [], startLocation, endLoca
                 dayPlan.push({
                     name: nextPlace.name,
                     location: nextPlace.location,
-                    image: nextPlace.image,
+                    image: nextPlace.imageSource,
                     ticketPrice: nextPlace.ticketPrice[budgetKey],
                     lat: nextPlace.lat,
                     lon: nextPlace.lon,
@@ -96,6 +96,7 @@ const generateItinerary = (days, budget, activities = [], startLocation, endLoca
                 remainingBudget -= nextPlace.ticketPrice[budgetKey];
                 sortedPlaces.splice(sortedPlaces.indexOf(nextPlace), 1);
                 console.log(`Added place: ${nextPlace.name}, Remaining budget: ${remainingBudget}`);
+                console.log(`Image source for ${nextPlace.name}:`, nextPlace.imageSource);
             } else {
                 console.warn(`No more suitable places found for Day ${day + 1}. Remaining budget: ${remainingBudget}`);
                 break;
