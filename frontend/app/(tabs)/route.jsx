@@ -143,9 +143,6 @@ const Itinerary = () => {
                     <TouchableOpacity style={styles.generateButton}onPress={handleGenerateItinerary}>
                         <Text style={styles.generateButtonText}>Generate My Itinerary</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.addPlaceButton} onPress={handleNavigateToAddPlace}>
-                        <Text style={styles.addPlaceButtonText}>Add Place</Text>
-                    </TouchableOpacity>
                 </View>
             </ScrollView>
         </View>
@@ -287,19 +284,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginBottom: 10,
     },
-    addPlaceButton: {
-        backgroundColor: 'blue', // You can change the color to your preference
-        borderRadius: 20,
-        padding: 12,
-        marginTop: 10, // Space between buttons
-    },
-    addPlaceButtonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: '500',
-        textAlign: 'center',
 
-    },
 
 });
 
