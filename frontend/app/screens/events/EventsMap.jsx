@@ -4,8 +4,9 @@ import MapView, { Marker } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import { Picker } from '@react-native-picker/picker';
 import colorScheme from '../../../assets/colors/colorScheme';
+import Config from "../../../apiConfig";
 
-const GOOGLE_MAPS_APIKEY = 'AIzaSyCYArjTR-_oidGua6LPFXbKguECVdHBO0Q';
+const GOOGLE_MAPS_APIKEY = Config.GOOGLE_MAPS_API_KEY;
 
 const sampleRoutes = {
     "Route 1": {
