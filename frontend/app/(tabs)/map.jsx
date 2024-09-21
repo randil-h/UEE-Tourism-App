@@ -9,6 +9,9 @@ import { FAB } from 'react-native-paper';
 import { AntDesign } from '@expo/vector-icons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Config from "../../apiConfig";
+import { db, collection, addDoc } from '../../firebaseConfig'; // Import from your config file
+import { getDocs, doc, setDoc, arrayUnion, getDoc } from 'firebase/firestore';
+
 
 const Map = () => {
     const [location, setLocation] = useState(null);
@@ -18,9 +21,52 @@ const Map = () => {
     const [image, setImage] = useState(null);
     const [newTip, setNewTip] = useState('');
     const [newNote, setNewNote] = useState('');
+    const [userNotes, setUserNotes] = useState({});
+    const [selectedPlace, setSelectedPlace] = useState(null);
+    const [newUserNote, setNewUserNote] = useState('');
     const mapRef = useRef(null);
 
     const GOOGLE_MAPS_API_KEY = Config.GOOGLE_MAPS_API_KEY;
+
+    const fetchUserNotes = async (placeId) => {
+        try {
+            const noteDoc = await getDoc(doc(db, 'userNotes', placeId));
+            if (noteDoc.exists()) {
+                return noteDoc.data().notes;
+            }
+            return [];
+        } catch (error) {
+            console.error('Error fetching user notes:', error);
+            return [];
+        }
+    };
+
+    const handleMarkerPress = async (place) => {
+        setSelectedPlace(place);
+        const notes = await fetchUserNotes(place.place_id);
+        setUserNotes(prevNotes => ({
+            ...prevNotes,
+            [place.place_id]: notes
+        }));
+    };
+
+    const addUserNote = async (placeId, note) => {
+        try {
+            const noteRef = doc(db, 'userNotes', placeId);
+            await setDoc(noteRef, {
+                notes: arrayUnion(note)
+            }, { merge: true });
+
+            // Update local state
+            setUserNotes(prevNotes => ({
+                ...prevNotes,
+                [placeId]: [...(prevNotes[placeId] || []), note]
+            }));
+        } catch (error) {
+            console.error('Error adding user note:', error);
+            Alert.alert('Error', 'Failed to add note');
+        }
+    };
 
     const getCurrentLocation = async () => {
         try {
@@ -146,7 +192,6 @@ const Map = () => {
             >
                 {popularAttractions.map((place, index) => {
                     const placeType = place.types?.[0]?.replace('_', ' ') || 'Tourist attraction';
-                    const photos = place.photos ? place.photos.slice(0, 4).map(photo => getPhotoUrl(photo.photo_reference)) : [];
                     const isOpenNow = place.opening_hours?.open_now;
                     const openStatus = isOpenNow ? 'Open now' : 'Closed';
                     const is24Hours = place.opening_hours?.periods?.some(period => period.open.day === 0 && period.open.time === "0000");
@@ -160,6 +205,7 @@ const Map = () => {
                             }}
                             title={place.name}
                             description={`${placeType}\nRating: ${place.rating} (${place.user_ratings_total} reviews)\n${is24Hours ? 'Open 24 hours' : openStatus}`}
+                            onPress={() => handleMarkerPress(place)}
                         >
                             <Image source={require('../../assets/icons/MapPin2.png')} style={{ height: 35, width: 35 }} />
 
@@ -171,18 +217,33 @@ const Map = () => {
                                     <Text>{is24Hours ? 'Open 24 hours' : openStatus}</Text>
                                     <Text>Travel time: {place.travelTime}</Text>
 
-                                    <View style={styles.photoContainer}>
-                                        {photos.map((photoUrl, i) => (
-                                            <Image key={i} source={{ uri: photoUrl }} style={styles.photo} />
-                                        ))}
-                                    </View>
+                                    <Text style={styles.notesTitle}>User Notes:</Text>
+                                    {userNotes[place.place_id]?.map((note, i) => (
+                                        <Text key={i} style={styles.userNote}>{note}</Text>
+                                    ))}
+                                    <TextInput
+                                        style={styles.noteInput}
+                                        placeholder="Add a note"
+                                        value={newUserNote}
+                                        onChangeText={setNewUserNote}
+                                    />
+                                    <TouchableOpacity
+                                        style={styles.addNoteButton}
+                                        onPress={() => {
+                                            if (newUserNote.trim()) {
+                                                addUserNote(place.place_id, newUserNote.trim());
+                                                setNewUserNote('');
+                                            }
+                                        }}
+                                    >
+                                        <Text style={styles.addNoteButtonText}>Add Note</Text>
+                                    </TouchableOpacity>
                                 </View>
                             </Callout>
                         </Marker>
                     );
                 })}
             </MapView>
-
 
             <BlurView intensity={60} style={styles.sliderContainer}>
                 <Slider
@@ -197,9 +258,9 @@ const Map = () => {
                             fetchPopularAttractions(location);
                         }
                     }}
-                    minimumTrackTintColor="#3f51b5"
+                    minimumTrackTintColor="#478747"
                     maximumTrackTintColor="rgba(255, 255, 255, 0.8)"
-                    thumbTintColor="#3f51b5"
+                    thumbTintColor="#478747"
                 />
                 <Text style={styles.sliderValue}>{radius / 1000} km</Text>
             </BlurView>
@@ -405,6 +466,34 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 10,
         right: 10,
+    },
+    notesTitle: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        marginTop: 10,
+    },
+    userNote: {
+        fontSize: 12,
+        marginTop: 5,
+    },
+    noteInput: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: 5,
+        marginTop: 10,
+        width: '100%',
+    },
+    addNoteButton: {
+        backgroundColor: '#478747',
+        padding: 5,
+        borderRadius: 5,
+        marginTop: 5,
+        alignItems: 'center',
+    },
+    addNoteButtonText: {
+        color: 'white',
+        fontSize: 12,
     },
 });
 
