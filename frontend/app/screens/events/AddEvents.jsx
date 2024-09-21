@@ -1,110 +1,227 @@
-import {View, Text, ScrollView, TouchableOpacity, StyleSheet, StatusBar, Platform} from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import MapView from 'react-native-maps';
-import { useRouter } from "expo-router";
-import EventsList from "../../../components/events_page/EventsList";
-import { Divider } from "react-native-paper";
-import { FontAwesome6 } from "@expo/vector-icons";
-import colors from '../../../assets/colors/colorScheme';
-import {BlurView} from "expo-blur";
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { addDoc, collection } from "@firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { auth, db, storage } from "../../../firebaseConfig";
 
 const AddEvents = () => {
     const router = useRouter();
+    const [eventName, setEventName] = useState('');
+    const [eventDate, setEventDate] = useState(new Date());
+    const [image, setImage] = useState(null);
+    const [location, setLocation] = useState('');
+    const [ticketPrice, setTicketPrice] = useState('');
+    const [maxTickets, setMaxTickets] = useState('');
+    const [showPicker, setShowPicker] = useState(false);
+
+    // Handle Image Pick
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1], // Ensure square image
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setImage(result.assets[0].uri);
+        }
+    };
+
+    // Save event to Firestore and upload image to Firebase Storage
+    const saveEvent = async () => {
+        if (!image) {
+            Alert.alert("Image Required", "Please upload an event image");
+            return;
+        }
+
+        try {
+            // Upload image to Firebase Storage
+            const imageRef = ref(storage, `events/${new Date().getTime()}_${auth.currentUser.uid}.jpg`);
+            const response = await fetch(image); // Convert the image to a blob
+            const blob = await response.blob();
+            await uploadBytes(imageRef, blob);
+
+            // Get the image URL from Firebase Storage
+            const imageUrl = await getDownloadURL(imageRef);
+
+            // Save event data to Firestore
+            const eventData = {
+                name: eventName,
+                date: eventDate,
+                location,
+                ticketPrice,
+                maxTickets,
+                imageUrl, // Store image URL
+                createdBy: auth.currentUser.uid,
+                createdAt: new Date(),
+            };
+
+            await addDoc(collection(db, "events"), eventData);
+
+            Alert.alert("Success", "Event saved successfully!");
+            router.push('/success');
+        } catch (error) {
+            console.error("Error saving event: ", error);
+            Alert.alert("Error", "Failed to save event");
+        }
+    };
+
+    const onChange = (event, selectedDate) => {
+        const currentDate = selectedDate || eventDate;
+        setShowPicker(false);
+        setEventDate(currentDate);
+    };
 
     return (
-        <View style={{ flex: 1 }}>
-            <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
+        <ScrollView style={styles.scrollView}>
+            <View style={styles.container}>
+                {/* Event Name */}
+                <Text style={styles.label}>Event Name</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Enter event name"
+                    value={eventName}
+                    onChangeText={setEventName}
+                />
 
-                <View>
+                {/* Image Upload */}
+                <Text style={styles.label}>Event Image</Text>
+                <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
+                    {image ? <Image source={{ uri: image }} style={styles.imagePreview} /> : <Text>Pick an image (Square)</Text>}
+                </TouchableOpacity>
 
-                    {/*
-                    <View style={styles.headerContainer}>
-                        <TouchableOpacity style={styles.iconButton}>
-                            <FontAwesome6 name="bucket" size={20} color="black" />
-                        </TouchableOpacity>
-                    </View>
+                {/* Event Date */}
+                <Text style={styles.label}>Event Date</Text>
+                <TouchableOpacity onPress={() => setShowPicker(true)}>
+                    <Text style={styles.input}>{eventDate.toLocaleDateString()}</Text>
+                </TouchableOpacity>
 
-                    <View style={styles.mapContainer}>
-                         //Map Preview
-                        <TouchableOpacity onPress={() => router.push('screens/events/EventsMap')} style={styles.mapTouchable}>
-                            <View style={styles.mapViewContainer}>
-                                <MapView
-                                    style={styles.mapView}
-                                    initialRegion={{
-                                        latitude: 7.8731,
-                                        longitude: 80.7718,
-                                        latitudeDelta: 2.2,
-                                        longitudeDelta: 2.2,
-                                    }}
-                                    showsUserLocation={true}
-                                    followsUserLocation={true}
-                                    scrollEnabled={true} // Enable panning
-                                    zoomEnabled={true}   // Enable zoom
-                                    pitchEnabled={true}  // Enable map tilt
-                                    rotateEnabled={true} // Enable map rotation
-                                />
-                            </View>
-                        </TouchableOpacity>
+                {showPicker && (
+                    <DateTimePicker
+                        value={eventDate}
+                        mode="date"
+                        display="default"
+                        onChange={onChange}
+                    />
+                )}
 
-                    </View>
-                    // Event List
-                    <EventsList />*/}
-                </View>
-            </ScrollView>
-        </View>
+                {/* Location (Google Places) */}
+                <Text style={styles.label}>Location</Text>
+                <GooglePlacesAutocomplete
+                    placeholder="Search for a location"
+                    onPress={(data) => setLocation(data.description)}
+                    query={{
+                        key: 'YOUR_GOOGLE_PLACES_API_KEY',
+                        language: 'en',
+                    }}
+                    styles={{ textInput: styles.input }}
+                />
+
+                {/* Map Selection (optional) */}
+                <TouchableOpacity onPress={() => router.push('screens/events/EventsMap')} style={styles.mapViewContainer}>
+                    <MapView
+                        style={styles.mapView}
+                        initialRegion={{
+                            latitude: 37.78825,
+                            longitude: -122.4324,
+                            latitudeDelta: 0.0922,
+                            longitudeDelta: 0.0421,
+                        }}
+                    />
+                </TouchableOpacity>
+
+                {/* Ticket Price */}
+                <Text style={styles.label}>Ticket Price</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Enter ticket price"
+                    keyboardType="numeric"
+                    value={ticketPrice}
+                    onChangeText={setTicketPrice}
+                />
+
+                {/* Max Tickets */}
+                <Text style={styles.label}>Max Number of Tickets</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Enter max number of tickets"
+                    keyboardType="numeric"
+                    value={maxTickets}
+                    onChangeText={setMaxTickets}
+                />
+
+                {/* Save Button */}
+                <TouchableOpacity onPress={saveEvent} style={styles.button}>
+                    <Text style={styles.buttonText}>Save Event</Text>
+                </TouchableOpacity>
+            </View>
+        </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
     scrollView: {
-
-        marginTop: 0,
-        backgroundColor: colors.white, // bg-slate-900
+        backgroundColor: '#fff',
+        padding: 20,
     },
-    headerContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingHorizontal: 20, // px-6
-        paddingVertical: 24, // py-2
-    },
-    headerTitle: {
-        fontWeight: 'bold',
-        fontSize: 40, // text-5xl
-        paddingTop: 16, // pt-4
-    },
-    headerSubtitle: {
-        fontWeight: 'bold',
-        fontSize: 24, // text-2xl
-        marginBottom: 16, // mb-4
-        color: colors.gray_text, // text-slate-500
-    },
-    mapContainer: {
-        flexDirection: 'row',
-    },
-    mapTouchable: {
-        pointerEvents: 'box-none',
-    },
-    mapViewContainer: {
-        paddingHorizontal: 16, // px-4
-        paddingVertical: 8, // py-2
-        marginVertical: 24, // my-6
+    container: {
         flex: 1,
-        alignItems: 'flex-start',
-        width: '100%',
     },
-    mapView: {
-        height: 200,
-        width: 200,
-        borderRadius: 100,
+    label: {
+        fontSize: 16,
+        marginVertical: 10,
+        fontWeight: 'bold',
+        color: '#333',
     },
-    iconButton: {
-        backgroundColor: colors.accent, // bg-blue-950
-        height: 32,
-        width: 32,
-        marginTop: 32, // mt-8
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        padding: 12,
+        fontSize: 16,
+    },
+    imagePicker: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        padding: 12,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 24,
+        height: 200,
+        marginVertical: 10,
+    },
+    imagePreview: {
+        width: 200,
+        height: 200,
+        borderRadius: 8, // Ensures square image
+    },
+    mapViewContainer: {
+        marginVertical: 20,
+        height: 200,
+        borderRadius: 20,
+        overflow: 'hidden',
+    },
+    mapView: {
+        width: '100%',
+        height: '100%',
+    },
+    button: {
+        backgroundColor: '#4CAF50',
+        padding: 15,
+        borderRadius: 8,
+        alignItems: 'center',
+        marginTop: 20,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });
 

@@ -1,7 +1,8 @@
-import { View, Text } from 'react-native'
+import {View, Text, Button} from 'react-native'
 import React from 'react'
 import {Stack, Tabs} from 'expo-router'
 import TabBar from "../components/navbar/TabBar";
+import { useNavigation } from '@react-navigation/native';
 
 const _layout = () => {
     return (
@@ -17,8 +18,25 @@ const _layout = () => {
             <Stack.Screen name="screens/AddPlaces" options={{headerShown: true, title: 'Add places'}}/>
             <Stack.Screen name="screens/itinerary/ItineraryDisplay" options={{headerShown: true, title: 'Generated Itinerary'}}/>
 
-            <Stack.Screen name="screens/events/EventsMap" options={{headerShown: true, title: 'Find Events', animation: 'fade', presentation: 'card'}}/>
-            <Stack.Screen name="screens/events/AddEvents" options={{headerShown: true, title: 'Add Events', animation: 'fade', presentation: 'card'}}/>
+            <Stack.Screen name="screens/events/EventsMap" options={{headerShown: true, title: 'Find Events', animation: 'default', presentation: 'card'}}/>
+
+            <Stack.Screen
+                name="screens/events/AddEvents"
+                options={{
+                    headerShown: true,
+                    title: 'Add Events (for testing)',
+                    animation: 'slide_from_bottom',
+                    presentation: 'modal', // This enables the sliding modal style
+                    gestureEnabled: true, // Allows you to swipe down to dismiss
+                    cardStyle: {
+                        borderTopRadius: 40,  // Rounded corners like a card
+                        marginTop: 20,  // Slight margin to show the screen below
+                    },
+                }}
+            />
+
+
+
 
             <Stack.Screen name="screens/Login" options={{headerShown: false, title: 'Login'}}/>
             <Stack.Screen name="screens/SignUp" options={{headerShown: false, title: 'Sign Up'}}/>

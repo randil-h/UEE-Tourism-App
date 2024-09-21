@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
         borderRadius: 100,
     },
     iconButton: {
-        backgroundColor: colors.accent, // bg-blue-950
+        backgroundColor: colors.accent,
         height: 32,
         width: 32,
         marginTop: 32, // mt-8
