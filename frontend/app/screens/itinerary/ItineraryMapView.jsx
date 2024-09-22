@@ -6,6 +6,7 @@ import { useLocalSearchParams } from 'expo-router';
 
 const GOOGLE_MAPS_APIKEY = Config.GOOGLE_MAPS_API_KEY;
 
+
 export default function ItineraryMapView() {
     const { itinerary } = useLocalSearchParams();
     const parsedItinerary = JSON.parse(itinerary);
