@@ -1,26 +1,73 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, View, Alert, Text, Image, Modal, TextInput, TouchableOpacity } from 'react-native';
-import MapView, {Callout, Marker} from 'react-native-maps';
+import MapView, { Callout, Marker, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
 import Slider from '@react-native-community/slider';
 import { BlurView } from 'expo-blur';
 import { FAB } from 'react-native-paper';
 import { AntDesign } from '@expo/vector-icons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Config from "../../apiConfig";
+import { db, collection, addDoc } from '../../firebaseConfig';
+import { getDocs, doc, setDoc, arrayUnion, getDoc } from 'firebase/firestore';
 
 const Map = () => {
     const [location, setLocation] = useState(null);
-    const [radius, setRadius] = useState(5000); // meters
+    const [radius, setRadius] = useState(5000);
     const [popularAttractions, setPopularAttractions] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [image, setImage] = useState(null);
     const [newTip, setNewTip] = useState('');
     const [newNote, setNewNote] = useState('');
+    const [userNotes, setUserNotes] = useState({});
+    const [selectedPlace, setSelectedPlace] = useState(null);
+    const [newUserNote, setNewUserNote] = useState('');
+    const [routeCoordinates, setRouteCoordinates] = useState(null);
     const mapRef = useRef(null);
+    const markerRef = useRef({});
 
     const GOOGLE_MAPS_API_KEY = Config.GOOGLE_MAPS_API_KEY;
+
+    const fetchUserNotes = async (placeId) => {
+        try {
+            const noteDoc = await getDoc(doc(db, 'userNotes', placeId));
+            if (noteDoc.exists()) {
+                return noteDoc.data().notes;
+            }
+            return [];
+        } catch (error) {
+            console.error('Error fetching user notes:', error);
+            return [];
+        }
+    };
+
+    const handleMarkerPress = async (place) => {
+        setSelectedPlace(place);
+        const notes = await fetchUserNotes(place.place_id);
+        setUserNotes(prevNotes => ({
+            ...prevNotes,
+            [place.place_id]: notes
+        }));
+    };
+
+    const addUserNote = async (placeId, note) => {
+        try {
+            const noteRef = doc(db, 'userNotes', placeId);
+            await setDoc(noteRef, {
+                notes: arrayUnion(note)
+            }, { merge: true });
+
+            setUserNotes(prevNotes => ({
+                ...prevNotes,
+                [placeId]: [...(prevNotes[placeId] || []), note]
+            }));
+        } catch (error) {
+            console.error('Error adding user note:', error);
+            Alert.alert('Error', 'Failed to add note');
+        }
+    };
 
     const getCurrentLocation = async () => {
         try {
@@ -84,7 +131,6 @@ const Map = () => {
                 place.rating >= 4.0 && place.user_ratings_total > 100
             );
 
-            // Fetch travel time for each attraction
             const attractionsWithTravelTime = await Promise.all(popular.map(async (place) => {
                 const travelTime = await fetchTravelTime(location, {
                     latitude: place.geometry.location.lat,
@@ -98,12 +144,6 @@ const Map = () => {
             console.error('Error fetching popular attractions:', error);
         }
     };
-
-// Helper function to get a photo URL from a reference
-    const getPhotoUrl = (photoReference) => {
-        return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${GOOGLE_MAPS_API_KEY}`;
-    };
-
 
     useEffect(() => {
         if (location) {
@@ -130,6 +170,67 @@ const Map = () => {
         setNewNote('');
     };
 
+    const fetchRoute = async (destination, placeId) => {
+        if (!location) return;
+
+        try {
+            const response = await fetch(
+                `https://maps.googleapis.com/maps/api/directions/json?origin=${location.latitude},${location.longitude}&destination=${destination.latitude},${destination.longitude}&key=${GOOGLE_MAPS_API_KEY}`
+            );
+            const data = await response.json();
+            if (data.routes && data.routes.length > 0) {
+                const points = data.routes[0].overview_polyline.points;
+                const decodedPoints = decodePolyline(points);
+                setRouteCoordinates(decodedPoints);
+
+                const coordinates = [
+                    { latitude: location.latitude, longitude: location.longitude },
+                    { latitude: destination.latitude, longitude: destination.longitude },
+                    ...decodedPoints
+                ];
+                mapRef.current?.fitToCoordinates(coordinates, {
+                    edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+                    animated: true,
+                });
+
+                markerRef.current[placeId]?.hideCallout();
+            }
+        } catch (error) {
+            console.error('Error fetching route:', error);
+            Alert.alert('Error', 'Failed to fetch route');
+        }
+    };
+
+    const decodePolyline = (encoded) => {
+        const poly = [];
+        let index = 0, len = encoded.length;
+        let lat = 0, lng = 0;
+
+        while (index < len) {
+            let b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++).charCodeAt(0) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            const dlat = ((result & 1) ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++).charCodeAt(0) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            const dlng = ((result & 1) ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+
+            poly.push({ latitude: lat / 1e5, longitude: lng / 1e5 });
+        }
+        return poly;
+    };
+
     return (
         <View style={styles.container}>
             <MapView
@@ -144,9 +245,18 @@ const Map = () => {
                 showsUserLocation={true}
                 followsUserLocation={true}
             >
+                {location && (
+                    <Marker
+                        coordinate={location}
+                        anchor={{ x: 0.5, y: 0.5 }}
+                    >
+                        <View style={styles.currentLocationMarker}>
+                            <View style={styles.currentLocationMarkerInner} />
+                        </View>
+                    </Marker>
+                )}
                 {popularAttractions.map((place, index) => {
                     const placeType = place.types?.[0]?.replace('_', ' ') || 'Tourist attraction';
-                    const photos = place.photos ? place.photos.slice(0, 4).map(photo => getPhotoUrl(photo.photo_reference)) : [];
                     const isOpenNow = place.opening_hours?.open_now;
                     const openStatus = isOpenNow ? 'Open now' : 'Closed';
                     const is24Hours = place.opening_hours?.periods?.some(period => period.open.day === 0 && period.open.time === "0000");
@@ -154,12 +264,14 @@ const Map = () => {
                     return (
                         <Marker
                             key={index}
+                            ref={ref => markerRef.current[place.place_id] = ref}
                             coordinate={{
                                 latitude: place.geometry.location.lat,
                                 longitude: place.geometry.location.lng
                             }}
                             title={place.name}
                             description={`${placeType}\nRating: ${place.rating} (${place.user_ratings_total} reviews)\n${is24Hours ? 'Open 24 hours' : openStatus}`}
+                            onPress={() => handleMarkerPress(place)}
                         >
                             <Image source={require('../../assets/icons/MapPin2.png')} style={{ height: 35, width: 35 }} />
 
@@ -171,18 +283,53 @@ const Map = () => {
                                     <Text>{is24Hours ? 'Open 24 hours' : openStatus}</Text>
                                     <Text>Travel time: {place.travelTime}</Text>
 
-                                    <View style={styles.photoContainer}>
-                                        {photos.map((photoUrl, i) => (
-                                            <Image key={i} source={{ uri: photoUrl }} style={styles.photo} />
-                                        ))}
-                                    </View>
+                                    <TouchableOpacity
+                                        style={styles.navigateButton}
+                                        onPress={() => fetchRoute({
+                                            latitude: place.geometry.location.lat,
+                                            longitude: place.geometry.location.lng
+                                        }, place.place_id)}
+                                    >
+                                        <View style={styles.buttonContent}>
+                                            <Icon name="navigation" size={20} color="#fff" />
+                                            <Text style={styles.navigateButtonText}>Navigate</Text>
+                                        </View>
+                                    </TouchableOpacity>
+
+                                    <Text style={styles.notesTitle}>User Notes:</Text>
+                                    {userNotes[place.place_id]?.map((note, i) => (
+                                        <Text key={i} style={styles.userNote}>{note}</Text>
+                                    ))}
+                                    <TextInput
+                                        style={styles.noteInput}
+                                        placeholder="Add a note"
+                                        value={newUserNote}
+                                        onChangeText={setNewUserNote}
+                                    />
+                                    <TouchableOpacity
+                                        style={styles.addNoteButton}
+                                        onPress={() => {
+                                            if (newUserNote.trim()) {
+                                                addUserNote(place.place_id, newUserNote.trim());
+                                                setNewUserNote('');
+                                            }
+                                        }}
+                                    >
+                                        <Text style={styles.addNoteButtonText}>Add Note</Text>
+                                    </TouchableOpacity>
                                 </View>
                             </Callout>
                         </Marker>
                     );
                 })}
+                {routeCoordinates && (
+                    <Polyline
+                        coordinates={routeCoordinates}
+                        strokeColor="#478747"
+                        strokeWidth={3}
+                    />
+                )}
             </MapView>
-
 
             <BlurView intensity={60} style={styles.sliderContainer}>
                 <Slider
@@ -197,9 +344,9 @@ const Map = () => {
                             fetchPopularAttractions(location);
                         }
                     }}
-                    minimumTrackTintColor="#3f51b5"
-                    maximumTrackTintColor="rgba(255, 255, 255, 0.8)"
-                    thumbTintColor="#3f51b5"
+                    minimumTrackTintColor="#478747"
+                    maximumTrackTintColor="#95a195"
+                    thumbTintColor="#478747"
                 />
                 <Text style={styles.sliderValue}>{radius / 1000} km</Text>
             </BlurView>
@@ -338,7 +485,7 @@ const styles = StyleSheet.create({
         left: 20,
         textAlign: 'center',
         fontSize: 16,
-        color: 'white',
+        color: 'black',
         textShadowOffset: { width: -1, height: 1 },
         textShadowRadius: 10,
     },
@@ -405,6 +552,64 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 10,
         right: 10,
+    },
+    notesTitle: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        marginTop: 10,
+    },
+    userNote: {
+        fontSize: 12,
+        marginTop: 5,
+    },
+    noteInput: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: 5,
+        marginTop: 10,
+        width: '100%',
+    },
+    addNoteButton: {
+        backgroundColor: '#478747',
+        padding: 5,
+        borderRadius: 5,
+        marginTop: 5,
+        alignItems: 'center',
+    },
+    addNoteButtonText: {
+        color: 'white',
+        fontSize: 12,
+    },
+    navigateButton: {
+        backgroundColor: '#478747',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    buttonContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    navigateButtonText: {
+        color: '#fff',
+        marginLeft: 5,
+        fontSize: 16,
+    },
+    currentLocationMarker: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        backgroundColor: '#ffffff',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    currentLocationMarkerInner: {
+        width: 16,
+        height: 16,
+        borderRadius: 12,
+        backgroundColor: '#478747',
     },
 });
 

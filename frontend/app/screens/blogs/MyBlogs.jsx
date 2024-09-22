@@ -125,10 +125,10 @@ const MyBlogs = () => {
                                         <Text style={styles.category}>{blog.category}</Text>
                                         <View style={{flexDirection: 'row'}}>
                                             <TouchableOpacity onPress={() => handleEditBlog(blog.id)}>
-                                                <Ionicons name= "pencil-outline" size = {22} color = "rgba(73, 73, 73, 0.8)" style = {styles.timeIcon1}/>
+                                                <Ionicons name= "pencil-outline" size = {20} color = "rgba(73, 73, 73, 0.8)" style = {styles.timeIcon1}/>
                                             </TouchableOpacity>
                                             <TouchableOpacity onPress={() => handleDeleteBlog(blog.id)}>
-                                                <Ionicons name= "trash-outline" size = {22} color = "rgba(73, 73, 73, 0.8)" style = {styles.timeIcon}/>
+                                                <Ionicons name= "trash-outline" size = {20} color = "rgba(73, 73, 73, 0.8)" style = {styles.timeIcon}/>
                                             </TouchableOpacity>
                                         </View>
                                     </View>
