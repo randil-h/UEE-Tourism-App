@@ -1,31 +1,35 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated, ScrollView, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated, ScrollView, Image, Alert, ActivityIndicator } from 'react-native';
 import React, { useState, useRef, useEffect } from 'react';
 import colorScheme from '../../assets/colors/colorScheme';
-import { AntDesign, Feather } from "@expo/vector-icons";
+import {AntDesign, Feather, MaterialCommunityIcons} from "@expo/vector-icons";
 import { Divider } from "react-native-paper";
-import { collection, getDocs, Timestamp } from "firebase/firestore";
+import { collection, getDocs, Timestamp, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig"; // Ensure this path is correct
 
 const EventsList = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [events, setEvents] = useState([]);
+    const [loading, setLoading] = useState(true); // Loading state for events
+    const [imageLoading, setImageLoading] = useState(false); // Loading state for image
 
     // Create animated values
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const slideAnim = useRef(new Animated.Value(300)).current; // Starts off-screen
 
-    // Fetch events from Firestore
-    const fetchEvents = async () => {
-        try {
-            const querySnapshot = await getDocs(collection(db, "events"));
+    // Real-time listener for events
+    const fetchEvents = () => {
+        const eventsCollectionRef = collection(db, "events");
+
+        const unsubscribe = onSnapshot(eventsCollectionRef, (querySnapshot) => {
             const eventsList = querySnapshot.docs.map(doc => {
                 const data = doc.data();
                 return {
                     id: doc.id,
                     name: data.name,
                     date: data.date instanceof Timestamp ? data.date.toDate().toLocaleDateString() : data.date,
-                    location: data.location,
+                    location: data.location.name, // Accessing location name
+                    coordinates: data.location.coordinates, // Accessing coordinates
                     ticketPrice: data.ticketPrice,
                     maxTickets: data.maxTickets,
                     imageUrl: data.imageUrl,
@@ -33,10 +37,15 @@ const EventsList = () => {
                 };
             });
             setEvents(eventsList);
-        } catch (error) {
+            setLoading(false); // Set loading to false when events are fetched
+        }, (error) => {
             console.error("Error fetching events: ", error);
             Alert.alert("Error", "Failed to load events");
-        }
+            setLoading(false); // Stop loading on error
+        });
+
+        // Cleanup listener on unmount
+        return () => unsubscribe();
     };
 
     useEffect(() => {
@@ -84,33 +93,49 @@ const EventsList = () => {
         });
     };
 
+    // Function to delete an event
+    const deleteEvent = async (eventId) => {
+        try {
+            await deleteDoc(doc(db, "events", eventId));
+            Alert.alert("Success", "Event deleted successfully");
+            closeModal(); // Close modal after deleting
+        } catch (error) {
+            console.error("Error deleting event: ", error);
+            Alert.alert("Error", "Failed to delete event");
+        }
+    };
+
     return (
         <ScrollView style={styles.container}>
-            {events.map((item, index) => (
-                <TouchableOpacity
-                    key={item.id}
-                    onPress={() => openModal(item)}
-                    style={styles.touchable}
-                >
-                    <View style={styles.eventCard}>
-                        <View style={styles.textContainer}>
-                            <Text style={styles.eventDate}>{item.date}</Text>
-                            <Text
-                                style={styles.eventTitle}
-                                numberOfLines={1}
-                                ellipsizeMode="tail"
-                            >
-                                {item.name}
-                            </Text>
-                        </View>
-                        <View>
-                            <View style={styles.indicator}>
-                                <Feather name="arrow-up-right" size={24} color="black" />
+            {loading ? (
+                <ActivityIndicator size="large" color={colorScheme.accent} />
+            ) : (
+                events.map((item) => (
+                    <TouchableOpacity
+                        key={item.id}
+                        onPress={() => openModal(item)}
+                        style={styles.touchable}
+                    >
+                        <View style={styles.eventCard}>
+                            <View style={styles.textContainer}>
+                                <Text style={styles.eventDate}>{item.date}</Text>
+                                <Text
+                                    style={styles.eventTitle}
+                                    numberOfLines={1}
+                                    ellipsizeMode="tail"
+                                >
+                                    {item.name}
+                                </Text>
+                            </View>
+                            <View>
+                                <View style={styles.indicator}>
+                                    <Feather name="arrow-up-right" size={24} color="black" />
+                                </View>
                             </View>
                         </View>
-                    </View>
-                </TouchableOpacity>
-            ))}
+                    </TouchableOpacity>
+                ))
+            )}
 
             {/* Modal for Event Details */}
             {modalVisible && selectedEvent && (
@@ -127,15 +152,18 @@ const EventsList = () => {
                                 { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
                             ]}
                         >
+                            {imageLoading && <ActivityIndicator size="small" color={colorScheme.accent} style={{alignSelf: 'center', marginTop: 100}} />}
                             <Image
                                 source={{ uri: selectedEvent.imageUrl }}
                                 style={styles.eventImage}
                                 resizeMode="cover"
+                                onLoadStart={() => setImageLoading(true)} // Show loading indicator
+                                onLoadEnd={() => setImageLoading(false)} // Hide loading indicator
                             />
                             <View style={styles.modalHeader}>
                                 <Text style={styles.modalTitle}>{selectedEvent.name}</Text>
                             </View>
-                            <Divider style={styles.divider}/>
+                            <Divider style={styles.divider} />
                             <View>
                                 <Text style={styles.modalDate}>{selectedEvent.date}</Text>
                                 <Text style={styles.modalLocation}>{selectedEvent.location}</Text>
@@ -144,9 +172,34 @@ const EventsList = () => {
                             <Text style={styles.modalDescription}>Tickets: {selectedEvent.maxTickets}</Text>
                             <Text style={styles.modalDescription}>Price: ${selectedEvent.ticketPrice}</Text>
 
-                            <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
-                                <AntDesign name="close" size={32} color="black" />
-                            </TouchableOpacity>
+                            <View style={{flexDirection: 'row', gap: 20, alignItems: 'center', alignSelf: 'flex-end'}}>
+                                {/* Delete Event Button */}
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        Alert.alert(
+                                            "Delete Event",
+                                            "Are you sure you want to delete this event?",
+                                            [
+                                                { text: "Cancel", style: "cancel" },
+                                                {
+                                                    text: "Delete",
+                                                    onPress: () => deleteEvent(selectedEvent.id),
+                                                    style: "destructive"
+                                                }
+                                            ]
+                                        );
+                                    }}
+                                    style={styles.deleteButton}
+                                >
+                                    <MaterialCommunityIcons name="delete-empty" size={32} color="black" />
+                                </TouchableOpacity>
+
+                                {/* Close Button */}
+                                <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
+                                    <AntDesign name="close" size={32} color="black" />
+                                </TouchableOpacity>
+                            </View>
+
                         </Animated.View>
                     </View>
                 </Modal>
@@ -161,7 +214,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         marginTop: 0,
         marginHorizontal: 20,
-        marginBottom: 20,
+        marginBottom: 110,
         backgroundColor: colorScheme.gray_bg,
     },
     eventCard: {
@@ -196,10 +249,10 @@ const styles = StyleSheet.create({
     },
     eventImage: {
         width: '100%',
-        height: 200,
-        borderRadius: 0,
+        aspectRatio: 1, // This ensures height is equal to width
         marginBottom: 20,
     },
+
     modalBackground: {
         flex: 1,
         justifyContent: 'center',
@@ -238,6 +291,17 @@ const styles = StyleSheet.create({
         marginTop: 20,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    deleteButton: {
+
+        borderRadius: 50,
+        marginTop: 20,
+        alignItems: 'center',
+    },
+    deleteButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     divider: {
         marginVertical: 10,

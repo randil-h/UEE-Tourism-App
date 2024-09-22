@@ -1,26 +1,29 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, Alert } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import MapView from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { addDoc, collection } from "@firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { auth, db, storage } from "../../../firebaseConfig";
+import { db, storage } from "../../../firebaseConfig";
 import Config from "../../../apiConfig";
 import colorScheme from "../../../assets/colors/colorScheme";
+import { Divider } from "react-native-paper";
+import { FontAwesome6 } from "@expo/vector-icons";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const AddEvents = () => {
     const router = useRouter();
     const [eventName, setEventName] = useState('');
-    const [eventDate, setEventDate] = useState(new Date());
+    const [eventDate, setEventDate] = useState('');
     const [image, setImage] = useState(null);
     const [location, setLocation] = useState('');
+    const [locationCoordinates, setLocationCoordinates] = useState(null); // Store coordinates separately
     const [ticketPrice, setTicketPrice] = useState('');
     const [maxTickets, setMaxTickets] = useState('');
-    const [showPicker, setShowPicker] = useState(false);
+    const [isLoading, setIsLoading] = useState(false); // State to manage loading animation
     const GOOGLE_MAPS_API_KEY = Config.GOOGLE_MAPS_API_KEY;
+    const googlePlacesRef = useRef(); // Reference to GooglePlacesAutocomplete
 
     // Handle Image Pick with aspect ratio constraint
     const pickImage = async () => {
@@ -43,10 +46,17 @@ const AddEvents = () => {
 
     // Save event to Firestore and upload image to Firebase Storage
     const saveEvent = async () => {
+        if (!eventDate.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+            Alert.alert("Invalid Date", "Please enter a valid date in MM/DD/YYYY format");
+            return;
+        }
+
         if (!image) {
             Alert.alert("Image Required", "Please upload an event image");
             return;
         }
+
+        setIsLoading(true); // Show loading spinner
 
         try {
             const imageRef = ref(storage, `events/${new Date().getTime()}.jpg`);
@@ -59,7 +69,10 @@ const AddEvents = () => {
             const eventData = {
                 name: eventName,
                 date: eventDate,
-                location,
+                location: {
+                    name: location,
+                    coordinates: locationCoordinates, // Save coordinates as well
+                },
                 ticketPrice,
                 maxTickets,
                 imageUrl,
@@ -68,27 +81,43 @@ const AddEvents = () => {
 
             await addDoc(collection(db, "events"), eventData);
             Alert.alert("Success", "Event saved successfully!");
-            router.push('/success'); // Redirect after successful save
         } catch (error) {
             console.error("Error saving event: ", error);
             Alert.alert("Error", "Failed to save event");
+        } finally {
+            setIsLoading(false); // Hide loading spinner
         }
     };
 
-    const onChange = (event, selectedDate) => {
-        const currentDate = selectedDate || eventDate;
-        setShowPicker(false);
-        setEventDate(currentDate);
-    };
-
     return (
-        <ScrollView style={styles.scrollView}>
+        <KeyboardAwareScrollView
+            style={styles.scrollView}
+            enableOnAndroid={true}
+            extraScrollHeight={100}
+        >
             <View style={styles.container}>
+                <View style={styles.headerContainer}>
+                    <View>
+                        <Text style={styles.headerTitle}>Add an Event</Text>
+                        <Text style={styles.headerSubtitle}>Fill the below form</Text>
+                        <Divider style={{ marginBottom: 30 }} />
+                    </View>
+                    {/* Save Button */}
+                    <TouchableOpacity onPress={saveEvent} style={styles.button} disabled={isLoading}>
+                        {isLoading ? (
+                            <ActivityIndicator size="small" color="black" />
+                        ) : (
+                            <FontAwesome6 name="save" size={20} color="black" />
+                        )}
+                    </TouchableOpacity>
+                </View>
+
                 {/* Event Name */}
                 <Text style={styles.label}>Event Name</Text>
                 <TextInput
                     style={styles.input}
                     placeholder="Enter event name"
+                    placeholderTextColor={colorScheme.gray_text} // Placeholder color
                     value={eventName}
                     onChangeText={setEventName}
                 />
@@ -96,15 +125,29 @@ const AddEvents = () => {
                 {/* Location (Google Places) */}
                 <Text style={styles.label}>Location</Text>
                 <GooglePlacesAutocomplete
+                    ref={googlePlacesRef}
                     placeholder="Search for a location"
-                    onPress={(data) => setLocation(data.description)}
+                    onPress={(data, details = null) => {
+                        setLocation(data.description);
+                        googlePlacesRef.current.setAddressText(data.description); // Update the input text with the selected location
+                        if (details) {
+                            const { lat, lng } = details.geometry.location;
+                            setLocationCoordinates({ lat, lng });
+                        }
+                    }}
                     query={{
                         key: GOOGLE_MAPS_API_KEY,
                         language: 'en',
                     }}
+                    fetchDetails={true} // This ensures you get more than just the name
                     styles={{
-                        textInput: {backgroundColor: colorScheme.gray_bg, borderRadius: 0, borderColor: colorScheme.accent, borderBottomWidth: 1.5},
-                        listView: { borderRadius: 0, marginTop: 0 }, // Add this for better styling,
+                        textInput: {
+                            backgroundColor: colorScheme.gray_bg,
+                            borderRadius: 0,
+                            borderColor: colorScheme.accent,
+                            borderBottomWidth: 1.5
+                        },
+                        listView: { borderRadius: 0, marginTop: 0 },
                     }}
                 />
 
@@ -113,6 +156,7 @@ const AddEvents = () => {
                 <TextInput
                     style={styles.input}
                     placeholder="Enter ticket price"
+                    placeholderTextColor={colorScheme.gray_text} // Placeholder color
                     keyboardType="numeric"
                     value={ticketPrice}
                     onChangeText={setTicketPrice}
@@ -123,37 +167,29 @@ const AddEvents = () => {
                 <TextInput
                     style={styles.input}
                     placeholder="Enter max number of tickets"
+                    placeholderTextColor={colorScheme.gray_text} // Placeholder color
                     keyboardType="numeric"
                     value={maxTickets}
                     onChangeText={setMaxTickets}
                 />
 
-                {/* Event Date */}
-                <Text style={styles.label}>Event Date</Text>
-                <TouchableOpacity onPress={() => setShowPicker(true)}>
-                    <Text style={styles.input}>{eventDate.toLocaleDateString()}</Text>
-                </TouchableOpacity>
-                {showPicker && (
-                    <DateTimePicker
-                        value={eventDate}
-                        mode="date"
-                        display="default"
-                        onChange={onChange}
-                    />
-                )}
+                {/* Event Date (Text Input with Validation) */}
+                <Text style={styles.label}>Event Date (MM/DD/YYYY)</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Enter event date"
+                    placeholderTextColor={colorScheme.gray_text} // Placeholder color
+                    value={eventDate}
+                    onChangeText={setEventDate}
+                />
 
                 {/* Image Upload */}
                 <Text style={styles.label}>Event Image</Text>
                 <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
                     {image ? <Image source={{ uri: image }} style={styles.imagePreview} /> : <Text>Pick an image (Square)</Text>}
                 </TouchableOpacity>
-
-                {/* Save Button */}
-                <TouchableOpacity onPress={saveEvent} style={styles.button}>
-                    <Text style={styles.buttonText}>Save Event</Text>
-                </TouchableOpacity>
             </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
     );
 };
 
@@ -166,10 +202,30 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
+        marginBottom: 40,
+    },
+    headerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 0, // px-6
+        paddingVertical: 0, // py-2
+        marginTop: 0, // mt-4
+    },
+    headerTitle: {
+        fontWeight: 'bold',
+        fontSize: 40,
+        paddingTop: 0,
+    },
+    headerSubtitle: {
+        fontWeight: 'bold',
+        fontSize: 24,
+        marginBottom: 16,
+        color: colorScheme.gray_text,
     },
     label: {
-        fontSize: 24,
+        fontSize: 20,
         marginVertical: 10,
+        marginLeft: 10,
         fontWeight: 'bold',
         color: colorScheme.black,
     },
@@ -193,29 +249,18 @@ const styles = StyleSheet.create({
     imagePreview: {
         width: 200,
         height: 200,
-        borderRadius: 0, // Ensures square image
-    },
-    mapViewContainer: {
-        marginVertical: 20,
-        height: 200,
-        borderRadius: 20,
-        overflow: 'hidden',
-    },
-    mapView: {
-        width: '100%',
-        height: '100%',
+        borderRadius: 0,
     },
     button: {
         backgroundColor: colorScheme.accent,
         padding: 15,
-        borderRadius: 0,
+        width: 50,
+        height: 50,
+        borderRadius: 25,
         alignItems: 'center',
-        marginTop: 20,
-    },
-    buttonText: {
-        color: 'black',
-        fontSize: 18,
-        fontWeight: 'bold',
+        alignSelf: 'flex-start',
+        marginTop: 0,
+        marginBottom: 0,
     },
 });
 
