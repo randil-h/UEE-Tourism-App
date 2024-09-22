@@ -4,7 +4,8 @@ const colorScheme = {
   gray_text: "#bfbcbc",
   black: "#35342f",
   white: "#f1f2f0",
-  accent: "#457c39"
+  accent: "#457c39",
+  red: "#801021"
 };
 
 export default colorScheme;

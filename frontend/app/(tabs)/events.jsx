@@ -42,6 +42,9 @@ const Events = () => {
                     <TouchableOpacity style={styles.iconButton}>
                         <FontAwesome6 name="bucket" size={20} color="black" />
                     </TouchableOpacity>
+                    <TouchableOpacity style={styles.iconButton} onPress={() => router.push('screens/events/AddEvents')}>
+                        <FontAwesome6 name="add" size={20} color="black" />
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.mapContainer}>
@@ -119,7 +122,7 @@ const styles = StyleSheet.create({
         borderRadius: 100,
     },
     iconButton: {
-        backgroundColor: colors.accent, // bg-blue-950
+        backgroundColor: colors.accent,
         height: 32,
         width: 32,
         marginTop: 32, // mt-8
