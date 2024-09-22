@@ -7,6 +7,7 @@ import Slider from '@react-native-community/slider';
 import { BlurView } from 'expo-blur';
 import { FAB } from 'react-native-paper';
 import { AntDesign } from '@expo/vector-icons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Config from "../../apiConfig";
 import { db, collection, addDoc } from '../../firebaseConfig';
@@ -289,7 +290,10 @@ const Map = () => {
                                             longitude: place.geometry.location.lng
                                         }, place.place_id)}
                                     >
-                                        <Text style={styles.navigateButtonText}>Navigate</Text>
+                                        <View style={styles.buttonContent}>
+                                            <Icon name="navigation" size={20} color="#fff" />
+                                            <Text style={styles.navigateButtonText}>Navigate</Text>
+                                        </View>
                                     </TouchableOpacity>
 
                                     <Text style={styles.notesTitle}>User Notes:</Text>
@@ -581,13 +585,17 @@ const styles = StyleSheet.create({
         backgroundColor: '#478747',
         padding: 10,
         borderRadius: 5,
-        marginTop: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    buttonContent: {
+        flexDirection: 'row',
         alignItems: 'center',
     },
     navigateButtonText: {
-        color: 'white',
-        fontSize: 14,
-        fontWeight: 'bold',
+        color: '#fff',
+        marginLeft: 5,
+        fontSize: 16,
     },
     currentLocationMarker: {
         width: 24,
