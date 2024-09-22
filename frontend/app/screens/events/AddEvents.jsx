@@ -8,6 +8,8 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import { addDoc, collection } from "@firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, db, storage } from "../../../firebaseConfig";
+import Config from "../../../apiConfig";
+import colorScheme from "../../../assets/colors/colorScheme";
 
 const AddEvents = () => {
     const router = useRouter();
@@ -18,17 +20,23 @@ const AddEvents = () => {
     const [ticketPrice, setTicketPrice] = useState('');
     const [maxTickets, setMaxTickets] = useState('');
     const [showPicker, setShowPicker] = useState(false);
+    const GOOGLE_MAPS_API_KEY = Config.GOOGLE_MAPS_API_KEY;
 
-    // Handle Image Pick
+    // Handle Image Pick with aspect ratio constraint
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
-            aspect: [1, 1], // Ensure square image
+            aspect: [1, 1], // Ensures square image
             quality: 1,
         });
 
         if (!result.canceled) {
+            const { width, height } = result.assets[0];
+            if (width !== height) {
+                Alert.alert("Invalid Image", "Please select a square image.");
+                return;
+            }
             setImage(result.assets[0].uri);
         }
     };
@@ -41,31 +49,26 @@ const AddEvents = () => {
         }
 
         try {
-            // Upload image to Firebase Storage
-            const imageRef = ref(storage, `events/${new Date().getTime()}_${auth.currentUser.uid}.jpg`);
-            const response = await fetch(image); // Convert the image to a blob
+            const imageRef = ref(storage, `events/${new Date().getTime()}.jpg`);
+            const response = await fetch(image);
             const blob = await response.blob();
             await uploadBytes(imageRef, blob);
 
-            // Get the image URL from Firebase Storage
             const imageUrl = await getDownloadURL(imageRef);
 
-            // Save event data to Firestore
             const eventData = {
                 name: eventName,
                 date: eventDate,
                 location,
                 ticketPrice,
                 maxTickets,
-                imageUrl, // Store image URL
-                createdBy: auth.currentUser.uid,
+                imageUrl,
                 createdAt: new Date(),
             };
 
             await addDoc(collection(db, "events"), eventData);
-
             Alert.alert("Success", "Event saved successfully!");
-            router.push('/success');
+            router.push('/success'); // Redirect after successful save
         } catch (error) {
             console.error("Error saving event: ", error);
             Alert.alert("Error", "Failed to save event");
@@ -90,51 +93,20 @@ const AddEvents = () => {
                     onChangeText={setEventName}
                 />
 
-                {/* Image Upload */}
-                <Text style={styles.label}>Event Image</Text>
-                <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
-                    {image ? <Image source={{ uri: image }} style={styles.imagePreview} /> : <Text>Pick an image (Square)</Text>}
-                </TouchableOpacity>
-
-                {/* Event Date */}
-                <Text style={styles.label}>Event Date</Text>
-                <TouchableOpacity onPress={() => setShowPicker(true)}>
-                    <Text style={styles.input}>{eventDate.toLocaleDateString()}</Text>
-                </TouchableOpacity>
-
-                {showPicker && (
-                    <DateTimePicker
-                        value={eventDate}
-                        mode="date"
-                        display="default"
-                        onChange={onChange}
-                    />
-                )}
-
                 {/* Location (Google Places) */}
                 <Text style={styles.label}>Location</Text>
                 <GooglePlacesAutocomplete
                     placeholder="Search for a location"
                     onPress={(data) => setLocation(data.description)}
                     query={{
-                        key: 'YOUR_GOOGLE_PLACES_API_KEY',
+                        key: GOOGLE_MAPS_API_KEY,
                         language: 'en',
                     }}
-                    styles={{ textInput: styles.input }}
+                    styles={{
+                        textInput: {backgroundColor: colorScheme.gray_bg, borderRadius: 0, borderColor: colorScheme.accent, borderBottomWidth: 1.5},
+                        listView: { borderRadius: 0, marginTop: 0 }, // Add this for better styling,
+                    }}
                 />
-
-                {/* Map Selection (optional) */}
-                <TouchableOpacity onPress={() => router.push('screens/events/EventsMap')} style={styles.mapViewContainer}>
-                    <MapView
-                        style={styles.mapView}
-                        initialRegion={{
-                            latitude: 37.78825,
-                            longitude: -122.4324,
-                            latitudeDelta: 0.0922,
-                            longitudeDelta: 0.0421,
-                        }}
-                    />
-                </TouchableOpacity>
 
                 {/* Ticket Price */}
                 <Text style={styles.label}>Ticket Price</Text>
@@ -156,6 +128,26 @@ const AddEvents = () => {
                     onChangeText={setMaxTickets}
                 />
 
+                {/* Event Date */}
+                <Text style={styles.label}>Event Date</Text>
+                <TouchableOpacity onPress={() => setShowPicker(true)}>
+                    <Text style={styles.input}>{eventDate.toLocaleDateString()}</Text>
+                </TouchableOpacity>
+                {showPicker && (
+                    <DateTimePicker
+                        value={eventDate}
+                        mode="date"
+                        display="default"
+                        onChange={onChange}
+                    />
+                )}
+
+                {/* Image Upload */}
+                <Text style={styles.label}>Event Image</Text>
+                <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
+                    {image ? <Image source={{ uri: image }} style={styles.imagePreview} /> : <Text>Pick an image (Square)</Text>}
+                </TouchableOpacity>
+
                 {/* Save Button */}
                 <TouchableOpacity onPress={saveEvent} style={styles.button}>
                     <Text style={styles.buttonText}>Save Event</Text>
@@ -167,29 +159,31 @@ const AddEvents = () => {
 
 const styles = StyleSheet.create({
     scrollView: {
-        backgroundColor: '#fff',
+        backgroundColor: colorScheme.gray_bg,
         padding: 20,
+        marginHorizontal: 20,
+        marginTop: 20,
     },
     container: {
         flex: 1,
     },
     label: {
-        fontSize: 16,
+        fontSize: 24,
         marginVertical: 10,
         fontWeight: 'bold',
-        color: '#333',
+        color: colorScheme.black,
     },
     input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
+        borderBottomWidth: 1.5,
+        borderColor: colorScheme.accent,
+        borderRadius: 0,
         padding: 12,
         fontSize: 16,
     },
     imagePicker: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
+        borderBottomWidth: 1.5,
+        borderColor: colorScheme.accent,
+        borderRadius: 0,
         padding: 12,
         alignItems: 'center',
         justifyContent: 'center',
@@ -199,7 +193,7 @@ const styles = StyleSheet.create({
     imagePreview: {
         width: 200,
         height: 200,
-        borderRadius: 8, // Ensures square image
+        borderRadius: 0, // Ensures square image
     },
     mapViewContainer: {
         marginVertical: 20,
@@ -212,14 +206,14 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     button: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: colorScheme.accent,
         padding: 15,
-        borderRadius: 8,
+        borderRadius: 0,
         alignItems: 'center',
         marginTop: 20,
     },
     buttonText: {
-        color: '#fff',
+        color: 'black',
         fontSize: 18,
         fontWeight: 'bold',
     },
