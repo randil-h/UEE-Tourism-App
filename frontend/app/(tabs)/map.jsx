@@ -244,6 +244,16 @@ const Map = () => {
                 showsUserLocation={true}
                 followsUserLocation={true}
             >
+                {location && (
+                    <Marker
+                        coordinate={location}
+                        anchor={{ x: 0.5, y: 0.5 }}
+                    >
+                        <View style={styles.currentLocationMarker}>
+                            <View style={styles.currentLocationMarkerInner} />
+                        </View>
+                    </Marker>
+                )}
                 {popularAttractions.map((place, index) => {
                     const placeType = place.types?.[0]?.replace('_', ' ') || 'Tourist attraction';
                     const isOpenNow = place.opening_hours?.open_now;
@@ -578,6 +588,20 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 14,
         fontWeight: 'bold',
+    },
+    currentLocationMarker: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        backgroundColor: '#ffffff',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    currentLocationMarkerInner: {
+        width: 16,
+        height: 16,
+        borderRadius: 12,
+        backgroundColor: '#478747',
     },
 });
 
