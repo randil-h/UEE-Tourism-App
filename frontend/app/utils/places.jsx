@@ -233,5 +233,282 @@ export const places = [
         ticketPrice: { local: 100, foreign: 5 },
         imageSource: require('../../assets/images/itinerary/dutchhospital.jpg'),
         lat: 6.027, lon: 80.217
+    },
+    {
+        name: 'Royal Botanical Gardens',
+        location: 'Peradeniya',
+        type: 'Sightseeing',
+        ticketPrice: { local: 1000, foreign: 20 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 7.256, lon: 80.596
+    },
+    {
+        name: 'Kandy Lake',
+        location: 'Kandy',
+        type: 'Relaxation',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 7.290, lon: 80.633
+    },
+    {
+        name: 'Weligama Bay',
+        location: 'Weligama',
+        type: 'Relaxation',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 5.972, lon: 80.399
+    },
+    {
+        name: 'Mihintale',
+        location: 'Mihintale',
+        type: 'Cultural',
+        ticketPrice: { local: 200, foreign: 10 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 8.392, lon: 80.545
+    },
+    {
+        name: 'Hikkaduwa Beach',
+        location: 'Hikkaduwa',
+        type: 'Relaxation',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.124, lon: 80.095
+    },
+    {
+        name: 'Yapahuwa',
+        location: 'Yapahuwa',
+        type: 'Cultural',
+        ticketPrice: { local: 300, foreign: 15 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 7.519, lon: 80.468
+    },
+    {
+        name: 'Pidurangala Rock',
+        location: 'Sigiriya',
+        type: 'Adventurous',
+        ticketPrice: { local: 500, foreign: 20 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 7.952, lon: 80.753
+    },
+    {
+        name: 'Knuckles Conservation Forest',
+        location: 'Kandy',
+        type: 'Adventurous',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 7.433, lon: 80.703
+    },
+    {
+        name: 'Devon Falls',
+        location: 'Talawakele',
+        type: 'Sightseeing',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.972, lon: 80.574
+    },
+    {
+        name: 'Lankathilaka Temple',
+        location: 'Kandy',
+        type: 'Cultural',
+        ticketPrice: { local: 100, foreign: 5 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 7.285, lon: 80.614
+    },
+    {
+        name: 'Kithulgala',
+        location: 'Kithulgala',
+        type: 'Adventurous',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.974, lon: 80.411
+    },
+
+    {
+        name: 'Ahangama Beach',
+        location: 'Ahangama',
+        type: 'Relaxation',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 5.952, lon: 80.078
+    },
+    {
+        name: 'Sinharaja Forest Reserve',
+        location: 'Ratnapura',
+        type: 'Adventurous',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.366, lon: 80.667
+    },
+    {
+        name: 'Samanalawewa',
+        location: 'Balangoda',
+        type: 'Sightseeing',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.701, lon: 80.679
+    },
+    {
+        name: 'Nuwara Eliya Golf Club',
+        location: 'Nuwara Eliya',
+        type: 'Relaxation',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.950, lon: 80.221
+    },
+    {
+        name: 'Kandy National Museum',
+        location: 'Kandy',
+        type: 'Cultural',
+        ticketPrice: { local: 500, foreign: 10 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 7.293, lon: 80.636
+    },
+    {
+        name: 'Polonnaruwa Gal Vihara',
+        location: 'Polonnaruwa',
+        type: 'Cultural',
+        ticketPrice: { local: 400, foreign: 20 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 7.934, lon: 81.002
+    },
+    {
+        name: 'Anuradhapura',
+        location: 'Anuradhapura',
+        type: 'Cultural',
+        ticketPrice: { local: 200, foreign: 10 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 8.348, lon: 80.395
+    },
+    {
+        name: 'Kalpitiya',
+        location: 'Kalpitiya',
+        type: 'Relaxation',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 8.409, lon: 79.771
+    },
+    {
+        name: 'Hambantota Port',
+        location: 'Hambantota',
+        type: 'Sightseeing',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.125, lon: 81.119
+    },
+
+    {
+        name: 'Galle Face Green',
+        location: 'Colombo',
+        type: 'Relaxation',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.927, lon: 79.958
+    },
+
+    {
+        name: 'Pettah Market',
+        location: 'Colombo',
+        type: 'Cultural',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.940, lon: 79.961
+    },
+
+
+    {
+        name: 'Batticaloa Lagoon',
+        location: 'Batticaloa',
+        type: 'Relaxation',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 7.706, lon: 81.693
+    },
+    {
+        name: 'Ramboda Falls',
+        location: 'Ramboda',
+        type: 'Sightseeing',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.975, lon: 80.569
+    },
+    {
+        name: 'Sella Kataragama',
+        location: 'Kataragama',
+        type: 'Cultural',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.304, lon: 81.285
+    },
+    {
+        name: 'Hatton Tea Museum',
+        location: 'Hatton',
+        type: 'Cultural',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.774, lon: 80.486
+    },
+    {
+        name: 'Tangalle Beach',
+        location: 'Tangalle',
+        type: 'Relaxation',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 5.979, lon: 80.816
+    },
+    {
+        name: 'Diyaluma Falls',
+        location: 'Koslanda',
+        type: 'Sightseeing',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.920, lon: 81.161
+    },
+
+    {
+        name: 'Ambalangoda Mask Museum',
+        location: 'Ambalangoda',
+        type: 'Cultural',
+        ticketPrice: { local: 200, foreign: 10 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.181, lon: 80.084
+    },
+    {
+        name: 'Beruwala Beach',
+        location: 'Beruwala',
+        type: 'Relaxation',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.495, lon: 79.988
+    },
+    {
+        name: 'Ratnapura Gem Museum',
+        location: 'Ratnapura',
+        type: 'Cultural',
+        ticketPrice: { local: 200, foreign: 10 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.684, lon: 80.370
+    },
+    {
+        name: 'Koggala Lake',
+        location: 'Koggala',
+        type: 'Relaxation',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+    },
+    {
+        name: 'Mawella Lagoon',
+        location: 'Mawella',
+        type: 'Relaxation',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 5.970, lon: 80.737
+    },
+    {
+        name: 'Bopath Ella Falls',
+        location: 'Ratnapura',
+        type: 'Sightseeing',
+        ticketPrice: { local: 0, foreign: 0 },
+        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        lat: 6.685, lon: 80.432
     }
 ];
