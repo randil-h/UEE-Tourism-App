@@ -26,26 +26,32 @@ const Itinerary = () => {
     const handleNavigateToAddPlace = () => {
         router.push('/screens/AddPlaces'); // Adjust the route according to your setup
     };
-    const handleGenerateItinerary = () => {
-            console.log('Form submitted with:', { days, budget, activities, startLocation, endLocation, touristType });
+    const handleGenerateItinerary = async () => {
+        console.log('Form submitted with:', { days, budget, activities, startLocation, endLocation, touristType });
 
-            const generatedItinerary = generateItinerary(
-            parseInt(days), // Ensure days is an integer
-            budget,
-            activities,
-            startLocation,
-            endLocation,
-            touristType
-        );
+        try {
+            const generatedItinerary = await generateItinerary(
+                parseInt(days), // Ensure days is an integer
+                budget,
+                activities,
+                startLocation,
+                endLocation,
+                touristType
+            );
 
-        // Log the generated itinerary for debugging
-        console.log('Generated Itinerary:', generatedItinerary);
+            // Log the generated itinerary for debugging
+            console.log('Generated Itinerary:', JSON.stringify(generatedItinerary));
 
-        // Navigate to ItineraryDisplay with the generated itinerary
-        router.push({
-            pathname: "/screens/itinerary/ItineraryDisplay",
-            params: { itinerary: JSON.stringify(generatedItinerary), touristType }
-        });
+            // Navigate to ItineraryDisplay with the generated itinerary
+            router.push({
+                pathname: "/screens/itinerary/ItineraryDisplay",
+                params: { itinerary: JSON.stringify(generatedItinerary), touristType }
+            });
+        } catch (error) {
+            console.error('Error generating itinerary:', error);
+            // Handle the error (e.g., show an alert to the user)
+
+        }
     };
 
 
