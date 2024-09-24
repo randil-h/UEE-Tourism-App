@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, View, Alert, Text, Image, Modal, TextInput, TouchableOpacity } from 'react-native';
+import {StyleSheet, View, Alert, Text, Image, Modal, TextInput, TouchableOpacity, ScrollView} from 'react-native';
 import MapView, { Callout, Marker, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
@@ -11,7 +11,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Config from "../../apiConfig";
 import { db, collection, addDoc } from '../../firebaseConfig';
-import { getDocs, doc, setDoc, arrayUnion, getDoc } from 'firebase/firestore';
+import { getDocs, doc, setDoc, arrayUnion, getDoc, updateDoc, arrayRemove } from 'firebase/firestore';
 
 const Map = () => {
     const [location, setLocation] = useState(null);
@@ -66,6 +66,23 @@ const Map = () => {
         } catch (error) {
             console.error('Error adding user note:', error);
             Alert.alert('Error', 'Failed to add note');
+        }
+    };
+
+    const deleteUserNote = async (placeId, noteIndex) => {
+        try {
+            const noteRef = doc(db, 'userNotes', placeId);
+            await updateDoc(noteRef, {
+                notes: arrayRemove(userNotes[placeId][noteIndex])
+            });
+
+            setUserNotes(prevNotes => ({
+                ...prevNotes,
+                [placeId]: prevNotes[placeId].filter((_, index) => index !== noteIndex)
+            }));
+        } catch (error) {
+            console.error('Error deleting user note:', error);
+            Alert.alert('Error', 'Failed to delete note');
         }
     };
 
@@ -275,8 +292,17 @@ const Map = () => {
                         >
                             <Image source={require('../../assets/icons/MapPin2.png')} style={{ height: 35, width: 35 }} />
 
-                            <Callout>
-                                <View style={styles.calloutContainer}>
+                            <Callout
+                                tooltip
+                                style={[
+                                    styles.calloutContainer,
+                                    { maxHeight: 600 },
+                                ]}
+                            >
+                                <ScrollView
+                                    contentContainerStyle={styles.calloutScrollView}
+                                    showsVerticalScrollIndicator={true}
+                                >
                                     <Text style={styles.calloutTitle}>{place.name}</Text>
                                     <Text>{placeType}</Text>
                                     <Text>Rating: {place.rating} ({place.user_ratings_total} reviews)</Text>
@@ -298,7 +324,15 @@ const Map = () => {
 
                                     <Text style={styles.notesTitle}>User Notes:</Text>
                                     {userNotes[place.place_id]?.map((note, i) => (
-                                        <Text key={i} style={styles.userNote}>{note}</Text>
+                                        <View key={i} style={styles.noteContainer}>
+                                            <Text style={styles.userNote}>{note}</Text>
+                                            <TouchableOpacity
+                                                style={styles.deleteButton}
+                                                onPress={() => deleteUserNote(place.place_id, i)}
+                                            >
+                                                <Icon name="delete" size={20} color="#f44336" />
+                                            </TouchableOpacity>
+                                        </View>
                                     ))}
                                     <TextInput
                                         style={styles.noteInput}
@@ -317,7 +351,7 @@ const Map = () => {
                                     >
                                         <Text style={styles.addNoteButtonText}>Add Note</Text>
                                     </TouchableOpacity>
-                                </View>
+                                </ScrollView>
                             </Callout>
                         </Marker>
                     );
@@ -441,8 +475,14 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
     },
     calloutContainer: {
-        width: 200,
+        backgroundColor: '#f7f7f7',
+        maxHeight: 300,
+        width: 250,
         padding: 10,
+        borderRadius: 24,
+    },
+    calloutScrollView: {
+        paddingVertical: 10,
     },
     calloutTitle: {
         fontSize: 16,
@@ -610,6 +650,15 @@ const styles = StyleSheet.create({
         height: 16,
         borderRadius: 12,
         backgroundColor: '#478747',
+    },
+    noteContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: 5,
+    },
+    deleteButton: {
+        padding: 5,
     },
 });
 
