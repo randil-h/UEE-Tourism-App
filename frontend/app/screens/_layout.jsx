@@ -9,6 +9,7 @@ export default function _layout() {
             <Stack.Screen name="AllBlogs" options={{headerShown: true, title: 'View Blogs'}}/>
             <Stack.Screen name="blogs/MyBlogs" options={{headerShown: true, title: 'My Blogs'}}/>
             <Stack.Screen name="blogs/EditBlog" options={{headerShown: true, title: 'Edit Blog'}}/>
+            <Stack.Screen name="blogs/SaveBlogs" options={{headerShown: true, title: 'Save Blogs'}}/>
 
 
             <Stack.Screen name="itinerary/ItineraryDisplay" options={{headerShown: false, title: 'Generated Itinerary'}}/>
