@@ -101,6 +101,12 @@ const Profile = () => {
                     </TouchableOpacity>
                     <Divider />
 
+                    <TouchableOpacity onPress={() => router.push('/screens/blogs/SaveBlogs')} style={styles.settingsOption}>
+                        <Text style={[styles.settingsText, { color: colors.darkSlateGray }]}>Saved Blogs</Text>
+                        <FontAwesome name="chevron-right" size={20} color={colors.darkOliveGreen} />
+                    </TouchableOpacity>
+                    <Divider />
+
                     <TouchableOpacity style={styles.settingsOption}>
                         <Text style={[styles.settingsText, { color: colors.darkSlateGray }]}>Privacy</Text>
                         <FontAwesome name="chevron-right" size={20} color={colors.darkOliveGreen} />
