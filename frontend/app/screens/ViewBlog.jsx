@@ -27,12 +27,13 @@ const ViewBlog = ({ route }) => {
     const [likesCount, setLikesCount] = useState(null);
     const [comments, setComments] = useState([]);
     const [isModalVisible, setModalVisible] = useState(false);
+    const [bookmarked, setBookmarked] = useState(false);
     const [newComment, setNewComment] = useState('');
     const currentUser = auth.currentUser;
 
     useEffect(() => {
         const fetchData = async () => {
-            await Promise.all([loadImages(), fetchLikes()]);
+            await Promise.all([loadImages(), fetchLikes(), checkIfBookmarked()]);
         };
         const loadImages = async () => {
             const urls = await Promise.all(
@@ -60,8 +61,71 @@ const ViewBlog = ({ route }) => {
             }
         };
 
+        const checkIfBookmarked = async () => {
+            if (!currentUser) return;
+
+            const userPreferencesRef = doc(db, "preferences", currentUser.uid);
+            const userPreferencesSnap = await getDoc(userPreferencesRef);
+
+            if (userPreferencesSnap.exists()) {
+                const userData = userPreferencesSnap.data();
+                const savedBlogs = userData.savedBlogs || [];
+                if (savedBlogs.includes(parsedBlog.id)) {
+                    setBookmarked(true);
+                } else {
+                    setBookmarked(false);
+                }
+            }
+        };
+
         fetchData();
     }, [parsedBlog.images, parsedBlog.id]);
+
+    const toggleBookmark = async () => {
+        if (!currentUser) {
+            Alert.alert("Authentication Required!", "You must be logged in to bookmark this blog.");
+            return;
+        }
+        try {
+            // Toggle bookmark state in the frontend
+            const newBookmarkStatus = !bookmarked;
+            setBookmarked(newBookmarkStatus);
+
+            // Reference to the user's preferences document
+            const userPreferencesRef = doc(db, "preferences", currentUser.uid);
+            const userPreferencesSnap = await getDoc(userPreferencesRef);
+
+            if (userPreferencesSnap.exists()) {
+                const userData = userPreferencesSnap.data();
+                let savedBlogs = userData.savedBlogs || [];
+
+                // Add or remove the blog ID based on the bookmark status
+                if (newBookmarkStatus) {
+                    // Add the blog ID if not already saved
+                    if (!savedBlogs.includes(parsedBlog.id)) {
+                        savedBlogs.push(parsedBlog.id);
+                    }
+                } else {
+                    // Remove the blog ID if already saved
+                    savedBlogs = savedBlogs.filter(blogId => blogId !== parsedBlog.id);
+                }
+
+                // Update the preferences document with the new savedBlogs array
+                await updateDoc(userPreferencesRef, {
+                    savedBlogs: savedBlogs
+                });
+            } else {
+                // If the preferences document doesn't exist, create it with the saved blog
+                await setDoc(userPreferencesRef, {
+                    userId: currentUser.uid,
+                    userName: currentUser.displayName || "Anonymous",
+                    savedBlogs: [parsedBlog.id]
+                });
+            }
+        } catch (error) {
+            console.error("Error updating saved blogs", error);
+        }
+    };
 
     const toggleLike = async () => {
         if( !currentUser) {
@@ -130,13 +194,18 @@ const ViewBlog = ({ route }) => {
         }
     };
 
-    /*const toggleModal = () => {
+    const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };
 
     const addComment = async () => {
         if(!currentUser) {
             Alert.alert('Authentication Required!', 'You must be logged in to comment on this blog.');
+            return;
+        }
+
+        if(newComment.trim() === ''){
+            Alert.alert('Invalid Comment!', 'Comment cannot be empty.');
             return;
         }
         const newCommentObj = {
@@ -158,14 +227,19 @@ const ViewBlog = ({ route }) => {
         }catch (error) {
             console.error("Error adding comment", error);
         }
-    };*/
+    };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.title}>{parsedBlog.title}</Text>
-            <View style={{flexDirection: 'row'}}>
-                <Ionicons name="create-outline" size={18} color="gray" style={styles.timeIcon} />
-                <Text style={styles.uName}>{parsedBlog.userName}</Text>
+            <View style={{flexDirection: 'row', justifyContent: 'flex-start' }}>
+                <View style={{flexDirection: 'row'}}>
+                    <Ionicons name="create-outline" size={18} color="gray" style={styles.timeIcon} />
+                    <Text style={styles.uName}>{parsedBlog.userName}</Text>
+                </View>
+                <TouchableOpacity onPress={toggleBookmark}>
+                    <Ionicons name={bookmarked ? "bookmark" : "bookmark-outline"} size={18} color={bookmarked ? "gray" : "gray"} style={styles.timeIcon} />
+                </TouchableOpacity>
             </View>
             <View style={styles.dateContainer}>
                 <View style={{flexDirection: 'row'}}>
@@ -179,7 +253,7 @@ const ViewBlog = ({ route }) => {
                     </TouchableOpacity>
                     <Text style={{color: 'rgba(87, 87, 87, 1)', marginRight: 15}}>{likesCount}</Text>
                 </View>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={toggleModal}>
                     <Ionicons name= "chatbubbles-outline" size = {18} color = "rgba(73, 73, 73, 0.8)" style = {styles.timeIcon}/>
                 </TouchableOpacity>
             </View>
@@ -194,7 +268,7 @@ const ViewBlog = ({ route }) => {
                 ))}
             </View>
             <Text style={styles.content}>{parsedBlog.content}</Text>
-            {/*<Modal
+            <Modal
                 visible={isModalVisible}
                 onRequestClose={toggleModal}
                 style={styles.modal}
@@ -230,7 +304,7 @@ const ViewBlog = ({ route }) => {
                         </TouchableOpacity>
                     </View>
                 </TouchableOpacity>
-            </Modal>*/}
+            </Modal>
         </ScrollView>
     );
 };
@@ -281,7 +355,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(190, 189, 190, 0.8)',
         borderRadius: 10,
         paddingHorizontal: 8,
-        paddingVertical: 1.5
+        paddingVertical: 1.5,
+        marginRight: 10
     },
     imageContainer: {
         width: '100%',
