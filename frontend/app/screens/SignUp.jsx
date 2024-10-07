@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import {View, Text, TextInput, Button, Alert, StyleSheet, TouchableOpacity} from 'react-native';
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
 import {auth} from "../../firebaseConfig";
-import {router} from "expo-router";
+import {router, useRouter} from "expo-router";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import {useRoute} from "@react-navigation/native";
 
 const Signup = ({ navigation }) => {
     const [email, setEmail] = useState('');
@@ -11,6 +13,7 @@ const Signup = ({ navigation }) => {
     const [fullName, setFullName] = useState('');
     const [emailError, setEmailError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
+    const router = useRouter();
 
     const handleSignup = () => {
 
@@ -61,7 +64,14 @@ const Signup = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
+            <View style={{ position: 'absolute', top: 60, left: 20}}>
+                <TouchableOpacity style={{marginBottom: 24,}} onPress={() => router.back()}>
+                    <Ionicons name="arrow-back" size={20}></Ionicons>
+                </TouchableOpacity>
+            </View>
             <Text style={styles.heading}>Sign Up</Text>
+            <Text style={styles.postHead}>Create an account to continue!</Text>
+            <Text style={styles.preInput}>Full Name</Text>
             <TextInput
             style={styles.input}
             placeholder="Full Name"
@@ -69,6 +79,7 @@ const Signup = ({ navigation }) => {
             onChangeText={setFullName}
             selectionColor= 'black'
             />
+            <Text style={styles.preInput}>Email</Text>
             <TextInput
                 style={[styles.input, emailError && styles.borderError]}
                 placeholder="Email"
@@ -76,6 +87,7 @@ const Signup = ({ navigation }) => {
                 onChangeText={setEmail}
                 selectionColor= 'black'
             />
+            <Text style={styles.preInput}>Set Password</Text>
             <TextInput
                 style={[styles.input, passwordError && styles.borderError]}
                 placeholder="Password"
@@ -84,6 +96,7 @@ const Signup = ({ navigation }) => {
                 secureTextEntry
                 selectionColor= 'black'
             />
+            <Text style={styles.preInput}>Confirm Password</Text>
             <TextInput
                 style={[styles.input]}
                 placeholder="Confirm Password"
@@ -92,12 +105,13 @@ const Signup = ({ navigation }) => {
                 secureTextEntry
                 selectionColor= 'black'
             />
-            <TouchableOpacity onPress={handleSignup} style={{alignItems: 'center', backgroundColor: 'blue', borderRadius: 20, paddingVertical: 10, paddingHorizontal: 25}} >
+            <TouchableOpacity onPress={handleSignup} style={{alignItems: 'center', backgroundColor: '#1D61E7', borderRadius: 10, paddingVertical: 12, paddingHorizontal: 25, marginTop: 10}} >
                 <Text style={{fontWeight: 'bold', fontSize: 18, color: 'white'}}>Signup</Text>
             </TouchableOpacity>
-            <Text style={styles.linkText} onPress={() => router.push('/screens/Login')}>
-                Already have an account? Log In
-            </Text>
+            <View style={{flexDirection: 'row', justifyContent: 'center', alignContent: 'center'}}>
+                <Text style={{marginTop: 35}}>Already have an account?</Text>
+                <Text style={styles.linkText} onPress={() => router.push('/screens/Login')}>Log In</Text>
+            </View>
         </View>
     );
 };
@@ -107,29 +121,40 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         padding: 20,
-        alignItems: 'center'
+        marginHorizontal: 10,
+        marginBottom: 20
     },
     heading: {
-        fontSize: 24,
-        marginBottom: 20,
-        textAlign: 'center',
+        fontSize: 30,
+        textAlign: 'left',
         fontWeight: 'bold'
+    },
+    postHead: {
+        fontSize: 12,
+        color: 'gray',
+        marginTop: 5,
+        marginBottom: 20,
+    },
+    preInput: {
+        marginBottom: 5,
+        color: 'grey'
     },
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
         padding: 10,
-        marginBottom: 15,
+        marginBottom: 13,
         borderRadius: 10,
-        width: '90%'
+        width: '100%'
     },
     borderError: {
       borderColor: 'red'
     },
     linkText: {
-        marginTop: 15,
+        marginTop: 35,
         textAlign: 'center',
         color: 'blue',
+        marginHorizontal: 8
     },
 });
 

@@ -182,7 +182,13 @@ const AllBlogs = () => {
                                           style={styles.likeIcon} />
                                 <Text style={{color: 'rgba(73, 73, 73, 0.8)'}}>{blog.likes}</Text>
                             </View>
-                            <Ionicons name= "chatbubbles-outline" size = {18} color = "rgba(73, 73, 73, 0.8)" style = {styles.timeIcon}/>
+                            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                <Ionicons name="chatbubbles-outline" size={18} color="rgba(73, 73, 73, 0.8)" style={styles.timeIcon}/>
+                                <View style={styles.commentCountContainer}>
+                                    <Text style={styles.commentCountText}>{blog.comments ? blog.comments.length : 0}</Text>
+                                </View>
+                            </View>
+
                         </View>
                     </TouchableOpacity>
                 ))}
@@ -324,6 +330,24 @@ const styles = StyleSheet.create({
         alignItems: 'center',
 
     },
+    commentCountContainer: {
+        position: 'relative',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+
+    commentCountText: {
+        position: 'absolute', // Allows for precise placement
+        top: -16, // Adjusts the vertical placement of the number
+        left: -14, // Adjusts the horizontal placement of the number
+        fontSize: 11,
+        fontWeight: 'bold',
+        color: 'rgba(73, 73, 73, 0.8)',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Optional background for better readability
+        paddingHorizontal: 1,
+        borderRadius: 8,
+
+    }
 });
 
 export default AllBlogs;
