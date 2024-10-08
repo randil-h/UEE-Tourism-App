@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {Button, Image, StyleSheet, Text, View, Alert} from 'react-native';
 import MapView, {Callout, Marker} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
-import {collection, getDocs} from '@firebase/firestore';
+import {collection, getDocs, addDoc} from '@firebase/firestore';
 import colorScheme from '../../../assets/colors/colorScheme';
 import Config from "../../../apiConfig";
 import {db} from "../../../firebaseConfig"; // Import your Firestore instance
@@ -64,6 +64,30 @@ const EventsMap = () => {
         return turf.pointToLineDistance(eventPoint, routeLine, {units: 'kilometers'}); // Return the calculated distance in kilometers
     };
 
+    const handleReserveEvent = async (event) => {
+        try {
+            const reservedEventsRef = collection(db, "reserved_events");
+
+            // Query to check if the event is already reserved
+            const querySnapshot = await getDocs(reservedEventsRef);
+            const alreadyReserved = querySnapshot.docs.some(doc => doc.data().id === event.id);
+
+            if (alreadyReserved) {
+                // Alert the user if the event is already reserved
+                Alert.alert("Already Reserved", "This event has already been reserved.");
+            } else {
+                // If not reserved, add the event to the reserved_events collection
+                await addDoc(reservedEventsRef, event);
+                Alert.alert("Success", "Event reserved successfully!");
+            }
+        } catch (error) {
+            console.error("Error reserving event: ", error);
+            Alert.alert("Error", `Failed to reserve the event: ${error.message}`);
+        }
+    };
+
+
+
     return (
         <View style={styles.container}>
             <MapView
@@ -120,11 +144,18 @@ const EventsMap = () => {
                             <View style={styles.calloutContainer}>
                                 <Text style={styles.calloutTitle}>{event.name}</Text>
                                 <Image
-                                    source={{ uri: event.image }} // Ensure `event.image` is a URL string
+                                    source={{ uri: event.image }}
                                     style={styles.calloutImage}
                                 />
                                 <Text>Date: {event.date}</Text>
                                 <Text>Description: {event.description}</Text>
+
+                                {/* Reserve Button */}
+                                <Button
+                                    title="Reserve"
+                                    onPress={() => handleReserveEvent(event)}
+                                    color={colorScheme.primary}
+                                />
                             </View>
                         </Callout>
                     </Marker>

@@ -60,8 +60,8 @@ const AddEvents = () => {
         }
 
         // Validate image
-        if (!image) {
-            Alert.alert("Image Required", "Please upload an event image");
+        if (!eventName) {
+            Alert.alert("Event Name Required", "Please enter an event name");
             return;
         }
 
@@ -201,10 +201,10 @@ const AddEvents = () => {
                     <MapView
                         style={styles.map}
                         initialRegion={{
-                            latitude: 37.78825,
-                            longitude: -122.4324,
-                            latitudeDelta: 0.0922,
-                            longitudeDelta: 0.0421,
+                            latitude: 7.8731,
+                            longitude: 80.7718,
+                            latitudeDelta: 2.5,
+                            longitudeDelta: 2.5,
                         }}
                         onPress={(e) => handleLocationSelect(e.nativeEvent.coordinate)} // Handle location select on map press
                     >
