@@ -15,7 +15,7 @@ export const places = [
         location: 'Kandy',
         type: 'Cultural',
         ticketPrice: { local: 300, foreign: 10 },
-        imageSource : require('../../assets/images/itinerary/kandytemple.jpg'),
+        imageSource : require('../../assets/images/itinerary/temple-sacred-tooth-relic-kandy-sri-lanka.jpg'),
         lat: 7.293, lon: 80.641
     },
     {
@@ -31,7 +31,7 @@ export const places = [
         location: 'Ella',
         type: 'Adventurous',
         ticketPrice: { local: 150, foreign: 8 },
-        imageSource: require('../../assets/images/itinerary/ellarock.jpg'),
+        imageSource: require('../../assets/images/itinerary/ella.jpeg'),
         lat: 6.866, lon: 81.046
     },
     {
@@ -47,7 +47,7 @@ export const places = [
         location: 'Minneriya',
         type: 'Sightseeing',
         ticketPrice: { local: 500, foreign: 25 },
-        imageSource: require('../../assets/images/itinerary/minneriyapark.jpg'),
+        imageSource: require('../../assets/images/itinerary/minneriya.jpg'),
         lat: 8.032, lon: 80.897
     },
     {
@@ -71,7 +71,7 @@ export const places = [
         location: 'Dambulla',
         type: 'Cultural',
         ticketPrice: { local: 400, foreign: 20 },
-        imageSource: require('../../assets/images/itinerary/dambullacave.jpg'),
+        imageSource: require('../../assets/images/itinerary/dambullacave.jpeg'),
         lat: 7.856, lon: 80.650
     },
     {
@@ -87,7 +87,7 @@ export const places = [
         location: 'Polonnaruwa',
         type: 'Cultural',
         ticketPrice: { local: 500, foreign: 25 },
-        imageSource: require('../../assets/images/itinerary/polonnaruwa.jpg'),
+        imageSource: require('../../assets/images/itinerary/polonnaruwa.jpeg'),
         lat: 7.939, lon: 81.002
     },
     {
@@ -95,7 +95,7 @@ export const places = [
         location: 'Pinnawala',
         type: 'Sightseeing',
         ticketPrice: { local: 350, foreign: 20 },
-        imageSource: require('../../assets/images/itinerary/pinnawala.jpg'),
+        imageSource: require('../../assets/images/itinerary/pinnawala.jpeg'),
         lat: 7.301, lon: 80.384
     },
     {
@@ -103,7 +103,7 @@ export const places = [
         location: 'Unawatuna',
         type: 'Relaxation',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/unawatuna.jpg'),
+        imageSource: require('../../assets/images/itinerary/unawatuna-sri-lanka.jpg'),
         lat: 5.978, lon: 80.440
     },
     {
@@ -127,7 +127,7 @@ export const places = [
         location: 'Udawalawe',
         type: 'Adventurous',
         ticketPrice: { local: 400, foreign: 25 },
-        imageSource: require('../../assets/images/itinerary/udawalawa.jpg'),
+        imageSource: require('../../assets/images/itinerary/udawalawa.jpeg'),
         lat: 6.472, lon: 80.888
     },
     {
@@ -215,7 +215,7 @@ export const places = [
         location: 'Kandy',
         type: 'Adventurous',
         ticketPrice: { local: 300, foreign: 20 },
-        imageSource: require('../../assets/images/itinerary/knuckles.jpg'),
+        imageSource: require('../../assets/images/itinerary/knuckles.jpeg'),
         lat: 7.466, lon: 80.786
     },
     {
@@ -223,7 +223,7 @@ export const places = [
         location: 'Colombo',
         type: 'Cultural',
         ticketPrice: { local: 200, foreign: 10 },
-        imageSource: require('../../assets/images/itinerary/museum.jpg'),
+        imageSource: require('../../assets/images/itinerary/museum.jpeg'),
         lat: 6.927, lon: 79.861
     },
     {
@@ -239,7 +239,7 @@ export const places = [
         location: 'Peradeniya',
         type: 'Sightseeing',
         ticketPrice: { local: 1000, foreign: 20 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/royalbotanic.jpg'),
         lat: 7.256, lon: 80.596
     },
     {
@@ -247,7 +247,7 @@ export const places = [
         location: 'Kandy',
         type: 'Relaxation',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/kandylake.jpg'),
         lat: 7.290, lon: 80.633
     },
     {
@@ -255,7 +255,7 @@ export const places = [
         location: 'Weligama',
         type: 'Relaxation',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/weligambay.jpg'),
         lat: 5.972, lon: 80.399
     },
     {
@@ -263,7 +263,7 @@ export const places = [
         location: 'Mihintale',
         type: 'Cultural',
         ticketPrice: { local: 200, foreign: 10 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/mihintale.jpg'),
         lat: 8.392, lon: 80.545
     },
     {
@@ -271,7 +271,7 @@ export const places = [
         location: 'Hikkaduwa',
         type: 'Relaxation',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/hikkaduwa.jpg'),
         lat: 6.124, lon: 80.095
     },
     {
@@ -279,7 +279,7 @@ export const places = [
         location: 'Yapahuwa',
         type: 'Cultural',
         ticketPrice: { local: 300, foreign: 15 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/yapahuwa.jpeg'),
         lat: 7.519, lon: 80.468
     },
     {
@@ -287,7 +287,7 @@ export const places = [
         location: 'Sigiriya',
         type: 'Adventurous',
         ticketPrice: { local: 500, foreign: 20 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/pidurangala.jpeg'),
         lat: 7.952, lon: 80.753
     },
     {
@@ -295,7 +295,7 @@ export const places = [
         location: 'Kandy',
         type: 'Adventurous',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/knuckles.jpeg'),
         lat: 7.433, lon: 80.703
     },
     {
@@ -303,7 +303,7 @@ export const places = [
         location: 'Talawakele',
         type: 'Sightseeing',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/devonfalls.jpeg'),
         lat: 6.972, lon: 80.574
     },
     {
@@ -311,7 +311,7 @@ export const places = [
         location: 'Kandy',
         type: 'Cultural',
         ticketPrice: { local: 100, foreign: 5 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/lankathilaka.jpg'),
         lat: 7.285, lon: 80.614
     },
     {
@@ -319,7 +319,7 @@ export const places = [
         location: 'Kithulgala',
         type: 'Adventurous',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/kithulgala.jpeg'),
         lat: 6.974, lon: 80.411
     },
 
@@ -328,7 +328,7 @@ export const places = [
         location: 'Ahangama',
         type: 'Relaxation',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/ahangama.jpg'),
         lat: 5.952, lon: 80.078
     },
     {
@@ -336,23 +336,15 @@ export const places = [
         location: 'Ratnapura',
         type: 'Adventurous',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/sinharaja.jpg'),
         lat: 6.366, lon: 80.667
-    },
-    {
-        name: 'Samanalawewa',
-        location: 'Balangoda',
-        type: 'Sightseeing',
-        ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
-        lat: 6.701, lon: 80.679
     },
     {
         name: 'Nuwara Eliya Golf Club',
         location: 'Nuwara Eliya',
         type: 'Relaxation',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/nuwaraeliyagolfclub.jpeg'),
         lat: 6.950, lon: 80.221
     },
     {
@@ -360,7 +352,7 @@ export const places = [
         location: 'Kandy',
         type: 'Cultural',
         ticketPrice: { local: 500, foreign: 10 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/kandymuseum.jpeg'),
         lat: 7.293, lon: 80.636
     },
     {
@@ -368,7 +360,7 @@ export const places = [
         location: 'Polonnaruwa',
         type: 'Cultural',
         ticketPrice: { local: 400, foreign: 20 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/polonnaruwagal.jpeg'),
         lat: 7.934, lon: 81.002
     },
     {
@@ -376,7 +368,7 @@ export const places = [
         location: 'Anuradhapura',
         type: 'Cultural',
         ticketPrice: { local: 200, foreign: 10 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/anuradhapura.jpg'),
         lat: 8.348, lon: 80.395
     },
     {
@@ -384,7 +376,7 @@ export const places = [
         location: 'Kalpitiya',
         type: 'Relaxation',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/kalpitiya.jpg'),
         lat: 8.409, lon: 79.771
     },
     {
@@ -392,7 +384,7 @@ export const places = [
         location: 'Hambantota',
         type: 'Sightseeing',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/hambantotabeach.png'),
         lat: 6.125, lon: 81.119
     },
 
@@ -401,7 +393,7 @@ export const places = [
         location: 'Colombo',
         type: 'Relaxation',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/galleface.jpeg'),
         lat: 6.927, lon: 79.958
     },
 
@@ -410,7 +402,7 @@ export const places = [
         location: 'Colombo',
         type: 'Cultural',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/pettahmarket.jpg'),
         lat: 6.940, lon: 79.961
     },
 
@@ -420,7 +412,7 @@ export const places = [
         location: 'Batticaloa',
         type: 'Relaxation',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/baticaloalagoon.jpg'),
         lat: 7.706, lon: 81.693
     },
     {
@@ -428,23 +420,15 @@ export const places = [
         location: 'Ramboda',
         type: 'Sightseeing',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/ramboda.jpg'),
         lat: 6.975, lon: 80.569
-    },
-    {
-        name: 'Sella Kataragama',
-        location: 'Kataragama',
-        type: 'Cultural',
-        ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
-        lat: 6.304, lon: 81.285
     },
     {
         name: 'Hatton Tea Museum',
         location: 'Hatton',
         type: 'Cultural',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/hattontea.jpeg'),
         lat: 6.774, lon: 80.486
     },
     {
@@ -452,7 +436,7 @@ export const places = [
         location: 'Tangalle',
         type: 'Relaxation',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/tangallebeach.jpg'),
         lat: 5.979, lon: 80.816
     },
     {
@@ -460,7 +444,7 @@ export const places = [
         location: 'Koslanda',
         type: 'Sightseeing',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/diyaluma.jpg'),
         lat: 6.920, lon: 81.161
     },
 
@@ -469,7 +453,7 @@ export const places = [
         location: 'Ambalangoda',
         type: 'Cultural',
         ticketPrice: { local: 200, foreign: 10 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/ambalangodamask.jpeg'),
         lat: 6.181, lon: 80.084
     },
     {
@@ -477,7 +461,7 @@ export const places = [
         location: 'Beruwala',
         type: 'Relaxation',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/beruwelabeach.jpg'),
         lat: 6.495, lon: 79.988
     },
     {
@@ -485,7 +469,7 @@ export const places = [
         location: 'Ratnapura',
         type: 'Cultural',
         ticketPrice: { local: 200, foreign: 10 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/ratnapuragem.jpeg'),
         lat: 6.684, lon: 80.370
     },
     {
@@ -493,22 +477,7 @@ export const places = [
         location: 'Koggala',
         type: 'Relaxation',
         ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
+        imageSource: require('../../assets/images/itinerary/koggalalake.jpg'),
     },
-    {
-        name: 'Mawella Lagoon',
-        location: 'Mawella',
-        type: 'Relaxation',
-        ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
-        lat: 5.970, lon: 80.737
-    },
-    {
-        name: 'Bopath Ella Falls',
-        location: 'Ratnapura',
-        type: 'Sightseeing',
-        ticketPrice: { local: 0, foreign: 0 },
-        imageSource: require('../../assets/images/itinerary/sigiriya.jpg'),
-        lat: 6.685, lon: 80.432
-    }
+
 ];

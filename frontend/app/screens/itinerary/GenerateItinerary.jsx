@@ -57,33 +57,33 @@ const generateItinerary = (days, budget, activities = [], startLocation, endLoca
 
     const budgetKey = touristType === 'Local' ? 'local' : 'foreign';
 
-    // Sort places by distance from the starting location
-    const sortedPlaces = filteredPlaces.sort((a, b) => {
-        const distanceA = calculateDistance(startPlace.lat, startPlace.lon, a.lat, a.lon);
-        const distanceB = calculateDistance(startPlace.lat, startPlace.lon, b.lat, b.lon);
-        return distanceA - distanceB;
-    });
-
+    // Sort places by distance from the current location (starting from startPlace)
     const itinerary = [];
     let currentLocation = startPlace;
     let remainingBudget = numericBudget;
-    const maxDistance = 1000; // Increased max distance to 1000km
+    const maxDistance = 500; // Adjust this to fine-tune how far you're willing to travel per day
     const maxPlacesPerDay = 3; // Allow up to 3 places per day
 
     for (let day = 0; day < days; day++) {
         let dayPlan = [];
 
         for (let i = 0; i < maxPlacesPerDay; i++) {
-            // Select places within budget and reasonable distance
-            const suitablePlaces = sortedPlaces.filter(place => {
-                const distance = calculateDistance(currentLocation.lat, currentLocation.lon, place.lat, place.lon);
-                return place.ticketPrice[budgetKey] <= remainingBudget && distance <= maxDistance;
-            });
+            // Re-sort places based on the current location, ensuring the next closest place is chosen
+            const suitablePlaces = filteredPlaces
+                .filter(place => {
+                    const distance = calculateDistance(currentLocation.lat, currentLocation.lon, place.lat, place.lon);
+                    return place.ticketPrice[budgetKey] <= remainingBudget && distance <= maxDistance;
+                })
+                .sort((a, b) => {
+                    const distanceA = calculateDistance(currentLocation.lat, currentLocation.lon, a.lat, a.lon);
+                    const distanceB = calculateDistance(currentLocation.lat, currentLocation.lon, b.lat, b.lon);
+                    return distanceA - distanceB;
+                });
 
             console.log(`Day ${day + 1}, Place ${i + 1}: ${suitablePlaces.length} suitable places found`);
 
             if (suitablePlaces.length > 0) {
-                const nextPlace = suitablePlaces[0]; // Select the first suitable place
+                const nextPlace = suitablePlaces[0]; // Pick the closest suitable place
                 dayPlan.push({
                     name: nextPlace.name,
                     location: nextPlace.location,
@@ -92,11 +92,10 @@ const generateItinerary = (days, budget, activities = [], startLocation, endLoca
                     lat: nextPlace.lat,
                     lon: nextPlace.lon,
                 });
-                currentLocation = nextPlace;
+                currentLocation = nextPlace; // Update the current location to the newly added place
                 remainingBudget -= nextPlace.ticketPrice[budgetKey];
-                sortedPlaces.splice(sortedPlaces.indexOf(nextPlace), 1);
+                filteredPlaces.splice(filteredPlaces.indexOf(nextPlace), 1); // Remove the visited place from the list
                 console.log(`Added place: ${nextPlace.name}, Remaining budget: ${remainingBudget}`);
-                console.log(`Image source for ${nextPlace.name}:`, nextPlace.imageSource);
             } else {
                 console.warn(`No more suitable places found for Day ${day + 1}. Remaining budget: ${remainingBudget}`);
                 break;
@@ -109,5 +108,6 @@ const generateItinerary = (days, budget, activities = [], startLocation, endLoca
     console.log('Generated Itinerary:', JSON.stringify(itinerary, null, 2));
     return itinerary;
 };
+
 
 export default generateItinerary;

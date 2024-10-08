@@ -16,7 +16,7 @@ const _layout = () => {
             <Stack.Screen name="screens/blogs/EditBlog" options={{headerShown: true, title: 'Edit Blog'}}/>
 
 
-            <Stack.Screen name="screens/itinerary/ItineraryDisplay" options={{headerShown: true, title: 'Generated Itinerary'}}/>
+            <Stack.Screen name="screens/itinerary/ItineraryDisplay" options={{headerShown: false, title: 'Generated Itinerary'}}/>
 
             <Stack.Screen name="screens/events/EventsMap" options={{headerShown: true, title: 'Find Events', animation: 'default', presentation: 'card'}}/>
 
