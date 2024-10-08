@@ -16,9 +16,9 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 // Convert budget to numeric value based on predefined ranges
 const parseBudget = (budget) => {
     const budgetMapping = {
-        'Low': 1000,    // Example value, adjust as needed
-        'Mid': 2000,   // Example value, adjust as needed
-        'High': 3000   // Example value, adjust as needed
+        'Low': 20000,
+        'Mid': 80000,
+        'High': 120000
     };
     return budgetMapping[budget] || 0;  // Default to 0 if unknown
 };
