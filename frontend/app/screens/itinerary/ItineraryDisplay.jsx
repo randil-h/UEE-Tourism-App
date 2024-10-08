@@ -1,16 +1,19 @@
-import React from 'react';
-import {View, Text, Image, ScrollView, StyleSheet, SafeAreaView, Button, TouchableOpacity} from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, Image, ScrollView, StyleSheet, SafeAreaView, Button, TouchableOpacity, Alert} from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import * as Print from 'expo-print';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { db } from "../../../firebaseConfig";
+import { collection, addDoc } from 'firebase/firestore';
 
 const ItineraryDisplay = () => {
     const router = useRouter();
     const route = useRoute();
     const { itinerary, touristType } = route.params || {};
+    const [saving, setSaving] = useState(false);
 
     console.log('Received Itinerary:', JSON.stringify(itinerary, null, 2));
     console.log('Received Tourist Type:', touristType);
@@ -36,7 +39,22 @@ const ItineraryDisplay = () => {
         console.log('Invalid itinerary format');
         return <Text style={styles.errorText}>Invalid itinerary format. Please try again.</Text>;
     }
-
+    const saveItineraryToFirestore = async () => {
+        setSaving(true);
+        try {
+            await addDoc(collection(db, 'itineraries'), {
+                itinerary: parsedItinerary,
+                touristType: touristType,
+                timestamp: new Date().toISOString(),
+            });
+            Alert.alert('Success', 'Itinerary saved successfully!');
+        } catch (error) {
+            console.error('Error saving itinerary:', error);
+            Alert.alert('Error', 'Failed to save itinerary.');
+        } finally {
+            setSaving(false);
+        }
+    };
     const handleViewRoute = () => {
         router.push({
             pathname: '/screens/itinerary/ItineraryMapView',
@@ -107,10 +125,19 @@ const ItineraryDisplay = () => {
                         <Text style={styles.buttonText}>View Route</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.buttonRight} onPress={generatePDF}>
-                        <Text style={styles.buttonText}>Save Itinerary</Text>
+                        <Text style={styles.buttonText}>Download</Text>
                         <Icon name="save-outline" size={20} color="white" style={styles.icon} />
                     </TouchableOpacity>
                 </View>
+                {/* Save Itinerary Button */}
+                <TouchableOpacity
+                    style={styles.saveButton}
+                    onPress={saveItineraryToFirestore}
+                    disabled={saving} // Disable button while saving
+                >
+                    <Text style={styles.buttonText}>{saving ? 'Saving...' : 'Save Itinerary'}</Text>
+                </TouchableOpacity>
+
                 {parsedItinerary.map((day, index) => (
                     <View key={index} style={styles.dayContainer}>
                         <Text style={styles.dayTitle}>Day {day.day}</Text>
@@ -216,6 +243,17 @@ const styles = StyleSheet.create({
         color: 'red',
         textAlign: 'center',
         marginTop: 50,
+    },
+    saveButton: {
+        backgroundColor: 'black',
+        borderRadius: 20,
+        paddingVertical: 10,
+        marginVertical: 1,
+        paddingHorizontal: 10,
+        marginHorizontal: 20, // Add margin for spacing
+        alignSelf: 'flex-start', // Align to the left
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     buttonLeft: {
         backgroundColor: 'black',
