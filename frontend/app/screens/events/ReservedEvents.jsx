@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import colorScheme from '../../../assets/colors/colorScheme';
-import { Feather } from "@expo/vector-icons";
-import { collection, getDocs, Timestamp } from "firebase/firestore";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { collection, getDocs, Timestamp, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../../firebaseConfig"; // Ensure this path is correct
 
 const ReservedEvents = () => {
@@ -39,6 +39,45 @@ const ReservedEvents = () => {
         }
     };
 
+    const [isUnreserving, setIsUnreserving] = useState(false);
+
+    const unreserveEvent = (eventId) => {
+        if (isUnreserving) return; // Prevent multiple triggers if already unreserving
+        setIsUnreserving(true); // Set flag to indicate unreserving is in progress
+
+        Alert.alert(
+            "Unreserve Event",
+            "Are you sure you want to unreserve this event?",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                    onPress: () => setIsUnreserving(false), // Reset flag if canceled
+                },
+                {
+                    text: "Unreserve",
+                    onPress: async () => {
+                        try {
+                            await deleteDoc(doc(db, "reserved_events", eventId));
+                            Alert.alert("Success", "Event unreserved successfully");
+                            fetchReservedEvents(); // Fetch updated list
+                        } catch (error) {
+                            console.error("Error unreserving event: ", error);
+                            Alert.alert("Error", "Failed to unreserve event");
+                        } finally {
+                            setIsUnreserving(false); // Reset flag after completion
+                        }
+                    },
+                    style: "destructive",
+                },
+            ],
+            { cancelable: false }
+        );
+    };
+
+
+
+
     useEffect(() => {
         fetchReservedEvents();
     }, []);
@@ -51,28 +90,32 @@ const ReservedEvents = () => {
                 <Text style={styles.noEventsText}>No reserved events found.</Text>
             ) : (
                 reservedEvents.map((item) => (
-                    <TouchableOpacity
-                        key={item.id}
-                        style={styles.touchable}
-                    >
-                        <View style={styles.eventCard}>
-                            <View style={styles.textContainer}>
-                                <Text style={styles.eventDate}>{item.date}</Text>
-                                <Text
-                                    style={styles.eventTitle}
-                                    numberOfLines={1}
-                                    ellipsizeMode="tail"
-                                >
-                                    {item.name}
-                                </Text>
-                            </View>
-                            <View>
-                                <View style={styles.indicator}>
-                                    <Feather name="arrow-up-right" size={24} color="black" />
-                                </View>
+                    <View key={item.id} style={styles.eventCard}>
+                        <View style={styles.textContainer}>
+                            <Text style={styles.eventDate}>{item.date}</Text>
+                            <Text
+                                style={styles.eventTitle}
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                            >
+                                {item.name}
+                            </Text>
+                        </View>
+                        <View style={styles.actionsContainer}>
+                            <TouchableOpacity
+                                style={styles.unreserveButton}
+                                onPress={() => {
+                                    unreserveEvent(item.id);
+                                }}
+                            >
+                                <MaterialCommunityIcons name="delete-outline" size={24} color="black" />
+
+                            </TouchableOpacity>
+                            <View style={styles.indicator}>
+                                <Feather name="arrow-up-right" size={24} color="black" />
                             </View>
                         </View>
-                    </TouchableOpacity>
+                    </View>
                 ))
             )}
         </ScrollView>
@@ -89,21 +132,15 @@ const styles = StyleSheet.create({
         backgroundColor: colorScheme.gray_bg,
     },
     eventCard: {
-        flex: 1,
         flexDirection: 'row',
         marginLeft: 10,
         marginRight: 10,
-        alignItems: 'flex-start',
-        justifyContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: 10,
         paddingVertical: 15,
         borderTopWidth: 1.5,
         borderColor: colorScheme.accent,
-    },
-    indicator: {
-        backgroundColor: colorScheme.accent,
-        borderRadius: 50,
-        padding: 4,
     },
     textContainer: {
         flex: 1,
@@ -117,6 +154,29 @@ const styles = StyleSheet.create({
     eventDate: {
         fontSize: 12,
         color: colorScheme.black,
+    },
+    actionsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 10,
+    },
+    unreserveButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: colorScheme.accent,
+        padding: 5,
+        borderRadius: 25,
+    },
+    unreserveText: {
+        marginLeft: 5,
+        fontSize: 16,
+        color: colorScheme.black,
+    },
+    indicator: {
+        backgroundColor: colorScheme.accent,
+        borderRadius: 50,
+        padding: 4,
     },
     noEventsText: {
         fontSize: 18,
