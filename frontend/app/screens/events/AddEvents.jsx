@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import MapView, { Marker } from 'react-native-maps';
 import { addDoc, collection } from "@firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../../../firebaseConfig";
@@ -17,20 +17,21 @@ const AddEvents = () => {
     const [eventName, setEventName] = useState('');
     const [eventDate, setEventDate] = useState('');
     const [image, setImage] = useState(null);
-    const [location, setLocation] = useState('');
-    const [locationCoordinates, setLocationCoordinates] = useState(null); // Store coordinates separately
+    const [locationCoordinates, setLocationCoordinates] = useState(null);
     const [ticketPrice, setTicketPrice] = useState('');
     const [maxTickets, setMaxTickets] = useState('');
-    const [isLoading, setIsLoading] = useState(false); // State to manage loading animation
+    const [isLoading, setIsLoading] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false); // Modal visibility for map
+    const [selectedLocation, setSelectedLocation] = useState(null); // Store selected location
+
     const GOOGLE_MAPS_API_KEY = Config.GOOGLE_MAPS_API_KEY;
-    const googlePlacesRef = useRef(); // Reference to GooglePlacesAutocomplete
 
     // Handle Image Pick with aspect ratio constraint
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
-            aspect: [1, 1], // Ensures square image
+            aspect: [1, 1],
             quality: 1,
         });
 
@@ -46,13 +47,27 @@ const AddEvents = () => {
 
     // Save event to Firestore and upload image to Firebase Storage
     const saveEvent = async () => {
+        // Validate date format
         if (!eventDate.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
             Alert.alert("Invalid Date", "Please enter a valid date in MM/DD/YYYY format");
             return;
         }
 
+        // Validate name
         if (!image) {
             Alert.alert("Image Required", "Please upload an event image");
+            return;
+        }
+
+        // Validate image
+        if (!image) {
+            Alert.alert("Image Required", "Please upload an event image");
+            return;
+        }
+
+        // Validate coordinates
+        if (!selectedLocation) {
+            Alert.alert("Location Required", "Please select a valid location.");
             return;
         }
 
@@ -70,8 +85,7 @@ const AddEvents = () => {
                 name: eventName,
                 date: eventDate,
                 location: {
-                    name: location,
-                    coordinates: locationCoordinates, // Save coordinates as well
+                    coordinates: selectedLocation,
                 },
                 ticketPrice,
                 maxTickets,
@@ -81,12 +95,20 @@ const AddEvents = () => {
 
             await addDoc(collection(db, "events"), eventData);
             Alert.alert("Success", "Event saved successfully!");
+            router.push('/events'); // Navigate to events list or another page
         } catch (error) {
             console.error("Error saving event: ", error);
             Alert.alert("Error", "Failed to save event");
         } finally {
             setIsLoading(false); // Hide loading spinner
         }
+    };
+
+    // Handle selecting location
+    const handleLocationSelect = (coordinate) => {
+        setSelectedLocation(coordinate);
+        setLocationCoordinates(coordinate);
+        setModalVisible(false);
     };
 
     return (
@@ -117,46 +139,25 @@ const AddEvents = () => {
                 <TextInput
                     style={styles.input}
                     placeholder="Enter event name"
-                    placeholderTextColor={colorScheme.gray_text} // Placeholder color
+                    placeholderTextColor={colorScheme.gray_text}
                     value={eventName}
                     onChangeText={setEventName}
                 />
 
-                {/* Location (Google Places) */}
+                {/* Location Selection */}
                 <Text style={styles.label}>Location</Text>
-                <GooglePlacesAutocomplete
-                    ref={googlePlacesRef}
-                    placeholder="Search for a location"
-                    onPress={(data, details = null) => {
-                        setLocation(data.description);
-                        googlePlacesRef.current.setAddressText(data.description); // Update the input text with the selected location
-                        if (details) {
-                            const { lat, lng } = details.geometry.location;
-                            setLocationCoordinates({ lat, lng });
-                        }
-                    }}
-                    query={{
-                        key: GOOGLE_MAPS_API_KEY,
-                        language: 'en',
-                    }}
-                    fetchDetails={true} // This ensures you get more than just the name
-                    styles={{
-                        textInput: {
-                            backgroundColor: colorScheme.gray_bg,
-                            borderRadius: 0,
-                            borderColor: colorScheme.accent,
-                            borderBottomWidth: 1.5
-                        },
-                        listView: { borderRadius: 0, marginTop: 0 },
-                    }}
-                />
+                <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.input}>
+                    <Text style={{ color: colorScheme.gray_text }}>
+                        {selectedLocation ? `Selected: ${selectedLocation.lat}, ${selectedLocation.lng}` : "Select a location on the map"}
+                    </Text>
+                </TouchableOpacity>
 
                 {/* Ticket Price */}
                 <Text style={styles.label}>Ticket Price</Text>
                 <TextInput
                     style={styles.input}
                     placeholder="Enter ticket price"
-                    placeholderTextColor={colorScheme.gray_text} // Placeholder color
+                    placeholderTextColor={colorScheme.gray_text}
                     keyboardType="numeric"
                     value={ticketPrice}
                     onChangeText={setTicketPrice}
@@ -167,7 +168,7 @@ const AddEvents = () => {
                 <TextInput
                     style={styles.input}
                     placeholder="Enter max number of tickets"
-                    placeholderTextColor={colorScheme.gray_text} // Placeholder color
+                    placeholderTextColor={colorScheme.gray_text}
                     keyboardType="numeric"
                     value={maxTickets}
                     onChangeText={setMaxTickets}
@@ -178,7 +179,7 @@ const AddEvents = () => {
                 <TextInput
                     style={styles.input}
                     placeholder="Enter event date"
-                    placeholderTextColor={colorScheme.gray_text} // Placeholder color
+                    placeholderTextColor={colorScheme.gray_text}
                     value={eventDate}
                     onChangeText={setEventDate}
                 />
@@ -189,6 +190,39 @@ const AddEvents = () => {
                     {image ? <Image source={{ uri: image }} style={styles.imagePreview} /> : <Text>Pick an image (Square)</Text>}
                 </TouchableOpacity>
             </View>
+
+            {/* Modal for Map View */}
+            <Modal
+                visible={modalVisible}
+                animationType="slide"
+                transparent={false}
+            >
+                <View style={styles.modalContainer}>
+                    <MapView
+                        style={styles.map}
+                        initialRegion={{
+                            latitude: 37.78825,
+                            longitude: -122.4324,
+                            latitudeDelta: 0.0922,
+                            longitudeDelta: 0.0421,
+                        }}
+                        onPress={(e) => handleLocationSelect(e.nativeEvent.coordinate)} // Handle location select on map press
+                    >
+                        {selectedLocation && (
+                            <Marker
+                                coordinate={selectedLocation}
+                                title="Selected Location"
+                            />
+                        )}
+                    </MapView>
+                    <TouchableOpacity
+                        style={styles.closeButton}
+                        onPress={() => setModalVisible(false)}
+                    >
+                        <Text style={styles.closeButtonText}>Close</Text>
+                    </TouchableOpacity>
+                </View>
+            </Modal>
         </KeyboardAwareScrollView>
     );
 };
@@ -207,9 +241,9 @@ const styles = StyleSheet.create({
     headerContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingHorizontal: 0, // px-6
-        paddingVertical: 0, // py-2
-        marginTop: 0, // mt-4
+        paddingHorizontal: 0,
+        paddingVertical: 0,
+        marginTop: 0,
     },
     headerTitle: {
         fontWeight: 'bold',
@@ -261,6 +295,25 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
         marginTop: 0,
         marginBottom: 0,
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+    },
+    map: {
+        width: '100%',
+        height: '80%',
+    },
+    closeButton: {
+        backgroundColor: colorScheme.accent,
+        padding: 15,
+        borderRadius: 5,
+        marginBottom: 20,
+    },
+    closeButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
     },
 });
 

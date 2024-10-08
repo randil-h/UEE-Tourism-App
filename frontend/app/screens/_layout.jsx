@@ -15,7 +15,7 @@ export default function _layout() {
             <Stack.Screen name="itinerary/ItineraryDisplay" options={{headerShown: false, title: 'Generated Itinerary'}}/>
             <Stack.Screen name="itinerary/ItineraryMapView" options={{ headerShown: true, title: 'Itinerary Map'}} />
 
-            <Stack.Screen name="events/EventsMap" options={{headerShown: true, title: 'Find Events', animation: 'fade', presentation: 'card'}}/>
+            <Stack.Screen name="events/EventsMap" options={{headerShown: false, title: 'Find Events', animation: 'fade', presentation: 'card'}}/>
 
             <Stack.Screen name="Login" options={{headerShown: false, title: 'Login'}}/>
             <Stack.Screen name="SignUp" options={{headerShown: false, title: 'Sign Up'}}/>

@@ -1,0 +1,94 @@
+{
+  "routes": [
+    {
+      "name": "Kandy to Ella",
+      "start": {"latitude": 7.2906, "longitude": 80.6337},
+      "waypoints": [
+        {"latitude": 7.1855, "longitude": 80.6999},
+        {"latitude": 7.1270, "longitude": 80.7377}
+      ],
+      "end": {"latitude": 6.9905, "longitude": 80.7345}
+    },
+    {
+      "name": "Colombo to Kandy",
+      "start": {"latitude": 6.9271, "longitude": 79.8612},
+      "waypoints": [
+        {"latitude": 6.9361, "longitude": 80.0620},
+        {"latitude": 7.1656, "longitude": 80.1912}
+      ],
+      "end": {"latitude": 7.2906, "longitude": 80.6337}
+    },
+    {
+      "name": "Galle to Colombo",
+      "start": {"latitude": 6.0535, "longitude": 80.2210},
+      "waypoints": [
+        {"latitude": 6.7254, "longitude": 80.2220},
+        {"latitude": 6.6892, "longitude": 80.0536}
+      ],
+      "end": {"latitude": 6.9271, "longitude": 79.8612}
+    },
+    {
+      "name": "Jaffna to Colombo",
+      "start": {"latitude": 9.6615, "longitude": 80.0255},
+      "waypoints": [
+        {"latitude": 8.5683, "longitude": 81.2335},
+        {"latitude": 8.7866, "longitude": 80.4205}
+      ],
+      "end": {"latitude": 6.9271, "longitude": 79.8612}
+    },
+    {
+      "name": "Matara to Nuwara Eliya",
+      "start": {"latitude": 5.9404, "longitude": 80.5466},
+      "waypoints": [
+        {"latitude": 6.1270, "longitude": 80.6950},
+        {"latitude": 6.9423, "longitude": 80.7798}
+      ],
+      "end": {"latitude": 6.9481, "longitude": 80.7920}
+    },
+    {
+      "name": "Anuradhapura to Dambulla",
+      "start": {"latitude": 8.3482, "longitude": 80.4050},
+      "waypoints": [
+        {"latitude": 8.3006, "longitude": 80.4080},
+        {"latitude": 8.3723, "longitude": 80.5612}
+      ],
+      "end": {"latitude": 7.8663, "longitude": 80.6474}
+    },
+    {
+      "name": "Negombo to Kandy",
+      "start": {"latitude": 7.2115, "longitude": 79.8372},
+      "waypoints": [
+        {"latitude": 7.2686, "longitude": 80.0460},
+        {"latitude": 7.1662, "longitude": 80.1838}
+      ],
+      "end": {"latitude": 7.2906, "longitude": 80.6337}
+    },
+    {
+      "name": "Hikkaduwa to Colombo",
+      "start": {"latitude": 6.0682, "longitude": 80.0955},
+      "waypoints": [
+        {"latitude": 6.4970, "longitude": 80.1273},
+        {"latitude": 6.8435, "longitude": 79.9750}
+      ],
+      "end": {"latitude": 6.9271, "longitude": 79.8612}
+    },
+    {
+      "name": "Trincomalee to Anuradhapura",
+      "start": {"latitude": 8.5714, "longitude": 81.2233},
+      "waypoints": [
+        {"latitude": 8.5847, "longitude": 81.2035},
+        {"latitude": 8.3100, "longitude": 80.4125}
+      ],
+      "end": {"latitude": 8.3482, "longitude": 80.4050}
+    },
+    {
+      "name": "Batticaloa to Colombo",
+      "start": {"latitude": 7.7035, "longitude": 81.6942},
+      "waypoints": [
+        {"latitude": 7.2865, "longitude": 81.4502},
+        {"latitude": 6.9698, "longitude": 80.2686}
+      ],
+      "end": {"latitude": 6.9271, "longitude": 79.8612}
+    }
+  ]
+}

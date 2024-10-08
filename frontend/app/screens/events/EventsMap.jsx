@@ -1,40 +1,68 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import React, {useEffect, useState} from 'react';
+import {Image, StyleSheet, Text, View} from 'react-native';
+import MapView, {Callout, Marker} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
-import { Picker } from '@react-native-picker/picker';
+import {collection, getDocs} from '@firebase/firestore';
 import colorScheme from '../../../assets/colors/colorScheme';
 import Config from "../../../apiConfig";
+import {db} from "../../../firebaseConfig"; // Import your Firestore instance
+import DropDownPicker from 'react-native-dropdown-picker';
+import Slider from "@react-native-community/slider";
+import * as turf from '@turf/turf';
 
 const GOOGLE_MAPS_APIKEY = Config.GOOGLE_MAPS_API_KEY;
 
-const sampleRoutes = {
-    "Route 1": {
-        start: { latitude: 6.9271, longitude: 79.8612 }, // Colombo
-        waypoints: [
-            { latitude: 7.2906, longitude: 80.6337 }, // Kandy
-        ],
-        end: { latitude: 8.3114, longitude: 80.4037 } // Anuradhapura
-    },
-    "Route 2": {
-        start: { latitude: 6.0535, longitude: 80.2210 }, // Galle
-        waypoints: [
-            { latitude: 6.9365, longitude: 79.8426 }, // Kalutara
-        ],
-        end: { latitude: 7.8731, longitude: 80.7718 } // Central
-    },
-    "Route 3": {
-        start: { latitude: 9.6615, longitude: 80.0255 }, // Jaffna
-        waypoints: [
-            { latitude: 8.5683, longitude: 81.2335 } // Trincomalee
-        ],
-        end: { latitude: 7.8731, longitude: 80.7718 } // Central
-    },
-};
+// Load the JSON file
+const routesData = require('../../../assets/data_scripts/routes.json'); // Update this path
 
 const EventsMap = () => {
-    const [selectedRoute, setSelectedRoute] = useState("Route 1");
-    const route = sampleRoutes[selectedRoute];
+    const [selectedRoute, setSelectedRoute] = useState(routesData.routes[0].name);
+    const [route, setRoute] = useState(routesData.routes[0]);
+    const [events, setEvents] = useState([]); // State to hold events
+    const [open, setOpen] = useState(false); // Controls dropdown visibility
+    const [distance, setDistance] = useState(5); // State to hold the distance value for filtering
+
+    useEffect(() => {
+        const selected = routesData.routes.find(r => r.name === selectedRoute);
+        setRoute(selected);
+    }, [selectedRoute]);
+
+    // Fetch events from Firestore
+    const fetchEvents = async () => {
+        try {
+            const eventsCollection = collection(db, "events");
+            const eventSnapshot = await getDocs(eventsCollection);
+            const eventList = eventSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setEvents(eventList);
+        } catch (error) {
+            console.error("Error fetching events: ", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchEvents(); // Fetch events on component mount
+    }, []);
+
+    // Function to check if the event is within the specified distance from the route
+    const isEventNearby = (event) => {
+        const { coordinates } = event.location; // Assuming event.location has coordinates
+        const distanceToRoute = calculateDistanceFromRoute(coordinates); // Implement this function
+        return distanceToRoute <= distance;
+    };
+
+    // Function to calculate the distance from the event to the nearest point on the route
+    const calculateDistanceFromRoute = (eventCoords) => {
+        // Create a point for the event
+        const eventPoint = turf.point([eventCoords.longitude, eventCoords.latitude]);
+
+        // Create a LineString from the route's waypoints
+        const routeLine = turf.lineString(
+            route.waypoints.map(wp => [wp.longitude, wp.latitude]) // Ensure you have longitude, latitude for waypoints
+        );
+
+        // Calculate the distance from the event point to the nearest point on the route line
+        return turf.pointToLineDistance(eventPoint, routeLine, {units: 'kilometers'}); // Return the calculated distance in kilometers
+    };
 
     return (
         <View style={styles.container}>
@@ -52,30 +80,84 @@ const EventsMap = () => {
                 {/* Render route dynamically */}
                 <MapViewDirections
                     origin={route.start}
-                    waypoints={route.waypoints}
+                    waypoints={route.waypoints.length > 0 ? route.waypoints : undefined}
                     destination={route.end}
                     apikey={GOOGLE_MAPS_APIKEY}
                     strokeWidth={6}
                     strokeColor={colorScheme.accent}
                     optimizeWaypoints={true}
+                    onStart={() => {
+                        console.log(`Starting route from ${JSON.stringify(route.start)} to ${JSON.stringify(route.end)}`);
+                    }}
+                    onReady={(result) => {
+                        console.log(`Route ready: ${result}`);
+                    }}
+                    onError={(errorMessage) => {
+                        console.log(`Error: ${errorMessage}`);
+                    }}
                 />
                 <Marker coordinate={route.start} title="Start" />
                 <Marker coordinate={route.end} title="End" />
                 {route.waypoints.map((wp, index) => (
                     <Marker key={index} coordinate={wp} title={`Waypoint ${index + 1}`} />
                 ))}
+
+                {/* Render event markers with custom icon */}
+                {events.filter(isEventNearby).map(event => (
+                    <Marker
+                        key={event.id}
+                        coordinate={{
+                            latitude: event.location.coordinates.latitude,
+                            longitude: event.location.coordinates.longitude,
+                        }}
+                        title={event.name}
+                    >
+                        <Image
+                            source={require('../../../assets/icons/icons8-marker-100.png')}
+                            style={styles.eventMarker}
+                        />
+                        <Callout>
+                            <View style={styles.calloutContainer}>
+                                <Text style={styles.calloutTitle}>{event.name}</Text>
+                                <Image
+                                    source={{ uri: event.image }} // Ensure `event.image` is a URL string
+                                    style={styles.calloutImage}
+                                />
+                                <Text>Date: {event.date}</Text>
+                                <Text>Description: {event.description}</Text>
+                            </View>
+                        </Callout>
+                    </Marker>
+                ))}
             </MapView>
             {/* Dropdown for selecting a route */}
             <View style={styles.pickerContainer}>
-                <Picker
-                    selectedValue={selectedRoute}
-                    style={styles.picker}
-                    onValueChange={(itemValue) => setSelectedRoute(itemValue)}
-                >
-                    {Object.keys(sampleRoutes).map((route) => (
-                        <Picker.Item label={route} value={route} key={route} />
-                    ))}
-                </Picker>
+                <DropDownPicker
+                    open={open}
+                    value={selectedRoute}
+                    items={routesData.routes.map(route => ({
+                        label: route.name,
+                        value: route.name,
+                    }))}
+                    setOpen={setOpen}
+                    setValue={setSelectedRoute}
+                    placeholder="Select a route"
+                    style={styles.dropdown} // Customize styles
+                    dropDownContainerStyle={styles.dropDownContainer} // Dropdown container styling
+                />
+            </View>
+
+            {/* Slider for controlling distance */}
+            <View style={styles.sliderContainer}>
+                <Text>Distance from route (km): {distance}</Text>
+                <Slider
+                    style={styles.slider}
+                    minimumValue={0}
+                    maximumValue={50}
+                    step={1}
+                    value={distance}
+                    onValueChange={setDistance}
+                />
             </View>
         </View>
     );
@@ -90,15 +172,64 @@ const styles = StyleSheet.create({
     },
     pickerContainer: {
         position: 'absolute',
-        top: 40,
-        left: 10,
+        top: 0,
+        alignSelf: 'center',
         backgroundColor: 'white',
-        borderRadius: 10,
+        borderRadius: 0,
         padding: 5,
         elevation: 2,
+        width: '100%', // Use the same width for both platforms
+        zIndex: 1,  // Ensure it's on top of other elements
+    },
+    dropdown: {
+        backgroundColor: 'white',
+        borderWidth: 0,
+        padding: 10,
+        elevation: 2,
+    },
+    dropDownContainer: {
+        backgroundColor: 'white',
+        zIndex: 1000, // Important for iOS
+        borderWidth: 0,
+        width: '80%',
+        alignSelf: 'flex-start',
     },
     picker: {
+        width: '100%',  // Ensure the picker fits within the container
+        height: 40,
+        color: 'black',
+    },
+    eventMarker: {
+        width: 40, // Adjust the size as needed
+        height: 40,
+        resizeMode: 'contain', // Ensure the image maintains its aspect ratio
+    },
+    calloutContainer: {
         width: 150,
+        padding: 5,
+    },
+    calloutTitle: {
+        fontWeight: 'bold',
+        marginBottom: 5,
+    },
+    calloutImage: {
+        width: 100,
+        height: 100,
+        borderRadius: 10,
+        marginBottom: 5,
+    },
+    sliderContainer: {
+        position: 'absolute',
+        bottom: 40,
+        left: 10,
+        right: 10,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 10,
+        elevation: 2,
+    },
+    slider: {
+        width: '100%',
         height: 40,
     },
 });
