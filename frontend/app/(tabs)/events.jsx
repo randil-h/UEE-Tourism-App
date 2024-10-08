@@ -39,7 +39,7 @@ const Events = () => {
                         <Text style={styles.headerSubtitle}>With Instant Access!</Text>
                         <Divider />
                     </View>
-                    <TouchableOpacity style={styles.iconButton}>
+                    <TouchableOpacity style={styles.iconButton} onPress={() => router.push('screens/events/ReservedEvents')}>
                         <FontAwesome6 name="bucket" size={20} color="black" />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.iconButton} onPress={() => router.push('screens/events/AddEvents')}>

@@ -17,22 +17,22 @@ const _layout = () => {
 
 
             <Stack.Screen name="screens/itinerary/ItineraryDisplay" options={{headerShown: false, title: 'Generated Itinerary'}}/>
+            <Stack.Screen name="screens/itinerary/ItineraryMapView" options={{ headerShown: true, title: 'Itinerary Map'}} />
 
             <Stack.Screen name="screens/events/EventsMap" options={{headerShown: true, title: 'Find Events', animation: 'default', presentation: 'card'}}/>
+
+            <Stack.Screen name="screens/events/ReservedEvents" options={{headerShown: true, title: 'Reserved Events'}}/>
 
             <Stack.Screen
                 name="screens/events/AddEvents"
                 options={{
-                    headerShown: false,
+                    headerShown: true,
                     title: 'Add Events (for testing)',
                     animation: 'slide_from_bottom',
                     presentation: 'modal', // This enables the sliding modal style
                     gestureEnabled: true, // Allows you to swipe down to dismiss
                 }}
             />
-
-
-
 
             <Stack.Screen name="screens/Login" options={{headerShown: false, title: 'Login'}}/>
             <Stack.Screen name="screens/SignUp" options={{headerShown: false, title: 'Sign Up'}}/>
