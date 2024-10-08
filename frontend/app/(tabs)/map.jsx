@@ -10,7 +10,7 @@ import { AntDesign } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Config from "../../apiConfig";
-import { db, collection, addDoc } from '../../firebaseConfig';
+import { db} from '../../firebaseConfig';
 import { getDocs, doc, setDoc, arrayUnion, getDoc, updateDoc, arrayRemove } from 'firebase/firestore';
 
 const Map = () => {
@@ -25,6 +25,7 @@ const Map = () => {
     const [selectedPlace, setSelectedPlace] = useState(null);
     const [newUserNote, setNewUserNote] = useState('');
     const [routeCoordinates, setRouteCoordinates] = useState(null);
+    const [editingNote, setEditingNote] = useState(null);
     const mapRef = useRef(null);
     const markerRef = useRef({});
 
@@ -66,6 +67,28 @@ const Map = () => {
         } catch (error) {
             console.error('Error adding user note:', error);
             Alert.alert('Error', 'Failed to add note');
+        }
+    };
+
+    const editUserNote = async (placeId, noteIndex, updatedNote) => {
+        try {
+            const noteRef = doc(db, 'userNotes', placeId);
+            const currentNotes = userNotes[placeId];
+            const updatedNotes = [...currentNotes];
+            updatedNotes[noteIndex] = updatedNote;
+
+            await updateDoc(noteRef, {
+                notes: updatedNotes
+            });
+
+            setUserNotes(prevNotes => ({
+                ...prevNotes,
+                [placeId]: updatedNotes
+            }));
+            setEditingNote(null);
+        } catch (error) {
+            console.error('Error editing user note:', error);
+            Alert.alert('Error', 'Failed to edit note');
         }
     };
 
@@ -325,18 +348,42 @@ const Map = () => {
                                     <Text style={styles.notesTitle}>User Notes:</Text>
                                     {userNotes[place.place_id]?.map((note, i) => (
                                         <View key={i} style={styles.noteContainer}>
-                                            <Text style={styles.userNote}>{note}</Text>
-                                            <TouchableOpacity
-                                                style={styles.deleteButton}
-                                                onPress={() => deleteUserNote(place.place_id, i)}
-                                            >
-                                                <Icon name="delete" size={20} color="#f44336" />
-                                            </TouchableOpacity>
+                                            {editingNote === i ? (
+                                                <TextInput
+                                                    style={styles.editNoteInput}
+                                                    value={note}
+                                                    onChangeText={(text) => {
+                                                        const updatedNotes = [...userNotes[place.place_id]];
+                                                        updatedNotes[i] = text;
+                                                        setUserNotes(prevNotes => ({
+                                                            ...prevNotes,
+                                                            [place.place_id]: updatedNotes
+                                                        }));
+                                                    }}
+                                                    onBlur={() => editUserNote(place.place_id, i, userNotes[place.place_id][i])}
+                                                />
+                                            ) : (
+                                                <Text style={styles.userNote}>{note}</Text>
+                                            )}
+                                            <View style={styles.noteActions}>
+                                                <TouchableOpacity
+                                                    style={styles.editButton}
+                                                    onPress={() => setEditingNote(i)}
+                                                >
+                                                    <Icon name="pencil" size={20} color="#478747" />
+                                                </TouchableOpacity>
+                                                <TouchableOpacity
+                                                    style={styles.deleteButton}
+                                                    onPress={() => deleteUserNote(place.place_id, i)}
+                                                >
+                                                    <Icon name="delete" size={20} color="#f44336" />
+                                                </TouchableOpacity>
+                                            </View>
                                         </View>
                                     ))}
                                     <TextInput
                                         style={styles.noteInput}
-                                        placeholder="Add a note"
+                                        placeholder="Add a new note"
                                         value={newUserNote}
                                         onChangeText={setNewUserNote}
                                     />
@@ -493,6 +540,15 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         marginTop: 5,
     },
+    noteInput: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: 5,
+        marginTop: 10,
+        width: '100%',
+        fontSize: 12,
+    },
     photo: {
         width: 50,
         height: 50,
@@ -602,14 +658,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: 5,
     },
-    noteInput: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        padding: 5,
-        marginTop: 10,
-        width: '100%',
-    },
     addNoteButton: {
         backgroundColor: '#478747',
         padding: 5,
@@ -656,6 +704,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginTop: 5,
+        width: '100%',
+    },
+    editNoteInput: {
+        fontSize: 12,
+        flex: 1,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 3,
+        padding: 2,
+    },
+    noteActions: {
+        flexDirection: 'row',
+    },
+    editButton: {
+        padding: 5,
+        marginRight: 5,
     },
     deleteButton: {
         padding: 5,
