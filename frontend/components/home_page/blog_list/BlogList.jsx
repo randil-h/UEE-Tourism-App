@@ -44,12 +44,16 @@ const BlogList = () => {
                     <View style={styles.imageContainer}>
                         {blog.images.map((image, index) => (
                             <ImageBackground key={index} source={{ uri: image }} style={styles.image} >
-                                <Text style={styles.title}>{blog.title}</Text>
-                                <View style={styles.dateContainer}>
-                                    <Ionicons name={blog.likedBy && currentUser && blog.likedBy.includes(currentUser.uid) ? "heart" : "heart-outline"}
-                                              size={24}
-                                              color={blog.likedBy && currentUser && blog.likedBy.includes(currentUser.uid) ? "red" : "red"}
-                                              style={styles.likeIcon} />
+                                <View style={styles.overlayz}>
+                                    <Text style={styles.title}>{blog.title}</Text>
+                                    <View style={styles.dateContainer}>
+                                        <Ionicons
+                                            name={blog.likedBy && currentUser && blog.likedBy.includes(currentUser.uid) ? "heart" : "heart-outline"}
+                                            size={24}
+                                            color={blog.likedBy && currentUser && blog.likedBy.includes(currentUser.uid) ? "red" : "red"}
+                                            style={styles.likeIcon}
+                                        />
+                                    </View>
                                 </View>
                             </ImageBackground>
                         ))}
@@ -62,6 +66,16 @@ const BlogList = () => {
 };
 
 const styles = StyleSheet.create({
+    overlayz: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',  // semi-transparent black overlay
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     container: {
         flexGrow: 1,
         padding: 10,
@@ -71,9 +85,9 @@ const styles = StyleSheet.create({
     blogCard: {
         marginBottom: 20,
         marginRight: 12,
-        width: 250,
+        width: 275,
         height: 400,
-        borderRadius: 0,
+        borderRadius: 20,
         backgroundColor: 'rgba(231, 245, 255, 0.8)',
         overflow: 'hidden'
     },
@@ -83,7 +97,10 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         alignContent: 'center',
         color: 'white',
-        textAlign: 'center'
+        textAlign: 'center',
+        textShadowColor: 'rgba(0, 0, 0, 0.75)',  // shadow for better readability
+        textShadowOffset: { width: -1, height: 1 },
+        textShadowRadius: 10,
     },
     category: {
         fontSize: 14,
@@ -102,7 +119,10 @@ const styles = StyleSheet.create({
         marginRight: 5
     },
     likeIcon: {
-        marginRight: 5
+        marginRight: 5,
+        textShadowColor: 'rgba(0, 0, 0, 0.75)',  // shadow for better readability
+        textShadowOffset: { width: -1, height: 1 },
+        textShadowRadius: 5,
     },
     date: {
         fontSize: 14,
