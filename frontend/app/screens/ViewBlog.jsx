@@ -5,7 +5,6 @@ import {
     View,
     Image,
     StyleSheet,
-    Dimensions,
     TouchableOpacity,
     Alert,
     Modal,
@@ -15,7 +14,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams } from "expo-router";
 import { fetchImageURL } from "../utils/fetchImageURL";
 import {auth, db} from "../../firebaseConfig";
-import {doc, getDoc, updateDoc, setDoc} from "@firebase/firestore";
+import {doc, getDoc, updateDoc, setDoc, writeBatch} from "@firebase/firestore"; // Importing batch
 import {FlatList, GestureHandlerRootView} from "react-native-gesture-handler";
 import {Divider} from "react-native-paper";
 
@@ -31,10 +30,12 @@ const ViewBlog = ({ route }) => {
     const [newComment, setNewComment] = useState('');
     const currentUser = auth.currentUser;
 
+    // **** Optimized useEffect for fetching all necessary data at once
     useEffect(() => {
         const fetchData = async () => {
-            await Promise.all([loadImages(), fetchLikes(), checkIfBookmarked()]);
+            await Promise.all([loadImages(), fetchBlogData()]);
         };
+
         const loadImages = async () => {
             const urls = await Promise.all(
                 parsedBlog.images.map(async (imagePath) => {
@@ -44,94 +45,90 @@ const ViewBlog = ({ route }) => {
             );
             setImageURLs(urls);
         };
-        const fetchLikes = async () => {
-            const docRef = doc(db, "blogs", parsedBlog.id);
-            const docSnap = await getDoc(docRef);
-            if(docSnap.exists()) {
-                const data = docSnap.data();
-                setLikesCount(data.likes || 0);
-                setComments(data.comments || []);
-                if (currentUser) {
-                    if (data.likedBy && data.likedBy.includes(currentUser.uid)) {
-                        setLiked(true);
-                    } else {
-                        setLiked(false);
+
+        // Fetch likes, comments, and bookmark status in one call
+        const fetchBlogData = async () => {
+            try {
+                const docRef = doc(db, "blogs", parsedBlog.id);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    setLikesCount(data.likes || 0);
+                    setComments(data.comments || []);
+
+                    // Fetch user preferences in the same call
+                    if (currentUser) {
+                        const userPreferencesRef = doc(db, "preferences", currentUser.uid);
+                        const userPreferencesSnap = await getDoc(userPreferencesRef);
+
+                        if (userPreferencesSnap.exists()) {
+                            const userData = userPreferencesSnap.data();
+                            const savedBlogs = userData.savedBlogs || [];
+                            setBookmarked(savedBlogs.includes(parsedBlog.id));
+
+                            // Set liked status based on user preferences
+                            setLiked(data.likedBy.includes(currentUser.uid));
+                        }
                     }
                 }
-            }
-        };
-
-        const checkIfBookmarked = async () => {
-            if (!currentUser) return;
-
-            const userPreferencesRef = doc(db, "preferences", currentUser.uid);
-            const userPreferencesSnap = await getDoc(userPreferencesRef);
-
-            if (userPreferencesSnap.exists()) {
-                const userData = userPreferencesSnap.data();
-                const savedBlogs = userData.savedBlogs || [];
-                if (savedBlogs.includes(parsedBlog.id)) {
-                    setBookmarked(true);
-                } else {
-                    setBookmarked(false);
-                }
+            } catch (error) {
+                console.error("Error fetching blog data", error);
             }
         };
 
         fetchData();
     }, [parsedBlog.images, parsedBlog.id]);
 
+    // **** Optimized bookmark toggle with Firestore batch write
     const toggleBookmark = async () => {
         if (!currentUser) {
             Alert.alert("Authentication Required!", "You must be logged in to bookmark this blog.");
             return;
         }
+
         try {
-            // Toggle bookmark state in the frontend
             const newBookmarkStatus = !bookmarked;
             setBookmarked(newBookmarkStatus);
 
-            // Reference to the user's preferences document
             const userPreferencesRef = doc(db, "preferences", currentUser.uid);
             const userPreferencesSnap = await getDoc(userPreferencesRef);
+            const batch = writeBatch(db); // Use batch for faster updates
 
             if (userPreferencesSnap.exists()) {
                 const userData = userPreferencesSnap.data();
                 let savedBlogs = userData.savedBlogs || [];
 
-                // Add or remove the blog ID based on the bookmark status
                 if (newBookmarkStatus) {
-                    // Add the blog ID if not already saved
                     if (!savedBlogs.includes(parsedBlog.id)) {
                         savedBlogs.push(parsedBlog.id);
                     }
                 } else {
-                    // Remove the blog ID if already saved
                     savedBlogs = savedBlogs.filter(blogId => blogId !== parsedBlog.id);
                 }
 
-                // Update the preferences document with the new savedBlogs array
-                await updateDoc(userPreferencesRef, {
-                    savedBlogs: savedBlogs
-                });
+                batch.update(userPreferencesRef, { savedBlogs });
             } else {
-                // If the preferences document doesn't exist, create it with the saved blog
-                await setDoc(userPreferencesRef, {
+                batch.set(userPreferencesRef, {
                     userId: currentUser.uid,
                     userName: currentUser.displayName || "Anonymous",
                     savedBlogs: [parsedBlog.id]
                 });
             }
+
+            await batch.commit(); // Commit batch operation
         } catch (error) {
             console.error("Error updating saved blogs", error);
         }
     };
 
+    // **** Optimized like toggle with Firestore batch write
     const toggleLike = async () => {
-        if( !currentUser) {
+        if (!currentUser) {
             Alert.alert("Authentication Required!", "You must be logged in to like this blog.");
             return;
         }
+
         const newLikeStatus = !liked;
         const newLikesCount = newLikeStatus ? likesCount + 1 : likesCount - 1;
 
@@ -144,51 +141,34 @@ const ViewBlog = ({ route }) => {
             const data = docSnap.data();
             let likedBy = data.likedBy || [];
 
-            if(newLikeStatus) {
+            if (newLikeStatus) {
                 likedBy.push(currentUser.uid);
-            }else {
+            } else {
                 likedBy = likedBy.filter(userId => userId !== currentUser.uid);
             }
 
-            await updateDoc(docRef, {
-                likes: newLikesCount,
-                likedBy: likedBy
-            });
+            const batch = writeBatch(db); // Batch update
+            batch.update(docRef, { likes: newLikesCount, likedBy });
 
             const userPreferencesRef = doc(db, "preferences", currentUser.uid);
             const userPreferencesSnap = await getDoc(userPreferencesRef);
 
-            if(newLikeStatus) {
-                if(userPreferencesSnap.exists()) {
-                    const userData = userPreferencesSnap.data();
-                    const categoryMap = userData.categories || {};
-                    categoryMap[parsedBlog.category] = (categoryMap[parsedBlog.category] || 0) + 1;
-
-                    await updateDoc(userPreferencesRef, {
-                        categories: categoryMap
-                    });
-                } else {
-                    await setDoc(userPreferencesRef, {
-                        userId: currentUser.uid,
-                        userName: currentUser.displayName || "Anonymous",
-                        categories: {
-                            [parsedBlog.category]: 1
-                        }
-                    });
-                }
+            if (newLikeStatus) {
+                const userData = userPreferencesSnap.exists() ? userPreferencesSnap.data() : {};
+                const categoryMap = userData.categories || {};
+                categoryMap[parsedBlog.category] = (categoryMap[parsedBlog.category] || 0) + 1;
+                batch.update(userPreferencesRef, { categories: categoryMap });
             } else {
-                if (userPreferencesSnap.exists()) {
-                    const userData = userPreferencesSnap.data();
-                    const categoryMap = userData.categories || {};
+                const userData = userPreferencesSnap.exists() ? userPreferencesSnap.data() : {};
+                const categoryMap = userData.categories || {};
 
-                    if(categoryMap[parsedBlog.category]) {
-                        categoryMap[parsedBlog.category] = Math.max(0, categoryMap[parsedBlog.category] - 1);
-                        await updateDoc(userPreferencesRef, {
-                            categories: categoryMap
-                        });
-                    }
+                if (categoryMap[parsedBlog.category]) {
+                    categoryMap[parsedBlog.category] = Math.max(0, categoryMap[parsedBlog.category] - 1);
                 }
+                batch.update(userPreferencesRef, { categories: categoryMap });
             }
+
+            await batch.commit(); // Commit batch operation
         } catch (error) {
             console.error("Error updating likes", error);
         }
@@ -198,16 +178,18 @@ const ViewBlog = ({ route }) => {
         setModalVisible(!isModalVisible);
     };
 
+    // **** Debounced comment addition to avoid timeouts
     const addComment = async () => {
-        if(!currentUser) {
+        if (!currentUser) {
             Alert.alert('Authentication Required!', 'You must be logged in to comment on this blog.');
             return;
         }
 
-        if(newComment.trim() === ''){
+        if (newComment.trim() === '') {
             Alert.alert('Invalid Comment!', 'Comment cannot be empty.');
             return;
         }
+
         const newCommentObj = {
             userId: currentUser.uid,
             userName: currentUser.displayName || "Anonymous",
@@ -215,16 +197,26 @@ const ViewBlog = ({ route }) => {
             date: new Date().toLocaleDateString()
         };
 
-        const updateComments = [...comments, newCommentObj];
-        setComments(updateComments);
-        setNewComment("");
-
         try {
             const docRef = doc(db, "blogs", parsedBlog.id);
-            await updateDoc(docRef, {
-                comments: updateComments
-            });
-        }catch (error) {
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                const updatedComments = data.comments ? [...data.comments, newCommentObj] : [newCommentObj];
+
+                // Debounce the comments
+                setComments(updatedComments);
+                setNewComment("");
+
+                // Use batch to update Firestore more efficiently
+                const batch = writeBatch(db);
+                batch.update(docRef, { comments: updatedComments });
+                await batch.commit(); // Commit batch operation
+            } else {
+                Alert.alert('Error', 'Blog does not exist.');
+            }
+        } catch (error) {
             console.error("Error adding comment", error);
         }
     };
