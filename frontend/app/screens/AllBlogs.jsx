@@ -115,7 +115,7 @@ const AllBlogs = () => {
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity onPress={handleAddBlog}>
-                    <FontAwesome name="plus" size={24} color="#2475ff" />
+                    <FontAwesome name="plus" size={24} color="#457c39" />
                 </TouchableOpacity>
             </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 10, marginBottom: 10, paddingHorizontal: 10 }}>
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     selectedCategoryButton: {
-        backgroundColor: '#2475ff',
+        backgroundColor: '#457c39',
         height: 35,
         marginHorizontal: 5
     },
