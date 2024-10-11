@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import {View, Text, TextInput, Image, TouchableOpacity, StyleSheet, ScrollView, ImageBackground} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import {router} from "expo-router";
 import generateItinerary from '../screens/itinerary/GenerateItinerary';
+import ColorScheme from "../../assets/colors/colorScheme";
+import {Divider} from "react-native-paper";
+import colorScheme from "../../assets/colors/colorScheme";
 const Itinerary = () => {
     const [days, setDays] = useState('');
     const [budget, setBudget] = useState('Mid');
@@ -27,6 +30,17 @@ const Itinerary = () => {
         router.push('/screens/AddPlaces'); // Adjust the route according to your setup
     };
     const handleGenerateItinerary = async () => {
+        // Validate input fields
+        if (!days || isNaN(days) || parseInt(days) <= 0) {
+            alert("Please enter a valid number of days.");
+            return;
+        }
+
+        if (activities.length === 0) {
+            alert("Please select at least one activity preference.");
+            return;
+        }
+
         console.log('Form submitted with:', { days, budget, activities, startLocation, endLocation, touristType });
 
         try {
@@ -50,29 +64,31 @@ const Itinerary = () => {
         } catch (error) {
             console.error('Error generating itinerary:', error);
             // Handle the error (e.g., show an alert to the user)
-
+            alert('An error occurred while generating the itinerary. Please try again.');
         }
     };
 
 
 
+
     return (
         <View style={styles.container}>
-            <ScrollView>
-                <Image
-                    source={{ uri: 'https://media1.thrillophilia.com/filestore/aobaf1yw2mrowt8a50rvhq5jhavm_1582217692_galle_lighthouse.jpg?w=400&dpr=2' }}
-                    style={styles.backgroundImage}
-                />
-                <View style={styles.overlay}>
-                    <View style={styles.overlay}>
-                        <Text style={styles.title1}>Build Your</Text>
-                        <Text style={styles.title2}>Ideal Trip</Text>
-                        <Text style={styles.subtitle}>Tailored Itinerary Just For You</Text>
-                    </View>
+            <ScrollView showsVerticalScrollIndicator={false}>
 
-                </View>
+                <ImageBackground
+                    source={{ uri: 'https://cdn.shopify.com/s/files/1/0026/2894/3925/t/20/assets/pf-1169a9ec--2007183484959238583074083851976799060087709n.jpg?v=1623782705' }} // Replace with your image URL
+                    style={styles.imageBackground}
+                    resizeMode="cover"
+                >
+                    <View style={styles.overlay}>
+                        <Text style={styles.title1}>Smart Itinerary</Text>
+                        <Text style={styles.subtitle}>Tailored Just For You</Text>
+                        <Divider style={{ marginBottom: 30 }} />
+                    </View>
+                </ImageBackground>
 
                 <View style={styles.form}>
+
                     <Text style={styles.label}>No of days</Text>
                     <TextInput
                         style={styles.input}
@@ -158,74 +174,89 @@ const Itinerary = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        paddingBottom:100,
+
+        backgroundColor: ColorScheme.white,
+
+    },
+    imageBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 250,
+    },
+    overlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dark overlay with transparency
+        width: '100%', // Ensures overlay covers the entire background
+        padding: 20,   // Adds padding to your content
     },
     backgroundImage: {
         width: '100%',
         height: 200,
         position: 'absolute',
     },
-    overlay: {
-        padding: 20,
-    },
+
     title1: {
-        fontSize: 24,
+        fontSize: 40,
         fontWeight: 'bold',
-        color: '#000',
+        color: ColorScheme.white,
         textAlign: "left",
+        marginTop: 30,
     },
     title2: {
-        fontSize: 24,
+        fontSize: 40,
         fontWeight: 'bold',
-        color: '#fff',
-        textAlign: "left",
+        color: ColorScheme.accent,
+
     },
     subtitle: {
-        fontSize: 16,
-        color: '#fff',
+        fontSize: 28,
+        color: ColorScheme.gray_text,
         fontWeight: 'bold',
-        textAlign: 'right', // Aligns the text to the right
-        marginTop: 60, // Adjust this value to move the subtitle down
+        textAlign: 'left', // Aligns the text to the right
+        marginTop: 0, // Adjust this value to move the subtitle down
 
     },
     form: {
-        paddingTop: 2,
-        paddingLeft:20,
-        paddingRight:20,
+        paddingTop: 30,
+        paddingLeft:30,
+        paddingRight:30,
         paddingBottom:5,
          // Adjust this value if needed to ensure form starts after the image
     },
     label: {
-        fontSize: 16,
+        fontSize: 20,
+        marginVertical: 10,
+        marginLeft: 10,
         fontWeight: 'bold',
-        marginTop: 10,
-        marginBottom: 5,
+        color: colorScheme.black,
     },
     input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        padding: 10,
-        marginBottom: 10,
+        borderBottomWidth: 1.5,
+        borderColor: colorScheme.accent,
+        borderRadius: 0,
+        padding: 12,
+        fontSize: 16,
+        marginBottom: 20,
     },
     budgetContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 20,
+        marginTop: 20,
     },
     budgetButton: {
         flex: 1,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
+        borderRadius: 25,
         paddingVertical: 12,
         paddingHorizontal: 10,
-        marginRight: 5,
+        marginRight: 10,
         backgroundColor: '#fff', // Adds a clean button background
     },
     selectedBudget: {
-        backgroundColor: '#000',
+        backgroundColor: ColorScheme.accent,
     },
     budgetText: {
         textAlign: 'center',
@@ -233,23 +264,24 @@ const styles = StyleSheet.create({
     },
     selectedText: {
         color: '#fff',
+        fontWeight: 'bold',
     },
     activityContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between', // Ensures even spacing
-        marginBottom: 10,
+        marginBottom: 20,
+        marginTop: 20,
     },
     activityButton: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
+        borderRadius: 25,
         padding: 10,
         width: '49%', // Makes sure two items fit per row with some spacing
         marginBottom: 10,
+        backgroundColor: '#fff', // Adds a clean button background
     },
     selectedActivity: {
-        backgroundColor: '#000',
+        backgroundColor: colorScheme.accent,
     },
     activityText: {
         color: '#000',
@@ -260,32 +292,33 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     touristTypeButton: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
+        backgroundColor: '#fff',
+        borderRadius: 25,
         padding: 10,
         flex: 1,
-        marginRight: 5,
+        marginRight: 10,
     },
     selectedTouristType: {
-        backgroundColor: '#000',
+        backgroundColor: ColorScheme.accent,
     },
     touristTypeText: {
         textAlign: 'center',
         color: '#000',
     },
     generateButton: {
-        backgroundColor: '#000',
+        borderWidth: 1,
+        borderColor: ColorScheme.accent,
         padding: 10,
-        borderRadius: 10,
+        borderRadius: 20,
         alignItems: 'center',
         marginTop: 20,
         width: '60%',
         alignSelf: 'center',
+        marginBottom: 120,
     },
 
     generateButtonText: {
-        color: '#fff',
+        color: ColorScheme.black,
         fontWeight: 'bold',
     },
     pickerContainer: {

@@ -8,6 +8,7 @@ import * as Sharing from 'expo-sharing';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { db } from "../../../firebaseConfig";
 import { collection, addDoc } from 'firebase/firestore';
+import ColorScheme from "../../../assets/colors/colorScheme";
 
 const ItineraryDisplay = () => {
     const router = useRouter();
@@ -179,17 +180,17 @@ const styles = StyleSheet.create({
         paddingTop: 30,
     },
     title: {
-        fontSize: 30,
+        fontSize: 40,
         fontWeight: 'bold',
         marginBottom: 4,
         textAlign: 'center',
         marginTop:20,
     },
     subtitle: {
-        fontSize: 16,
+        fontSize: 18,
         color: 'gray',
         textAlign: 'center',
-        marginBottom: 20,
+        marginBottom: 30,
     },
     dayContainer: {
         marginBottom: 20,
@@ -207,25 +208,24 @@ const styles = StyleSheet.create({
     placeImage: {
         height: 200,
         width: '100%',
-        borderRadius: 10,
+        borderRadius: 25,
     },
     overlay: {
         position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
-        padding: 10,
+        top: 0,
+        padding: 20,
+        justifyContent: 'flex-end',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
+        borderRadius: 25,
     },
     placeName: {
-        fontSize: 16,
+        fontSize: 28,
         fontWeight: 'bold',
         color: 'white',
-        textShadowColor: 'rgba(0, 0, 0, 0.75)',
-        textShadowOffset: { width: -1, height: 1 },
-        textShadowRadius: 10,
+        marginBottom: 10,
     },
     location: {
         fontSize: 14,
@@ -260,17 +260,17 @@ const styles = StyleSheet.create({
         marginRight:4,
     },
     button: {
-        backgroundColor: 'black',
-        borderRadius: 20,
+        backgroundColor: ColorScheme.black,
+        borderRadius: 30,
         paddingVertical: 10,
-        paddingHorizontal: 15,
+        paddingHorizontal: 30,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
     },
     iconButton: {
         backgroundColor: 'black',
-        borderRadius: 20,
+        borderRadius: 30,
         paddingVertical: 10,
         paddingHorizontal: 20,
         flexDirection: 'row',
