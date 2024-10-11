@@ -186,7 +186,6 @@ const Map = () => {
             // Extract unique attraction types
             const types = [...new Set(attractionsWithTravelTime.flatMap(place => place.types))];
             setAttractionTypes(types);
-            console.log(types);
         } catch (error) {
             console.error('Error fetching popular attractions:', error);
         }
@@ -490,11 +489,11 @@ const Map = () => {
                 <Text style={styles.sliderValue}>{radius / 1000} km</Text>
             </BlurView>
 
-            <FAB
-                style={styles.fab}
-                icon="plus"
-                onPress={() => setModalVisible(true)}
-            />
+            {/*<FAB*/}
+            {/*    style={styles.fab}*/}
+            {/*    icon="plus"*/}
+            {/*    onPress={() => setModalVisible(true)}*/}
+            {/*/>*/}
 
             <Modal
                 animationType="slide"
@@ -585,8 +584,10 @@ const styles = StyleSheet.create({
         padding: 10,
         width: 250,
         maxHeight: 300,
-        borderRadius: 24,
         overflow: 'hidden',
+        borderColor: '#57854e',
+        borderWidth: 1,
+        borderRadius: 16,
     },
     calloutScrollView: {
         paddingVertical: 10,
@@ -595,6 +596,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '600',
         marginBottom: 8,
+        alignSelf: 'center',
         color: '#333',
     },
     sliderContainer: {
@@ -603,10 +605,10 @@ const styles = StyleSheet.create({
         left: 20,
         height: 400,
         width: 80,
-        borderRadius: 16,
         overflow: 'hidden',
-        borderColor: 'rgba(255, 255, 255, 0.5)',
+        borderColor: '#57854e',
         borderWidth: 1,
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -626,7 +628,7 @@ const styles = StyleSheet.create({
     },
     fab: {
         position: 'absolute',
-        bottom: 30,
+        bottom: 100,
         right: 20,
         backgroundColor: '#3f51b5',
         borderRadius: 28,
@@ -696,10 +698,12 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 'bold',
         marginTop: 10,
+        marginBottom: 10,
     },
     userNote: {
         fontSize: 12,
         marginTop: 5,
+        marginBottom: 5,
     },
     noteContainer: {
         flexDirection: 'row',
@@ -738,7 +742,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#478747',
         padding: 5,
         borderRadius: 30,
-        marginTop: 5,
+        marginTop: 10,
         alignItems: 'center',
     },
     addNoteButtonText: {
@@ -788,7 +792,7 @@ const styles = StyleSheet.create({
     detailText: {
         fontSize: 14,
         color: '#333',
-        marginLeft: 5,  // Spacing between the icon and text
+        marginLeft: 5,
         fontWeight: '500',
     },
     filterChipsContainer: {
@@ -802,10 +806,13 @@ const styles = StyleSheet.create({
     filterChip: {
         marginRight: 8,
         marginBottom: 8,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: '#ffe8c5',
+        borderColor: '#57854e',
+        borderWidth: 2,
+        borderRadius: 16,
     },
     filterChipText: {
-        color: '#333',
+        color: '#57854e',
     },
     reviewCount: {
         fontSize: 12,
