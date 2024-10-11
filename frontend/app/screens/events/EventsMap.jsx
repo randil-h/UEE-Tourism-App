@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Image, StyleSheet, Text, View, Alert} from 'react-native';
+import {Button, Image, StyleSheet, Text, View, Alert, TouchableOpacity} from 'react-native';
 import MapView, {Callout, Marker} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import {collection, getDocs, addDoc} from '@firebase/firestore';
@@ -9,18 +9,18 @@ import {db} from "../../../firebaseConfig"; // Import your Firestore instance
 import DropDownPicker from 'react-native-dropdown-picker';
 import Slider from "@react-native-community/slider";
 import * as turf from '@turf/turf';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {BlurView} from "expo-blur";
 
 const GOOGLE_MAPS_APIKEY = Config.GOOGLE_MAPS_API_KEY;
-
-// Load the JSON file
-const routesData = require('../../../assets/data_scripts/routes.json'); // Update this path
+const routesData = require('../../../assets/data_scripts/routes.json'); // Load JSON file
 
 const EventsMap = () => {
     const [selectedRoute, setSelectedRoute] = useState(routesData.routes[0].name);
     const [route, setRoute] = useState(routesData.routes[0]);
-    const [events, setEvents] = useState([]); // State to hold events
-    const [open, setOpen] = useState(false); // Controls dropdown visibility
-    const [distance, setDistance] = useState(5); // State to hold the distance value for filtering
+    const [events, setEvents] = useState([]);
+    const [open, setOpen] = useState(false);
+    const [distance, setDistance] = useState(5);
 
     useEffect(() => {
         const selected = routesData.routes.find(r => r.name === selectedRoute);
@@ -45,38 +45,27 @@ const EventsMap = () => {
 
     // Function to check if the event is within the specified distance from the route
     const isEventNearby = (event) => {
-        const { coordinates } = event.location; // Assuming event.location has coordinates
-        const distanceToRoute = calculateDistanceFromRoute(coordinates); // Implement this function
+        const { coordinates } = event.location;
+        const distanceToRoute = calculateDistanceFromRoute(coordinates);
         return distanceToRoute <= distance;
     };
 
     // Function to calculate the distance from the event to the nearest point on the route
     const calculateDistanceFromRoute = (eventCoords) => {
-        // Create a point for the event
         const eventPoint = turf.point([eventCoords.longitude, eventCoords.latitude]);
-
-        // Create a LineString from the route's waypoints
-        const routeLine = turf.lineString(
-            route.waypoints.map(wp => [wp.longitude, wp.latitude]) // Ensure you have longitude, latitude for waypoints
-        );
-
-        // Calculate the distance from the event point to the nearest point on the route line
-        return turf.pointToLineDistance(eventPoint, routeLine, {units: 'kilometers'}); // Return the calculated distance in kilometers
+        const routeLine = turf.lineString(route.waypoints.map(wp => [wp.longitude, wp.latitude]));
+        return turf.pointToLineDistance(eventPoint, routeLine, {units: 'kilometers'});
     };
 
     const handleReserveEvent = async (event) => {
         try {
             const reservedEventsRef = collection(db, "reserved_events");
-
-            // Query to check if the event is already reserved
             const querySnapshot = await getDocs(reservedEventsRef);
             const alreadyReserved = querySnapshot.docs.some(doc => doc.data().id === event.id);
 
             if (alreadyReserved) {
-                // Alert the user if the event is already reserved
                 Alert.alert("Already Reserved", "This event has already been reserved.");
             } else {
-                // If not reserved, add the event to the reserved_events collection
                 await addDoc(reservedEventsRef, event);
                 Alert.alert("Success", "Event reserved successfully!");
             }
@@ -85,8 +74,6 @@ const EventsMap = () => {
             Alert.alert("Error", `Failed to reserve the event: ${error.message}`);
         }
     };
-
-
 
     return (
         <View style={styles.container}>
@@ -101,7 +88,6 @@ const EventsMap = () => {
                 showsUserLocation={true}
                 followsUserLocation={false}
             >
-                {/* Render route dynamically */}
                 <MapViewDirections
                     origin={route.start}
                     waypoints={route.waypoints.length > 0 ? route.waypoints : undefined}
@@ -110,15 +96,6 @@ const EventsMap = () => {
                     strokeWidth={6}
                     strokeColor={colorScheme.accent}
                     optimizeWaypoints={true}
-                    onStart={() => {
-                        console.log(`Starting route from ${JSON.stringify(route.start)} to ${JSON.stringify(route.end)}`);
-                    }}
-                    onReady={(result) => {
-                        console.log(`Route ready: ${result}`);
-                    }}
-                    onError={(errorMessage) => {
-                        console.log(`Error: ${errorMessage}`);
-                    }}
                 />
                 <Marker coordinate={route.start} title="Start" />
                 <Marker coordinate={route.end} title="End" />
@@ -126,7 +103,6 @@ const EventsMap = () => {
                     <Marker key={index} coordinate={wp} title={`Waypoint ${index + 1}`} />
                 ))}
 
-                {/* Render event markers with custom icon */}
                 {events.filter(isEventNearby).map(event => (
                     <Marker
                         key={event.id}
@@ -144,24 +120,26 @@ const EventsMap = () => {
                             <View style={styles.calloutContainer}>
                                 <Text style={styles.calloutTitle}>{event.name}</Text>
                                 <Image
-                                    source={{ uri: event.image }}
+                                    source={{ uri: event.imageUrl }}
                                     style={styles.calloutImage}
                                 />
-                                <Text>Date: {event.date}</Text>
-                                <Text>Description: {event.description}</Text>
+                                <Text style={styles.calloutText}>Date: {event.date}</Text>
+                                <Text style={styles.calloutText}>Ticket Price: Rs. {event.ticketPrice}</Text>
 
-                                {/* Reserve Button */}
-                                <Button
-                                    title="Reserve"
+                                {/* Reserve Button with icon */}
+                                <TouchableOpacity
+                                    style={styles.reserveButton}
                                     onPress={() => handleReserveEvent(event)}
-                                    color={colorScheme.primary}
-                                />
+                                >
+                                    <Ionicons name="bookmark-outline" size={20} color="white" style={styles.reserveIcon} />
+                                    <Text style={styles.reserveButtonText}>Reserve</Text>
+                                </TouchableOpacity>
                             </View>
                         </Callout>
                     </Marker>
                 ))}
             </MapView>
-            {/* Dropdown for selecting a route */}
+
             <View style={styles.pickerContainer}>
                 <DropDownPicker
                     open={open}
@@ -173,13 +151,18 @@ const EventsMap = () => {
                     setOpen={setOpen}
                     setValue={setSelectedRoute}
                     placeholder="Select a route"
-                    style={styles.dropdown} // Customize styles
-                    dropDownContainerStyle={styles.dropDownContainer} // Dropdown container styling
+                    style={styles.dropdown}
+                    dropDownContainerStyle={styles.dropDownContainer}
+                    textStyle={styles.dropdownText}
                 />
+                <BlurView intensity={100} tint="light" style={styles.blurContainer} />
             </View>
 
-            {/* Slider for controlling distance */}
+
+
+
             <View style={styles.sliderContainer}>
+                <BlurView intensity={100} tint="light" style={styles.blurBackground} />
                 <Text>Distance from route (km): {distance}</Text>
                 <Slider
                     style={styles.slider}
@@ -203,66 +186,114 @@ const styles = StyleSheet.create({
     },
     pickerContainer: {
         position: 'absolute',
-        top: 0,
+        top: 12,
         alignSelf: 'center',
-        backgroundColor: 'white',
-        borderRadius: 0,
-        padding: 5,
-        elevation: 2,
-        width: '100%', // Use the same width for both platforms
-        zIndex: 1,  // Ensure it's on top of other elements
+        width: '80%',
+        zIndex: 9999, // Ensure the container is on top of all other views
+    },
+    blurContainer: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        borderRadius: 50,
+        overflow: 'hidden',
     },
     dropdown: {
-        backgroundColor: 'white',
+        backgroundColor: 'rgba(255,255,255,0.5)', // Semi-transparent background for the blur effect
         borderWidth: 0,
         padding: 10,
-        elevation: 2,
+        borderRadius: 50,
     },
     dropDownContainer: {
-        backgroundColor: 'white',
-        zIndex: 1000, // Important for iOS
+        backgroundColor: 'rgba(255,255,255,0.5)', // Dark background for dropdown items
+        zIndex: 10000, // Ensure the dropdown is visible on top of other components
         borderWidth: 0,
-        width: '80%',
-        alignSelf: 'flex-start',
+        borderRadius: 25,
+        width: '100%',
     },
-    picker: {
-        width: '100%',  // Ensure the picker fits within the container
-        height: 40,
-        color: 'black',
+    dropdownText: {
+        color: 'black', // Set text color to white for contrast
+        fontWeight: 'bold',
     },
     eventMarker: {
-        width: 40, // Adjust the size as needed
+        width: 40,
         height: 40,
-        resizeMode: 'contain', // Ensure the image maintains its aspect ratio
+        resizeMode: 'contain',
     },
     calloutContainer: {
-        width: 150,
-        padding: 5,
+        width: 250, // Make the callout wider for more content space
+        borderRadius: 10,
+        alignItems: 'center',
     },
     calloutTitle: {
         fontWeight: 'bold',
+        fontSize: 16,
+        marginBottom: 8, // Added spacing between title and content
+        color: colorScheme.black,
+        textAlign: 'center', // Center-align the title
+    },
+    calloutText: {
+        fontSize: 14,
+        color: colorScheme.black,
         marginBottom: 5,
+        textAlign: 'center', // Center-align the text
     },
     calloutImage: {
-        width: 100,
-        height: 100,
+        width: '100%', // Slightly larger image
+        height: 120,
         borderRadius: 10,
-        marginBottom: 5,
+        marginBottom: 10, // Adjust spacing between image and text
+    },
+    reserveButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center', // Center the content horizontally
+        backgroundColor: colorScheme.accent,
+        paddingVertical: 10, // Adjust padding for better clickability
+        paddingHorizontal: 15,
+        borderRadius: 25,
+        marginTop: 10,
+        width: '100%', // Full width of the container
+    },
+    reserveButtonText: {
+        color: 'white',
+        marginLeft: 5,
+        fontWeight: 'bold',
+        textAlign: 'center', // Center-align text
+    },
+    reserveIcon: {
+        marginRight: 5,
     },
     sliderContainer: {
         position: 'absolute',
-        bottom: 40,
-        left: 10,
-        right: 10,
-        backgroundColor: 'white',
-        borderRadius: 10,
-        padding: 10,
-        elevation: 2,
+        bottom: 30,
+        width: '80%',
+        alignSelf: 'center',
+        paddingVertical: 5,
+
+        borderRadius: 25,
+
+        alignItems: 'center',
+        zIndex: 9999, // Ensure the slider is on top of other views
+    },
+    blurBackground: {
+        position: 'absolute',
+        top: 0,
+
+        alignSelf: 'center',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        borderRadius: 25,
+        overflow: 'hidden',
     },
     slider: {
         width: '100%',
         height: 40,
     },
 });
+
 
 export default EventsMap;

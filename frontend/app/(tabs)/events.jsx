@@ -7,6 +7,7 @@ import { Divider } from "react-native-paper";
 import { FontAwesome6 } from "@expo/vector-icons";
 import colors from '../../assets/colors/colorScheme';
 import {BlurView} from "expo-blur";
+import ColorScheme from "../../assets/colors/colorScheme";
 
 const Events = () => {
     const router = useRouter();
@@ -70,6 +71,18 @@ const Events = () => {
                     </TouchableOpacity>
 
                 </View>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingTop: 20, paddingBottom: 12 }}>
+                    <Text style={{ fontWeight: 'bold', fontSize: 28, paddingLeft: 8 }}>Featured Events</Text>
+                    {/*<TouchableOpacity onPress={() => router.push('screens/AddBlog')}>
+                    <Text style={{fontWeight: 'bold',color: '#2475ff', padding: 4, borderRadius: 5}}>Add Blog</Text>
+                </TouchableOpacity>*/}
+                    <TouchableOpacity  style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={{ color: ColorScheme.accent, fontWeight: '500' }}>See More</Text>
+                        <Text style={{ color: ColorScheme.accent, marginLeft: 4 }}>{'\u2192'}</Text>
+                    </TouchableOpacity>
+                </View>
+
                 {/* Event List */}
                 <EventsList />
             </View>
