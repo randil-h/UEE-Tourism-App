@@ -9,6 +9,7 @@ import Blogs from "../../components/home_page/Blogs";
 import {router} from "expo-router";
 import {auth} from "../../firebaseConfig";
 import { onAuthStateChanged } from 'firebase/auth';
+import ColorScheme from "../../assets/colors/colorScheme";
 
 const Home = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -63,12 +64,12 @@ const Home = () => {
                 />
             )}
 
-            <ScrollView contentContainerStyle={{ paddingTop: StatusBar.currentHeight || 50, marginTop: 16 }}>
+            <ScrollView contentContainerStyle={{ paddingTop: StatusBar.currentHeight || 50, marginTop: 16, marginBottom: 32, paddingBottom:75 }}>
                 <View style={{ position: 'relative' }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 8 }}>
+                    <View style={{ flexDirection: 'column', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 8 }}>
 
-                        <Text className="font-bold text-4xl">Home</Text>
-
+                        <Text style={{fontSize: 40, fontWeight: 'bold'}}>Home</Text>
+                        {/*<Text style={{fontSize: 28, fontWeight: 'bold', color: ColorScheme.gray_text}}>Discover Ceylon</Text>*/}
 
                     </View>
 
@@ -83,7 +84,7 @@ const Home = () => {
                                 style={{ flex: 1, fontSize: 16, textAlignVertical: 'center' }}
                             />
                             <TouchableOpacity>
-                                <FontAwesome name="search" size={18} color="#75808c" style={{ marginLeft: 10 }} />
+                                <FontAwesome name="search" size={18} color={ColorScheme.accent} style={{ marginLeft: 10 }} />
                             </TouchableOpacity>
                         </View>
                     </View>

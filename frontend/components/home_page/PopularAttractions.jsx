@@ -1,5 +1,6 @@
 import {View, Text, ScrollView, TouchableOpacity} from 'react-native'
 import React from 'react'
+import ColorScheme from "../../assets/colors/colorScheme";
 
 import { MaterialIcons} from "@expo/vector-icons";
 import {LinearGradient} from "expo-linear-gradient";
@@ -21,15 +22,15 @@ const PopularAttractions = () => {
     const getRandomGradient = () => {
         const colors = [
             ['#A8E063', '#56AB2F'],
-            ['#FDC830', '#F37335'],
-            ['#FF9966', '#FF5E62'],
+            ['#55a52f', '#a2d660'],
+            ['#9bce5e', '#55a52f'],
             ['#76B852', '#8DC26F'],
-            ['#F4C20D', '#F39C12'],
+            ['#96c65c', '#55a52f'],
             ['#b0dc70', '#77aa3d'],
-            ['#FFAB40', '#FF8C00'],
-            ['#fae77a', '#e4c132'],
-            ['#F48FB1', '#F06292'],
-            ['#FF7043', '#FF5722'],
+            ['#539f30', '#72b151'],
+            ['#539f30', '#89ba6b'],
+            ['#89ba6b', '#74a43d'],
+            ['#709e3d', '#539f30'],
         ];
         return colors.sort(() => Math.random() - 0.5);
     };
@@ -38,11 +39,11 @@ const PopularAttractions = () => {
 
     return (
      <View>
-         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingTop: 16 }}>
-             <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Popular Attractions</Text>
+         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingTop: 20, paddingBottom: 12 }}>
+             <Text style={{ fontWeight: 'bold', fontSize: 28, paddingLeft: 8 }}>Attractions</Text>
              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}>
-                 <Text style={{ color: '#2475ff', fontWeight: '500' }}>See More</Text>
-                 <Text style={{ color: '#2475ff', marginLeft: 4 }}>{'\u2192'}</Text>
+                 <Text style={{ color: ColorScheme.accent , fontWeight: '500' }}>See More</Text>
+                 <Text style={{ color: ColorScheme.accent, marginLeft: 4 }}>{'\u2192'}</Text>
              </TouchableOpacity>
          </View>
          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: 24, paddingVertical: 16, paddingEnd: 48}}>

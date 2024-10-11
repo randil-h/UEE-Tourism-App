@@ -2,6 +2,7 @@ import { View, Text, ScrollView, TouchableOpacity, ImageBackground } from 'react
 import React from 'react';
 import BlogList from "./blog_list/BlogList";
 import { useRouter } from 'expo-router';
+import ColorScheme from "../../assets/colors/colorScheme";
 
 const Blogs = () => {
     const router = useRouter();
@@ -14,14 +15,14 @@ const Blogs = () => {
 
     return (
         <View >
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingTop: 16 }}>
-                <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Recent Blogs</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingTop: 20, paddingBottom: 12 }}>
+                <Text style={{ fontWeight: 'bold', fontSize: 28, paddingLeft: 8 }}>Recent Blogs</Text>
                 {/*<TouchableOpacity onPress={() => router.push('screens/AddBlog')}>
                     <Text style={{fontWeight: 'bold',color: '#2475ff', padding: 4, borderRadius: 5}}>Add Blog</Text>
                 </TouchableOpacity>*/}
                 <TouchableOpacity onPress={() => router.push('screens/AllBlogs')} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={{ color: '#2475ff', fontWeight: '500' }}>See More</Text>
-                    <Text style={{ color: '#2475ff', marginLeft: 4 }}>{'\u2192'}</Text>
+                    <Text style={{ color: ColorScheme.accent, fontWeight: '500' }}>See More</Text>
+                    <Text style={{ color: ColorScheme.accent, marginLeft: 4 }}>{'\u2192'}</Text>
                 </TouchableOpacity>
             </View>
 
