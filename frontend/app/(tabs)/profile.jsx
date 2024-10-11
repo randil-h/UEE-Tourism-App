@@ -107,6 +107,11 @@ const Profile = () => {
                     </TouchableOpacity>
                     <Divider />
 
+                    <TouchableOpacity onPress={() => router.push('/screens/itinerary/SavedItinerary')} style={styles.settingsOption}>
+                        <Text style={[styles.settingsText, { color: colors.darkSlateGray }]}>Saved Itineraries</Text>
+                        <FontAwesome name="chevron-right" size={20} color={colors.darkOliveGreen} />
+                    </TouchableOpacity>
+                    <Divider />
                     <TouchableOpacity style={styles.settingsOption}>
                         <Text style={[styles.settingsText, { color: colors.darkSlateGray }]}>Privacy</Text>
                         <FontAwesome name="chevron-right" size={20} color={colors.darkOliveGreen} />
