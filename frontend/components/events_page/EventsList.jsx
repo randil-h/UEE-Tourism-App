@@ -1,313 +1,271 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Animated, ScrollView, Image, Alert, ActivityIndicator } from 'react-native';
-import React, { useState, useRef, useEffect } from 'react';
-import colorScheme from '../../assets/colors/colorScheme';
-import {AntDesign, Feather, MaterialCommunityIcons} from "@expo/vector-icons";
-import { Divider } from "react-native-paper";
-import { collection, getDocs, Timestamp, onSnapshot, doc, deleteDoc } from "firebase/firestore";
-import { db } from "../../firebaseConfig"; // Ensure this path is correct
+import React, { useState } from "react";
+import { ScrollView, StyleSheet, Text, View, ImageBackground, TouchableOpacity, Modal, Button, Alert } from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { collection, onSnapshot, query, orderBy, limit, doc, deleteDoc } from "@firebase/firestore";
+import { auth, db } from "../../firebaseConfig";
+import ColorScheme from "../../assets/colors/colorScheme";
 
 const EventsList = () => {
-    const [modalVisible, setModalVisible] = useState(false);
-    const [selectedEvent, setSelectedEvent] = useState(null);
     const [events, setEvents] = useState([]);
-    const [loading, setLoading] = useState(true); // Loading state for events
-    const [imageLoading, setImageLoading] = useState(false); // Loading state for image
+    const [selectedEvent, setSelectedEvent] = useState(null);  // State to store selected event
+    const [modalVisible, setModalVisible] = useState(false);  // State to control modal visibility
+    const currentUser = auth.currentUser;
 
-    // Create animated values
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-    const slideAnim = useRef(new Animated.Value(300)).current; // Starts off-screen
+    React.useEffect(() => {
+        const q = query(collection(db, 'events'), orderBy('createdAt', 'desc'), limit(5));
 
-    // Real-time listener for events
-    const fetchEvents = () => {
-        const eventsCollectionRef = collection(db, "events");
-
-        const unsubscribe = onSnapshot(eventsCollectionRef, (querySnapshot) => {
-            const eventsList = querySnapshot.docs.map(doc => {
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const eventsArray = querySnapshot.docs.map(doc => {
                 const data = doc.data();
+
                 return {
                     id: doc.id,
-                    name: data.name,
-                    date: data.date instanceof Timestamp ? data.date.toDate().toLocaleDateString() : data.date,
-                    location: data.location.name, // Accessing location name
-                    coordinates: data.location.coordinates, // Accessing coordinates
-                    ticketPrice: data.ticketPrice,
-                    maxTickets: data.maxTickets,
-                    imageUrl: data.imageUrl,
-                    createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate().toLocaleDateString() : data.createdAt,
+                    name: data.name || "Unnamed Event",
+                    date: data.date || "Unknown Date",
+                    imageUrl: data.imageUrl || "",
+                    location: data.location?.name || "Unknown Location",
+                    ticketPrice: data.ticketPrice || "0",
+                    maxTickets: data.maxTickets || "N/A",
+                    coordinates: data.coordinates || { latitude: 0, longitude: 0 },
                 };
             });
-            setEvents(eventsList);
-            setLoading(false); // Set loading to false when events are fetched
-        }, (error) => {
-            console.error("Error fetching events: ", error);
-            Alert.alert("Error", "Failed to load events");
-            setLoading(false); // Stop loading on error
+            setEvents(eventsArray);
         });
 
-        // Cleanup listener on unmount
         return () => unsubscribe();
-    };
-
-    useEffect(() => {
-        fetchEvents();
     }, []);
 
-    // Function to handle opening the modal with the selected event
     const openModal = (event) => {
         setSelectedEvent(event);
         setModalVisible(true);
-
-        // Trigger the animation (fade in and elastic slide up)
-        Animated.parallel([
-            Animated.timing(fadeAnim, {
-                toValue: 1,
-                duration: 300,
-                useNativeDriver: true,
-            }),
-            Animated.spring(slideAnim, {
-                toValue: 0, // Slides up to its position
-                friction: 10, // Increase friction for bounciness (elastic effect)
-                tension: 70, // Adjust tension for a slower or faster bounce
-                useNativeDriver: true,
-            }),
-        ]).start();
     };
 
-    // Function to handle closing the modal
     const closeModal = () => {
-        // Trigger the animation (fade out and slide down)
-        Animated.parallel([
-            Animated.timing(fadeAnim, {
-                toValue: 0,
-                duration: 300,
-                useNativeDriver: true,
-            }),
-            Animated.timing(slideAnim, {
-                toValue: 300, // Slides back down
-                duration: 300,
-                useNativeDriver: true,
-            }),
-        ]).start(() => {
-            setModalVisible(false);
-            setSelectedEvent(null); // Clear the event after animation completes
-        });
+        setSelectedEvent(null);
+        setModalVisible(false);
     };
 
-    // Function to delete an event
     const deleteEvent = async (eventId) => {
         try {
             await deleteDoc(doc(db, "events", eventId));
-            Alert.alert("Success", "Event deleted successfully");
-            closeModal(); // Close modal after deleting
+            Alert.alert("Event deleted successfully.");
+            closeModal();
         } catch (error) {
             console.error("Error deleting event: ", error);
-            Alert.alert("Error", "Failed to delete event");
+            Alert.alert("Error deleting event.");
         }
     };
 
     return (
-        <ScrollView style={styles.container}>
-            {loading ? (
-                <ActivityIndicator size="large" color={colorScheme.accent} />
-            ) : (
-                events.map((item) => (
+        <>
+            <ScrollView horizontal contentContainerStyle={styles.container}>
+                {events.map((event) => (
                     <TouchableOpacity
-                        key={item.id}
-                        onPress={() => openModal(item)}
-                        style={styles.touchable}
+                        key={event.id}
+                        style={styles.eventCard}
+                        onPress={() => openModal(event)}  // Open modal on press
                     >
-                        <View style={styles.eventCard}>
-                            <View style={styles.textContainer}>
-                                <Text style={styles.eventDate}>{item.date}</Text>
-                                <Text
-                                    style={styles.eventTitle}
-                                    numberOfLines={1}
-                                    ellipsizeMode="tail"
-                                >
-                                    {item.name}
-                                </Text>
-                            </View>
-                            <View>
-                                <View style={styles.indicator}>
-                                    <Feather name="arrow-up-right" size={24} color="black" />
+                        <View style={styles.imageContainer}>
+                            <ImageBackground source={{ uri: event.imageUrl }} style={styles.image}>
+                                {/* Dark overlay */}
+                                <View style={styles.overlay} />
+
+                                {/* Event content */}
+                                <View style={styles.contentContainer}>
+                                    <Text style={styles.title}>{event.name}</Text>
+
+                                    <View style={styles.detailsContainer}>
+                                        <Text style={styles.location}>{event.location}</Text>
+                                        <Text style={styles.date}>{event.date}</Text>
+                                        <Text style={styles.ticketInfo}>Tickets: {event.maxTickets} | Price: Rs.{event.ticketPrice}</Text>
+                                    </View>
                                 </View>
-                            </View>
+                            </ImageBackground>
                         </View>
                     </TouchableOpacity>
-                ))
-            )}
+                ))}
+            </ScrollView>
 
-            {/* Modal for Event Details */}
-            {modalVisible && selectedEvent && (
+            {/* Modal for showing event details */}
+            {selectedEvent && (
                 <Modal
-                    animationType="none"
-                    transparent={true}
                     visible={modalVisible}
-                    onRequestClose={closeModal}
+                    transparent={true}
+                    animationType="fade"
+                    onRequestClose={closeModal}  // Close modal on back press
                 >
                     <View style={styles.modalBackground}>
-                        <Animated.View
-                            style={[
-                                styles.modalContent,
-                                { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
-                            ]}
-                        >
-                            {imageLoading && <ActivityIndicator size="small" color={colorScheme.accent} style={{alignSelf: 'center', marginTop: 100}} />}
-                            <Image
-                                source={{ uri: selectedEvent.imageUrl }}
-                                style={styles.eventImage}
-                                resizeMode="cover"
-                                onLoadStart={() => setImageLoading(true)} // Show loading indicator
-                                onLoadEnd={() => setImageLoading(false)} // Hide loading indicator
-                            />
-                            <View style={styles.modalHeader}>
-                                <Text style={styles.modalTitle}>{selectedEvent.name}</Text>
-                            </View>
-                            <Divider style={styles.divider} />
-                            <View>
-                                <Text style={styles.modalDate}>{selectedEvent.date}</Text>
-                                <Text style={styles.modalLocation}>{selectedEvent.location}</Text>
-                            </View>
+                        <View style={styles.modalContainer}>
+                            <ImageBackground source={{ uri: selectedEvent.imageUrl }} style={styles.modalImage}>
+                                <View style={styles.modalOverlay} />
 
-                            <Text style={styles.modalDescription}>Tickets: {selectedEvent.maxTickets}</Text>
-                            <Text style={styles.modalDescription}>Price: ${selectedEvent.ticketPrice}</Text>
+                                {/* Delete and Close Icons */}
+                                <View style={styles.modalIconContainer}>
+                                    <TouchableOpacity onPress={() => deleteEvent(selectedEvent.id)}>
+                                        <Ionicons name="trash-outline" size={30} color="white" />
+                                    </TouchableOpacity>
 
-                            <View style={{flexDirection: 'row', gap: 20, alignItems: 'center', alignSelf: 'flex-end'}}>
-                                {/* Delete Event Button */}
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        Alert.alert(
-                                            "Delete Event",
-                                            "Are you sure you want to delete this event?",
-                                            [
-                                                { text: "Cancel", style: "cancel" },
-                                                {
-                                                    text: "Delete",
-                                                    onPress: () => deleteEvent(selectedEvent.id),
-                                                    style: "destructive"
-                                                }
-                                            ]
-                                        );
-                                    }}
-                                    style={styles.deleteButton}
-                                >
-                                    <MaterialCommunityIcons name="delete-empty" size={32} color="black" />
-                                </TouchableOpacity>
+                                    <TouchableOpacity onPress={closeModal}>
+                                        <Ionicons name="close-outline" size={30} color="white" />
+                                    </TouchableOpacity>
+                                </View>
 
-                                {/* Close Button */}
-                                <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
-                                    <AntDesign name="close" size={32} color="black" />
-                                </TouchableOpacity>
-                            </View>
-
-                        </Animated.View>
+                                <View style={styles.modalContentContainer}>
+                                    <Text style={styles.modalTitle}>{selectedEvent.name}</Text>
+                                    <Text style={styles.modalDate}>{selectedEvent.date}</Text>
+                                    <Text style={styles.modalLocation}>Location: {selectedEvent.location}</Text>
+                                    <Text style={styles.modalTicketInfo}>Price: Rs.{selectedEvent.ticketPrice}</Text>
+                                    <Text style={styles.modalMaxTickets}>Max Tickets: {selectedEvent.maxTickets}</Text>
+                                </View>
+                            </ImageBackground>
+                        </View>
                     </View>
                 </Modal>
             )}
-        </ScrollView>
+        </>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        paddingVertical: 50,
-        paddingHorizontal: 10,
-        marginTop: 0,
-        marginHorizontal: 20,
-        marginBottom: 110,
-        backgroundColor: colorScheme.gray_bg,
+        flexGrow: 1,
+        padding: 10,
+        height: 450,
+        marginLeft: 10,
     },
     eventCard: {
-        flex: 1,
-        flexDirection: 'row',
-        marginLeft: 10,
-        marginRight: 10,
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-        paddingHorizontal: 10,
-        paddingVertical: 15,
-        borderTopWidth: 1.5,
-        borderColor: colorScheme.accent,
-    },
-    indicator: {
-        backgroundColor: colorScheme.accent,
-        borderRadius: 50,
-        padding: 4,
-    },
-    textContainer: {
-        flex: 1,
-    },
-    eventTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: colorScheme.black,
-        marginBottom: 1,
-    },
-    eventDate: {
-        fontSize: 12,
-        color: colorScheme.black,
-    },
-    eventImage: {
-        width: '100%',
-        aspectRatio: 1, // This ensures height is equal to width
         marginBottom: 20,
+        marginRight: 12,
+        width: 300,
+        height: 350,
+        backgroundColor: 'rgba(231, 245, 255, 0.8)',
+        overflow: 'hidden',
+        borderRadius: 25,
     },
-
-    modalBackground: {
-        flex: 1,
+    imageContainer: {
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+    },
+    image: {
+        width: '100%',
+        height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        borderRadius: 25,
     },
-    modalContent: {
-        backgroundColor: colorScheme.white,
-        padding: 20,
-        borderRadius: 0,
-        width: '80%',
+    overlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        zIndex: 1,
+    },
+    contentContainer: {
+        position: 'absolute',
+        bottom: 16,
+        left: 16,
+        right: 16,
+        zIndex: 2,
+    },
+    title: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: 'white',
+        marginBottom: 12,
+    },
+    detailsContainer: {
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        height: 50,
         alignItems: 'flex-start',
     },
+    location: {
+        fontSize: 14,
+        color: ColorScheme.gray_text,
+        fontWeight: '500',
+    },
+    date: {
+        fontSize: 12,
+        color: ColorScheme.gray_text,
+        fontStyle: 'italic',
+    },
+    ticketInfo: {
+        fontSize: 12,
+        color: ColorScheme.gray_text,
+    },
+
+    // Modal styles
+    modalBackground: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContainer: {
+        width: '80%',
+        backgroundColor: 'white',
+        borderRadius: 20,
+        overflow: 'hidden',
+    },
+    modalImage: {
+        width: '100%',
+        height: 450,
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+
+    },
+    modalOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContentContainer: {
+        padding: 20,
+        marginHorizontal: 30,
+        marginVertical: 30,
+    },
+    modalIconContainer: {
+        position: 'absolute',
+        top: 20,
+        right: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '80%',
+        zIndex: 3,
+        paddingBottom: 50,
+    },
     modalTitle: {
-        fontSize: 34,
+        fontSize: 36,
         fontWeight: 'bold',
-        color: colorScheme.black,
+        color: 'white',
         marginBottom: 10,
+        marginTop: 50,
     },
     modalDate: {
-        fontSize: 12,
-        color: colorScheme.black,
-        marginBottom: 10,
+        fontSize: 14,
+        color: 'white',
+        marginBottom: 5,
     },
     modalLocation: {
         fontSize: 14,
-        color: colorScheme.black,
-        marginBottom: 10,
-    },
-    modalDescription: {
-        fontSize: 16,
-        color: colorScheme.black,
-        marginBottom: 10,
-    },
-    closeButton: {
-        marginTop: 20,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    deleteButton: {
-
-        borderRadius: 50,
-        marginTop: 20,
-        alignItems: 'center',
-    },
-    deleteButtonText: {
         color: 'white',
-        fontSize: 16,
-        fontWeight: 'bold',
+        marginBottom: 5,
     },
-    divider: {
-        marginVertical: 10,
-        width: '100%',
-        height: 1.5,
-        backgroundColor: colorScheme.accent,
+    modalTicketInfo: {
+        fontSize: 14,
+        color: 'white',
+        marginBottom: 5,
+    },
+    modalMaxTickets: {
+        fontSize: 14,
+        color: 'white',
+        marginBottom: 10,
     },
 });
 
