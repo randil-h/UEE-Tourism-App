@@ -120,23 +120,24 @@ const ItineraryDisplay = () => {
         <SafeAreaView style={styles.container}>
             <ScrollView>
                 <Text style={styles.title}>My Itinerary</Text>
+                <Text style={styles.subtitle}>Your personalized travel plan</Text>
+
                 <View style={styles.buttonRow}>
-                    <TouchableOpacity style={styles.buttonLeft} onPress={handleViewRoute}>
+                    <TouchableOpacity style={styles.button} onPress={handleViewRoute}>
                         <Text style={styles.buttonText}>View Route</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.buttonRight} onPress={generatePDF}>
-                        <Text style={styles.buttonText}>Download</Text>
-                        <Icon name="save-outline" size={20} color="white" style={styles.icon} />
+
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={saveItineraryToFirestore}
+                        disabled={saving} // Disable button while saving
+                    >
+                        <Text style={styles.buttonText}>{saving ? 'Saving...' : 'Save Itinerary'}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.iconButton} onPress={generatePDF}>
+                        <Icon name="download-outline" size={24} color="white" />
                     </TouchableOpacity>
                 </View>
-                {/* Save Itinerary Button */}
-                <TouchableOpacity
-                    style={styles.saveButton}
-                    onPress={saveItineraryToFirestore}
-                    disabled={saving} // Disable button while saving
-                >
-                    <Text style={styles.buttonText}>{saving ? 'Saving...' : 'Save Itinerary'}</Text>
-                </TouchableOpacity>
 
                 {parsedItinerary.map((day, index) => (
                     <View key={index} style={styles.dayContainer}>
@@ -175,44 +176,51 @@ const styles = StyleSheet.create({
         paddingTop: 30,
     },
     title: {
-        fontSize: 24,
+        fontSize: 30,
         fontWeight: 'bold',
-        marginBottom: 20,
+        marginBottom: 4,
         textAlign: 'center',
+        marginTop:20,
+    },
+    subtitle: {
+        fontSize: 16,
+        color: 'gray',
+        textAlign: 'center',
+        marginBottom: 20,
     },
     dayContainer: {
         marginBottom: 20,
         padding: 10,
     },
     dayTitle: {
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 10,
     },
     card: {
         marginBottom: 10,
-        position: 'relative', // Ensure the overlay is positioned relative to the card
+        position: 'relative',
     },
     placeImage: {
-        height: 200, // Increased height of the image
+        height: 200,
         width: '100%',
         borderRadius: 10,
     },
     overlay: {
         position: 'absolute',
-        bottom: 0, // Position at the bottom of the image
+        bottom: 0,
         left: 0,
         right: 0,
         padding: 10,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Transparent black overlay for text background
-        borderBottomLeftRadius: 10, // Matching the image's border radius
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        borderBottomLeftRadius: 10,
         borderBottomRightRadius: 10,
     },
     placeName: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: 'white', // White text color for visibility
-        textShadowColor: 'rgba(0, 0, 0, 0.75)', // Text shadow for better readability
+        color: 'white',
+        textShadowColor: 'rgba(0, 0, 0, 0.75)',
         textShadowOffset: { width: -1, height: 1 },
         textShadowRadius: 10,
     },
@@ -235,36 +243,29 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
         textAlign: 'center',
     },
-    icon: {
-        marginLeft: 5, // Space between icon and text
-    },
     errorText: {
         fontSize: 18,
         color: 'red',
         textAlign: 'center',
         marginTop: 50,
     },
-    saveButton: {
-        backgroundColor: 'black',
-        borderRadius: 20,
-        paddingVertical: 10,
-        marginVertical: 1,
-        paddingHorizontal: 10,
-        marginHorizontal: 20, // Add margin for spacing
-        alignSelf: 'flex-start', // Align to the left
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    buttonLeft: {
-        backgroundColor: 'black',
-        borderRadius: 20,
-        paddingVertical: 10,
+    buttonRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         paddingHorizontal: 20,
+        marginBottom: 20,
+        marginRight:4,
+    },
+    button: {
+        backgroundColor: 'black',
+        borderRadius: 20,
+        paddingVertical: 10,
+        paddingHorizontal: 15,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
     },
-    buttonRight: {
+    iconButton: {
         backgroundColor: 'black',
         borderRadius: 20,
         paddingVertical: 10,
@@ -277,12 +278,6 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 16,
         textAlign: 'center',
-    },
-    buttonRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        marginBottom: 20,
     },
 });
 export default ItineraryDisplay;

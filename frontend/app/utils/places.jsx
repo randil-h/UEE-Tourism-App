@@ -278,7 +278,7 @@ export const places = [
         name: 'Yapahuwa',
         location: 'Yapahuwa',
         type: 'Cultural',
-        ticketPrice: { local: 300, foreign: 15 },
+        ticketPrice: { local: 0, foreign: 0 },
         imageSource: require('../../assets/images/itinerary/yapahuwa.jpeg'),
         lat: 7.519, lon: 80.468
     },
