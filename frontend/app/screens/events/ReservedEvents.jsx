@@ -1,13 +1,21 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import colorScheme from '../../../assets/colors/colorScheme';
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import {Feather, FontAwesome6, MaterialCommunityIcons} from "@expo/vector-icons";
 import { collection, getDocs, Timestamp, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../../firebaseConfig"; // Ensure this path is correct
+import * as Print from 'expo-print';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import ColorScheme from "../../../assets/colors/colorScheme";
+
 
 const ReservedEvents = () => {
     const [reservedEvents, setReservedEvents] = useState([]);
     const [loading, setLoading] = useState(true); // Loading state for reserved events
+    const [isUnreserving, setIsUnreserving] = useState(false);
+
+    const [isLoading, setIsLoading] = useState(false);
 
     // Fetch reserved events from Firebase
     const fetchReservedEvents = async () => {
@@ -38,8 +46,6 @@ const ReservedEvents = () => {
             setLoading(false); // Stop loading indicator
         }
     };
-
-    const [isUnreserving, setIsUnreserving] = useState(false);
 
     const unreserveEvent = (eventId) => {
         if (isUnreserving) return; // Prevent multiple triggers if already unreserving
@@ -75,8 +81,56 @@ const ReservedEvents = () => {
         );
     };
 
+    const generatePDF = async () => {
+        try {
+            const htmlContent = `
+                <html>
+                    <head>
+                        <style>
+                            body { font-family: Arial, sans-serif; padding: 20px; }
+                            h1 { text-align: center; }
+                            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                            th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+                            th { background-color: ${colorScheme.accent}; color: white; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>Reserved Events Report</h1>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Date</th>
+                                    <th>Location</th>
+                                    <th>Ticket Price</th>
+                                    <th>Max Tickets</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${reservedEvents.map(event => `
+                                    <tr>
+                                        <td>${event.name}</td>
+                                        <td>${event.date}</td>
+                                        <td>${event.location}</td>
+                                        <td>$${event.ticketPrice}</td>
+                                        <td>${event.maxTickets}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </body>
+                </html>
+            `;
 
+            const { uri } = await Print.printToFileAsync({ html: htmlContent });
 
+            // Sharing the PDF file
+            await Sharing.shareAsync(uri);
+        } catch (error) {
+            console.error("Error generating PDF: ", error);
+            Alert.alert("Error", "Failed to generate PDF report");
+        }
+    };
 
     useEffect(() => {
         fetchReservedEvents();
@@ -89,34 +143,43 @@ const ReservedEvents = () => {
             ) : reservedEvents.length === 0 ? (
                 <Text style={styles.noEventsText}>No reserved events found.</Text>
             ) : (
-                reservedEvents.map((item) => (
-                    <View key={item.id} style={styles.eventCard}>
-                        <View style={styles.textContainer}>
-                            <Text style={styles.eventDate}>{item.date}</Text>
-                            <Text
-                                style={styles.eventTitle}
-                                numberOfLines={1}
-                                ellipsizeMode="tail"
-                            >
-                                {item.name}
-                            </Text>
-                        </View>
-                        <View style={styles.actionsContainer}>
-                            <TouchableOpacity
-                                style={styles.unreserveButton}
-                                onPress={() => {
-                                    unreserveEvent(item.id);
-                                }}
-                            >
-                                <MaterialCommunityIcons name="delete-outline" size={24} color="black" />
+                <>
+                    <TouchableOpacity onPress={generatePDF} style={styles.button} disabled={isLoading}>
+                        {isLoading ? (
+                            <ActivityIndicator size="small" color={ColorScheme.gray_bg} />
+                        ) : (
+                            <FontAwesome6 name="save" size={20} color={ColorScheme.gray_bg} />
+                        )}
+                    </TouchableOpacity>
+                    {reservedEvents.map((item) => (
+                        <View key={item.id} style={styles.eventCard}>
 
-                            </TouchableOpacity>
-                            <View style={styles.indicator}>
-                                <Feather name="arrow-up-right" size={24} color="black" />
+                            <View style={styles.textContainer}>
+                                <Text style={styles.eventDate}>{item.date}</Text>
+                                <Text
+                                    style={styles.eventTitle}
+                                    numberOfLines={1}
+                                    ellipsizeMode="tail"
+                                >
+                                    {item.name}
+                                </Text>
+                            </View>
+                            <View style={styles.actionsContainer}>
+                                <TouchableOpacity
+                                    style={styles.unreserveButton}
+                                    onPress={() => {
+                                        unreserveEvent(item.id);
+                                    }}
+                                >
+                                    <MaterialCommunityIcons name="delete-outline" size={24} color="black" />
+                                </TouchableOpacity>
+                                <View style={styles.indicator}>
+                                    <Feather name="arrow-up-right" size={24} color="black" />
+                                </View>
                             </View>
                         </View>
-                    </View>
-                ))
+                    ))}
+                </>
             )}
         </ScrollView>
     );
@@ -124,11 +187,11 @@ const ReservedEvents = () => {
 
 const styles = StyleSheet.create({
     container: {
-        paddingVertical: 50,
+        paddingTop: 20,
         paddingHorizontal: 10,
-        marginTop: 0,
+        marginTop: 20,
         marginHorizontal: 20,
-        marginBottom: 110,
+        marginBottom: 20,
         backgroundColor: colorScheme.gray_bg,
     },
     eventCard: {
@@ -168,10 +231,16 @@ const styles = StyleSheet.create({
         padding: 5,
         borderRadius: 25,
     },
-    unreserveText: {
-        marginLeft: 5,
-        fontSize: 16,
-        color: colorScheme.black,
+    generateReportButton: {
+        marginTop: 20,
+        padding: 10,
+        backgroundColor: colorScheme.accent,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    generateReportText: {
+        color: 'white',
+        fontSize: 18,
     },
     indicator: {
         backgroundColor: colorScheme.accent,
@@ -183,6 +252,18 @@ const styles = StyleSheet.create({
         color: colorScheme.black,
         textAlign: 'center',
         marginTop: 100,
+    },
+    button: {
+        backgroundColor: colorScheme.black,
+        padding: 15,
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        alignItems: 'center',
+        alignSelf: 'flex-end',
+        marginTop: 0,
+        marginBottom: 20,
+        marginRight: 10,
     },
 });
 
