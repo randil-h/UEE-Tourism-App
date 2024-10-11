@@ -173,11 +173,13 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: '#000',
+        textAlign: "left",
     },
     title2: {
         fontSize: 24,
         fontWeight: 'bold',
         color: '#fff',
+        textAlign: "left",
     },
     subtitle: {
         fontSize: 16,
@@ -208,17 +210,19 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     budgetContainer: {
-        flexDirection: 'column',
+        flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 10,
+        marginBottom: 20,
     },
     budgetButton: {
+        flex: 1,
         borderWidth: 1,
         borderColor: '#ccc',
-        borderRadius: 5,
-        padding: 10,
-        flex: 1,
+        borderRadius: 8,
+        paddingVertical: 12,
+        paddingHorizontal: 10,
         marginRight: 5,
+        backgroundColor: '#fff', // Adds a clean button background
     },
     selectedBudget: {
         backgroundColor: '#000',

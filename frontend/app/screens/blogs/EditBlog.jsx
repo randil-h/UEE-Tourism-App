@@ -19,6 +19,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { router, useLocalSearchParams } from 'expo-router';
 import {db} from "../../../firebaseConfig";
 import travel from "../../../assets/images//demo_images/travel.jpg";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const categories = ['Religious', 'Beach', 'Adventure', 'Wildlife', 'Food & Culinary', 'Cultural'];
 
@@ -177,22 +178,30 @@ const EditBlogPage = () => {
                         />
 
                         <Text style={styles.label}>Images</Text>
-                        <TouchableOpacity
-                            style={styles.imagePickerButton}
-                            onPress={selectImages}
-                        >
-                            <Text style={styles.imagePickerButtonText}>Select Images</Text>
-                        </TouchableOpacity>
-
-                        <View style={styles.imageContainer}>
-                            {images.map((image, index) => (
-                                <View key={index} style={styles.imageWrapper}>
-                                    <Image source={{ uri: image }} style={styles.image} />
-                                    <TouchableOpacity style={styles.removeButton} onPress={() => removeImage(image)}>
-                                        <Text style={styles.removeButtonText}>X</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            ))}
+                        <View style={{borderWidth: 1, borderStyle: 'dashed', width: '75%', justifyContent: 'center', padding: 10, marginTop: 10, borderColor: 'grey', marginBottom: 15}}>
+                            <TouchableOpacity
+                                style={{justifyContent: 'center', alignItems: 'center'}}
+                                onPress={selectImages}
+                            >
+                                {images.length === 0 ? (
+                                    <>
+                                        <Ionicons name="image-outline" size={60} color="grey" />
+                                        <Text style={styles.imagePickerButtonText}>Add Images</Text>
+                                    </>
+                                ) : (
+                                    <Text style={styles.imagePickerButtonText}>Add More Images</Text>
+                                )}
+                            </TouchableOpacity>
+                            <View style={styles.imageContainer}>
+                                {images.map((image, index) => (
+                                    <View key={index} style={styles.imageWrapper}>
+                                        <Image source={{ uri: image }} style={styles.image} />
+                                        <TouchableOpacity style={styles.removeButton} onPress={() => removeImage(image)}>
+                                            <Text style={styles.removeButtonText}>X</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                ))}
+                            </View>
                         </View>
 
                         {loading ? (
@@ -295,15 +304,16 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     imagePickerButtonText: {
-        color: 'white',
+        color: 'grey',
         textAlign: 'center',
-        fontSize: 16,
-        fontWeight: "500"
+        fontSize: 14,
+        fontWeight: "bold"
     },
     imageContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        marginBottom: 20,
+        justifyContent: 'center',
+        marginTop: 5
     },
     imageWrapper: {
         position: 'relative',
@@ -331,10 +341,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     updateBlgBttn: {
-        backgroundColor: 'black',
-        borderRadius: 20,
+        backgroundColor: '#457c39',
+        borderRadius: 10,
+        width: '50%',
         padding: 12,
-        marginBottom: 10
+        marginBottom: 10,
     },
     updateBlgBttnText: {
         color: 'white',

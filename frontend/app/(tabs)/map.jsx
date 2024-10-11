@@ -5,7 +5,7 @@ import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
 import Slider from '@react-native-community/slider';
 import { BlurView } from 'expo-blur';
-import { FAB } from 'react-native-paper';
+import {Chip, FAB} from 'react-native-paper';
 import { AntDesign } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -26,6 +26,8 @@ const Map = () => {
     const [newUserNote, setNewUserNote] = useState('');
     const [routeCoordinates, setRouteCoordinates] = useState(null);
     const [editingNote, setEditingNote] = useState(null);
+    const [attractionTypes, setAttractionTypes] = useState([]);
+    const [selectedTypes, setSelectedTypes] = useState([]);
     const mapRef = useRef(null);
     const markerRef = useRef({});
 
@@ -180,16 +182,38 @@ const Map = () => {
             }));
 
             setPopularAttractions(attractionsWithTravelTime);
+
+            // Extract unique attraction types
+            const types = [...new Set(attractionsWithTravelTime.flatMap(place => place.types))];
+            setAttractionTypes(types);
+            console.log(types);
         } catch (error) {
             console.error('Error fetching popular attractions:', error);
         }
     };
 
-    useEffect(() => {
-        if (location) {
-            fetchPopularAttractions(location);
+    const filterAttractions = () => {
+        if (selectedTypes.length === 0) {
+            return popularAttractions;
         }
-    }, [location, radius]);
+        return popularAttractions.filter(place =>
+            place.types.some(type => selectedTypes.includes(type))
+        );
+    };
+
+    const toggleTypeSelection = (type) => {
+        setSelectedTypes(prevTypes =>
+            prevTypes.includes(type)
+                ? prevTypes.filter(t => t !== type)
+                : [...prevTypes, type]
+        );
+    };
+
+    const formatAttractionType = (type) => {
+        return type.split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    };
 
     const openImagePicker = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -273,6 +297,23 @@ const Map = () => {
 
     return (
         <View style={styles.container}>
+            <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.filterChipsContainer}
+            >
+                {attractionTypes.map((type) => (
+                    <Chip
+                        key={type}
+                        selected={selectedTypes.includes(type)}
+                        onPress={() => toggleTypeSelection(type)}
+                        style={styles.filterChip}
+                        textStyle={styles.filterChipText}
+                    >
+                        {formatAttractionType(type)}
+                    </Chip>
+                ))}
+            </ScrollView>
             <MapView
                 ref={mapRef}
                 style={styles.map}
@@ -295,8 +336,8 @@ const Map = () => {
                         </View>
                     </Marker>
                 )}
-                {popularAttractions.map((place, index) => {
-                    const placeType = place.types?.[0]?.replace('_', ' ') || 'Tourist attraction';
+                {filterAttractions().map((place, index) => {
+                    const placeType = place.types?.[0] ? formatAttractionType(place.types[0]) : 'Tourist Attraction';
                     const isOpenNow = place.opening_hours?.open_now;
                     const openStatus = isOpenNow ? 'Open now' : 'Closed';
                     const is24Hours = place.opening_hours?.periods?.some(period => period.open.day === 0 && period.open.time === "0000");
@@ -327,10 +368,27 @@ const Map = () => {
                                     showsVerticalScrollIndicator={true}
                                 >
                                     <Text style={styles.calloutTitle}>{place.name}</Text>
-                                    <Text>{placeType}</Text>
-                                    <Text>Rating: {place.rating} ({place.user_ratings_total} reviews)</Text>
-                                    <Text>{is24Hours ? 'Open 24 hours' : openStatus}</Text>
-                                    <Text>Travel time: {place.travelTime}</Text>
+                                    <View style={styles.placeDetailsContainer}>
+                                        <View style={styles.detailRow}>
+                                            <Icon name="map-marker" size={18} color="#478747" />
+                                            <Text style={styles.detailText}>{placeType}</Text>
+                                        </View>
+                                        <View style={styles.detailRow}>
+                                            <Icon name="star" size={18} color="#fbc02d" />
+                                            <Text style={styles.detailText}>
+                                                {place.rating}
+                                                <Text style={styles.reviewCount}> ({place.user_ratings_total} reviews)</Text>
+                                            </Text>
+                                        </View>
+                                        <View style={styles.detailRow}>
+                                            <Icon name="clock" size={18} color="#478747" />
+                                            <Text style={styles.detailText}>{is24Hours ? 'Open 24 hours' : openStatus}</Text>
+                                        </View>
+                                        <View style={styles.detailRow}>
+                                            <Icon name="car" size={18} color="#478747" />
+                                            <Text style={styles.detailText}>Travel time: {place.travelTime}</Text>
+                                        </View>
+                                    </View>
 
                                     <TouchableOpacity
                                         style={styles.navigateButton}
@@ -504,9 +562,9 @@ const Map = () => {
                             onChangeText={setNewNote}
                         />
 
-                        <TouchableOpacity style={styles.addButton} onPress={handleAddLocation}>
-                            <Text style={styles.addButtonText}>Add Attraction</Text>
-                        </TouchableOpacity>
+                        {/*<TouchableOpacity style={styles.addButton} onPress={handleAddLocation}>*/}
+                        {/*    <Text style={styles.addButtonText}>Add Attraction</Text>*/}
+                        {/*</TouchableOpacity>*/}
                     </View>
                 </View>
             </Modal>
@@ -517,79 +575,64 @@ const Map = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        position: 'relative',
     },
     map: {
         ...StyleSheet.absoluteFillObject,
     },
     calloutContainer: {
         backgroundColor: '#f7f7f7',
-        maxHeight: 300,
-        width: 250,
         padding: 10,
+        width: 250,
+        maxHeight: 300,
         borderRadius: 24,
+        overflow: 'hidden',
     },
     calloutScrollView: {
         paddingVertical: 10,
     },
     calloutTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    photoContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        marginTop: 5,
-    },
-    noteInput: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        padding: 5,
-        marginTop: 10,
-        width: '100%',
-        fontSize: 12,
-    },
-    photo: {
-        width: 50,
-        height: 50,
-        marginRight: 5,
-        marginBottom: 5,
-        borderRadius: 5,
+        fontSize: 18,
+        fontWeight: '600',
+        marginBottom: 8,
+        color: '#333',
     },
     sliderContainer: {
         position: 'absolute',
         bottom: 100,
         left: 20,
+        height: 400,
+        width: 80,
         borderRadius: 16,
         overflow: 'hidden',
         borderColor: 'rgba(255, 255, 255, 0.5)',
         borderWidth: 1,
-        height: 400,
-        width: 80,
         justifyContent: 'center',
         alignItems: 'center',
     },
     slider: {
-        marginBottom: 20,
         width: 340,
         height: 40,
         transform: [{ rotate: '-90deg' }],
+        marginBottom: 20,
     },
     sliderValue: {
+        fontSize: 16,
+        color: '#000',
         position: 'absolute',
         bottom: 10,
         left: 20,
         textAlign: 'center',
-        fontSize: 16,
-        color: 'black',
-        textShadowOffset: { width: -1, height: 1 },
-        textShadowRadius: 10,
     },
     fab: {
         position: 'absolute',
         bottom: 30,
         right: 20,
         backgroundColor: '#3f51b5',
+        borderRadius: 28,
+        padding: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     modalContainer: {
         flex: 1,
@@ -600,7 +643,7 @@ const styles = StyleSheet.create({
     modalContent: {
         width: 300,
         padding: 20,
-        backgroundColor: 'white',
+        backgroundColor: '#fff',
         borderRadius: 10,
         alignItems: 'center',
     },
@@ -633,17 +676,17 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         marginBottom: 20,
     },
-    addButton: {
-        backgroundColor: '#3f51b5',
+    /*addButton: {
+        width: '100%',
         padding: 10,
         borderRadius: 5,
-        width: '100%',
+        backgroundColor: '#3f51b5',
         alignItems: 'center',
     },
     addButtonText: {
-        color: 'white',
+        color: '#fff',
         fontSize: 16,
-    },
+    },*/
     closeButton: {
         position: 'absolute',
         top: 10,
@@ -658,53 +701,20 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: 5,
     },
-    addNoteButton: {
-        backgroundColor: '#478747',
-        padding: 5,
-        borderRadius: 5,
-        marginTop: 5,
-        alignItems: 'center',
-    },
-    addNoteButtonText: {
-        color: 'white',
-        fontSize: 12,
-    },
-    navigateButton: {
-        backgroundColor: '#478747',
-        padding: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    buttonContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    navigateButtonText: {
-        color: '#fff',
-        marginLeft: 5,
-        fontSize: 16,
-    },
-    currentLocationMarker: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
-        backgroundColor: '#ffffff',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    currentLocationMarkerInner: {
-        width: 16,
-        height: 16,
-        borderRadius: 12,
-        backgroundColor: '#478747',
-    },
     noteContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         marginTop: 5,
         width: '100%',
+    },
+    noteInput: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        padding: 10,
+        fontSize: 14,
     },
     editNoteInput: {
         fontSize: 12,
@@ -724,6 +734,85 @@ const styles = StyleSheet.create({
     deleteButton: {
         padding: 5,
     },
+    addNoteButton: {
+        backgroundColor: '#478747',
+        padding: 5,
+        borderRadius: 30,
+        marginTop: 5,
+        alignItems: 'center',
+    },
+    addNoteButtonText: {
+        color: '#fff',
+        fontSize: 12,
+    },
+    navigateButton: {
+        backgroundColor: '#478747',
+        padding: 12,
+        borderRadius: 30,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 12,
+    },
+    buttonContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    navigateButtonText: {
+        color: '#fff',
+        marginLeft: 5,
+        fontSize: 16,
+    },
+    currentLocationMarker: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    currentLocationMarkerInner: {
+        width: 16,
+        height: 16,
+        borderRadius: 12,
+        backgroundColor: '#478747',
+    },
+    placeDetailsContainer: {
+        paddingVertical: 10,
+        paddingHorizontal: 5,
+    },
+    detailRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+    },
+    detailText: {
+        fontSize: 14,
+        color: '#333',
+        marginLeft: 5,  // Spacing between the icon and text
+        fontWeight: '500',
+    },
+    filterChipsContainer: {
+        position: 'absolute',
+        top: 60,
+        left: 0,
+        right: 0,
+        zIndex: 1,
+        paddingHorizontal: 10,
+    },
+    filterChip: {
+        marginRight: 8,
+        marginBottom: 8,
+        backgroundColor: '#f0f0f0',
+    },
+    filterChipText: {
+        color: '#333',
+    },
+    reviewCount: {
+        fontSize: 12,
+        color: '#777',
+        fontWeight: '400',
+    },
 });
+
 
 export default Map;

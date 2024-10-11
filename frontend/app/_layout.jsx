@@ -14,10 +14,12 @@ const _layout = () => {
             <Stack.Screen name="screens/AllBlogs" options={{headerShown: true, title: 'View Blogs'}}/>
             <Stack.Screen name="screens/blogs/MyBlogs" options={{headerShown: true, title: 'My Blogs'}}/>
             <Stack.Screen name="screens/blogs/EditBlog" options={{headerShown: true, title: 'Edit Blog'}}/>
+            <Stack.Screen name="screens/blogs/SaveBlogs" options={{headerShown: true, title: 'Save Blogs'}}/>
 
 
-            <Stack.Screen name="screens/itinerary/ItineraryDisplay" options={{headerShown: true, title: 'Generated Itinerary'}}/>
-            <Stack.Screen name="screens/itinerary/ItineraryMapView" options={{ headerShown: true, title: 'Itinerary Map'}} />
+            <Stack.Screen name="screens/itinerary/ItineraryDisplay" options={{headerShown: false, title: 'Generated Itinerary'}}/>
+            <Stack.Screen name="screens/itinerary/ItineraryMapView" options={{ headerShown: false, title: 'Itinerary Map'}} />
+                <Stack.Screen name="screens/itinerary/SavedItinerary" options={{ headerShown: false, title: ' SavedItinerary'}} />
 
             <Stack.Screen name="screens/events/EventsMap" options={{headerShown: true, title: 'Find Events', animation: 'default', presentation: 'card'}}/>
 
