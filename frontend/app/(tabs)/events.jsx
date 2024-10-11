@@ -104,6 +104,10 @@ const styles = StyleSheet.create({
     },
     mapContainer: {
         flexDirection: 'row',
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
     },
     mapTouchable: {
         pointerEvents: 'box-none',
@@ -113,13 +117,13 @@ const styles = StyleSheet.create({
         paddingVertical: 8, // py-2
         marginVertical: 24, // my-6
         flex: 1,
-        alignItems: 'flex-start',
+        alignItems: 'center',
         width: '100%',
     },
     mapView: {
-        height: 200,
-        width: 200,
-        borderRadius: 100,
+        height: 300,
+        width: 300,
+        borderRadius: 150,
     },
     iconButton: {
         backgroundColor: colors.accent,

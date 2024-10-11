@@ -41,10 +41,7 @@ const PopularAttractions = () => {
      <View>
          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingTop: 20, paddingBottom: 12 }}>
              <Text style={{ fontWeight: 'bold', fontSize: 28, paddingLeft: 8 }}>Attractions</Text>
-             <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}>
-                 <Text style={{ color: ColorScheme.accent , fontWeight: '500' }}>See More</Text>
-                 <Text style={{ color: ColorScheme.accent, marginLeft: 4 }}>{'\u2192'}</Text>
-             </TouchableOpacity>
+
          </View>
          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: 24, paddingVertical: 16, paddingEnd: 48}}>
              {popular_attraction_categories.map((attraction, index) => {
