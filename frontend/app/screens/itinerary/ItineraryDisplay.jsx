@@ -12,7 +12,7 @@ import { collection, addDoc } from 'firebase/firestore';
 const ItineraryDisplay = () => {
     const router = useRouter();
     const route = useRoute();
-    const { itinerary, touristType } = route.params || {};
+    const { itinerary, touristType, hideSaveButton } = route.params || {};
     const [saving, setSaving] = useState(false);
 
     console.log('Received Itinerary:', JSON.stringify(itinerary, null, 2));
@@ -127,13 +127,16 @@ const ItineraryDisplay = () => {
                         <Text style={styles.buttonText}>View Route</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={saveItineraryToFirestore}
-                        disabled={saving} // Disable button while saving
-                    >
-                        <Text style={styles.buttonText}>{saving ? 'Saving...' : 'Save Itinerary'}</Text>
-                    </TouchableOpacity>
+                    {/* Conditionally render the save button */}
+                    {!hideSaveButton && (
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={saveItineraryToFirestore}
+                            disabled={saving} // Disable button while saving
+                        >
+                            <Text style={styles.buttonText}>{saving ? 'Saving...' : 'Save Itinerary'}</Text>
+                        </TouchableOpacity>
+                    )}
                     <TouchableOpacity style={styles.iconButton} onPress={generatePDF}>
                         <Icon name="download-outline" size={24} color="white" />
                     </TouchableOpacity>
