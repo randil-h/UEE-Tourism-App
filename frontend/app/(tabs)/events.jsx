@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         width: '100%',
+        borderRadius: 150, // rounded-xl
     },
     mapView: {
         height: 300,
