@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 20,
-        marginVertical: 10,
+        marginVertical: 2,
         marginLeft: 10,
         fontWeight: 'bold',
         color: colorScheme.black,
