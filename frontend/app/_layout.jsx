@@ -29,7 +29,7 @@ const _layout = () => {
                 name="screens/events/AddEvents"
                 options={{
                     headerShown: true,
-                    title: 'Add Events (for testing)',
+                    title: 'Add Events',
                     animation: 'slide_from_bottom',
                     presentation: 'modal', // This enables the sliding modal style
                     gestureEnabled: true, // Allows you to swipe down to dismiss

@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff', // Adds a clean button background
     },
     selectedBudget: {
-        backgroundColor: ColorScheme.accent,
+        backgroundColor: ColorScheme.black,
     },
     budgetText: {
         textAlign: 'center',
@@ -327,6 +327,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginBottom: 10,
     },
+
 
 
 });

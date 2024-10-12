@@ -48,7 +48,8 @@ export default function ItineraryMapView() {
                     />
                 ))}
 
-                {/* Directions between places */}
+                {/* Direct
+                ions between places */}
                 <MapViewDirections
                     origin={{ latitude: origin.lat, longitude: origin.lon }}
                     destination={{ latitude: destination.lat, longitude: destination.lon }}
