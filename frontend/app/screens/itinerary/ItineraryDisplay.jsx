@@ -254,22 +254,24 @@ const styles = StyleSheet.create({
     },
     buttonRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start', // Align buttons to the left
         paddingHorizontal: 20,
         marginBottom: 20,
-        marginRight:4,
+        marginRight: 4,
     },
     button: {
         backgroundColor: ColorScheme.black,
         borderRadius: 30,
         paddingVertical: 10,
-        paddingHorizontal: 30,
+        paddingHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
+        marginRight: 5, // Add spacing between buttons
     },
+
     iconButton: {
-        backgroundColor: 'black',
+        backgroundColor:  ColorScheme.black,
         borderRadius: 30,
         paddingVertical: 10,
         paddingHorizontal: 20,

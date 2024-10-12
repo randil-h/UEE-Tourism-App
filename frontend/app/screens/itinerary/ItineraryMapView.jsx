@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
+import MapViewDirections from 'react-native-maps-directions';
 import Config from "../../../apiConfig";
 import { useLocalSearchParams } from 'expo-router';
 
 const GOOGLE_MAPS_APIKEY = Config.GOOGLE_MAPS_API_KEY;
-
 
 export default function ItineraryMapView() {
     const { itinerary } = useLocalSearchParams();
@@ -20,6 +20,13 @@ export default function ItineraryMapView() {
         longitude: allPlaces.reduce((sum, place) => sum + place.lon, 0) / allPlaces.length,
     };
 
+    // Extract the origin (first place) and destination (last place)
+    const origin = allPlaces[0];
+    const destination = allPlaces[allPlaces.length - 1];
+
+    // Waypoints exclude the first and last places
+    const waypoints = allPlaces.slice(1, -1);
+
     return (
         <View style={styles.container}>
             <MapView
@@ -31,6 +38,7 @@ export default function ItineraryMapView() {
                 }}
                 provider="google"
             >
+                {/* Markers for each place */}
                 {allPlaces.map((place, index) => (
                     <Marker
                         key={index}
@@ -39,14 +47,22 @@ export default function ItineraryMapView() {
                         description={place.location}
                     />
                 ))}
-                <Polyline
-                    coordinates={allPlaces.map(place => ({
-                        latitude: place.lat,
-                        longitude: place.lon
+
+                {/* Directions between places */}
+                <MapViewDirections
+                    origin={{ latitude: origin.lat, longitude: origin.lon }}
+                    destination={{ latitude: destination.lat, longitude: destination.lon }}
+                    waypoints={waypoints.map(waypoint => ({
+                        latitude: waypoint.lat,
+                        longitude: waypoint.lon
                     }))}
-                    strokeColor="#000"
-                    strokeWidth={2}
+                    apikey={GOOGLE_MAPS_APIKEY}
+                    strokeWidth={4}
+                    strokeColor="#1e90ff"
+                    optimizeWaypoints={true}  // Optimizes the route
+                    onError={(errorMessage) => console.error("Directions Error: ", errorMessage)}
                 />
+
             </MapView>
         </View>
     );
