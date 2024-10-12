@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
     ScrollView,
@@ -245,9 +246,9 @@ const styles = StyleSheet.create({
         fontSize: 25
     },
     footerContainer: {
-      position: 'absolute',
-      bottom: 12,
-      right: 15
+        position: 'absolute',
+        bottom: 12,
+        right: 15
     },
     imageFootText: {
         fontWeight: "bold",

@@ -144,7 +144,7 @@ const AllBlogs = () => {
                         style={styles.blogCard}
                         onPress={() => router.push(`screens/ViewBlog?blog=${encodeURIComponent(JSON.stringify(blog))}`)}
                     >
-                       {/* <View style={styles.imageContainer}>
+                        {/* <View style={styles.imageContainer}>
                             {blog.images.map((image, index) => (
                                 <ImageBackground key={index} source={{ uri: image }} style={styles.image} >
                                     <Text style={styles.title}>{blog.title}</Text>

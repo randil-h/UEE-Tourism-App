@@ -89,11 +89,13 @@ const ViewBlog = ({ route }) => {
 
         try {
             const newBookmarkStatus = !bookmarked;
+
+            // Optimistic UI update
             setBookmarked(newBookmarkStatus);
 
             const userPreferencesRef = doc(db, "preferences", currentUser.uid);
             const userPreferencesSnap = await getDoc(userPreferencesRef);
-            const batch = writeBatch(db); // Use batch for faster updates
+            const batch = writeBatch(db);
 
             if (userPreferencesSnap.exists()) {
                 const userData = userPreferencesSnap.data();
@@ -112,7 +114,7 @@ const ViewBlog = ({ route }) => {
                 batch.set(userPreferencesRef, {
                     userId: currentUser.uid,
                     userName: currentUser.displayName || "Anonymous",
-                    savedBlogs: [parsedBlog.id]
+                    savedBlogs: [parsedBlog.id],
                 });
             }
 
@@ -122,7 +124,9 @@ const ViewBlog = ({ route }) => {
         }
     };
 
+
     // **** Optimized like toggle with Firestore batch write
+    // Optimistic like toggle with Firestore batch write
     const toggleLike = async () => {
         if (!currentUser) {
             Alert.alert("Authentication Required!", "You must be logged in to like this blog.");
@@ -132,6 +136,7 @@ const ViewBlog = ({ route }) => {
         const newLikeStatus = !liked;
         const newLikesCount = newLikeStatus ? likesCount + 1 : likesCount - 1;
 
+        // Optimistic UI update
         setLiked(newLikeStatus);
         setLikesCount(newLikesCount);
 
@@ -147,7 +152,8 @@ const ViewBlog = ({ route }) => {
                 likedBy = likedBy.filter(userId => userId !== currentUser.uid);
             }
 
-            const batch = writeBatch(db); // Batch update
+            // Batch update
+            const batch = writeBatch(db);
             batch.update(docRef, { likes: newLikesCount, likedBy });
 
             const userPreferencesRef = doc(db, "preferences", currentUser.uid);
@@ -161,7 +167,6 @@ const ViewBlog = ({ route }) => {
             } else {
                 const userData = userPreferencesSnap.exists() ? userPreferencesSnap.data() : {};
                 const categoryMap = userData.categories || {};
-
                 if (categoryMap[parsedBlog.category]) {
                     categoryMap[parsedBlog.category] = Math.max(0, categoryMap[parsedBlog.category] - 1);
                 }
@@ -174,11 +179,13 @@ const ViewBlog = ({ route }) => {
         }
     };
 
+
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };
 
     // **** Debounced comment addition to avoid timeouts
+    // Debounced comment addition
     const addComment = async () => {
         if (!currentUser) {
             Alert.alert('Authentication Required!', 'You must be logged in to comment on this blog.');
@@ -194,32 +201,29 @@ const ViewBlog = ({ route }) => {
             userId: currentUser.uid,
             userName: currentUser.displayName || "Anonymous",
             content: newComment,
-            date: new Date().toLocaleDateString()
+            date: new Date().toLocaleDateString(),
         };
+
+        // Optimistic UI update
+        setComments(prevComments => [...prevComments, newCommentObj]);
+        setNewComment("");
 
         try {
             const docRef = doc(db, "blogs", parsedBlog.id);
-            const docSnap = await getDoc(docRef);
+            const batch = writeBatch(db);
+            batch.update(docRef, {
+                comments: [...comments, newCommentObj],
+            });
 
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                const updatedComments = data.comments ? [...data.comments, newCommentObj] : [newCommentObj];
-
-                // Debounce the comments
-                setComments(updatedComments);
-                setNewComment("");
-
-                // Use batch to update Firestore more efficiently
-                const batch = writeBatch(db);
-                batch.update(docRef, { comments: updatedComments });
-                await batch.commit(); // Commit batch operation
-            } else {
-                Alert.alert('Error', 'Blog does not exist.');
-            }
+            await batch.commit();
         } catch (error) {
             console.error("Error adding comment", error);
+            // Rollback UI if necessary
+            setComments(prevComments => prevComments.filter(comment => comment !== newCommentObj));
         }
     };
+
+
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
